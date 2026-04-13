@@ -1,0 +1,4 @@
+# Nexus Swarm Stack
+.nexus/locks/
+*.lockdir
+*.flock
