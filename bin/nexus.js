@@ -65,9 +65,9 @@ Examples:
   nexus init
   nexus doctor --fix
   nexus persona
-  nexus claim src/lib/components/login/ @Besh-Claude "Building login UI"
+  nexus claim src/lib/components/login/ @Claude "Building login UI"
   nexus release src/lib/components/login/ "feat: login form component"
   nexus clean --stale
-  nexus next @Besh-Claude
+  nexus next @Claude
 `);
 }
