@@ -164,53 +164,98 @@ ${protocolBlock(agent)}`;
 }
 
 function upsertProtocolBlock(content, block) {
-  const start = content.indexOf(START_MARKER);
-  const end = content.indexOf(END_MARKER);
+  const cleanContent = removeUnmanagedProtocolBlock(content);
+  const start = cleanContent.indexOf(START_MARKER);
+  const end = cleanContent.indexOf(END_MARKER);
 
   if (start !== -1 && end !== -1 && end > start) {
-    const before = content.slice(0, start).trimEnd();
-    const after = content.slice(end + END_MARKER.length).trimStart();
+    const before = cleanContent.slice(0, start).trimEnd();
+    const after = cleanContent.slice(end + END_MARKER.length).trimStart();
     return `${before}\n\n${block.trim()}\n${after ? `\n${after}` : ''}`;
   }
 
-  const unmanagedRange = findUnmanagedProtocolRange(content);
+  const unmanagedRange = findUnmanagedProtocolRange(cleanContent);
   if (unmanagedRange) {
-    const before = content.slice(0, unmanagedRange.start).trimEnd();
-    const after = content.slice(unmanagedRange.end).trimStart();
+    const before = cleanContent.slice(0, unmanagedRange.start).trimEnd();
+    const after = cleanContent.slice(unmanagedRange.end).trimStart();
     return `${before}\n\n${block.trim()}\n${after ? `\n${after}` : ''}`;
   }
 
-  return `${content.trimEnd()}\n\n${block.trim()}\n`;
+  return `${cleanContent.trimEnd()}\n\n${block.trim()}\n`;
 }
 
 function findUnmanagedProtocolRange(content) {
-  const start = content.indexOf('This project uses Nexus for multi-agent coordination.');
-  if (start === -1) return null;
+  const protocolIntro = 'This project uses Nexus for multi-agent coordination.';
+  let searchFrom = 0;
 
   const unmanagedMarkers = [
-    '## Start Here',
-    '## Nexus Rules',
-    '## Supply-Chain Safety',
-    '## Agent-Local Files',
-    '## Memory Flow',
+    '\n## Start Here',
+    '\n## Nexus Rules',
+    '\n## Supply-Chain Safety',
+    '\n## Agent-Local Files',
+    '\n## Memory Flow',
     'Memory entry format:',
   ];
 
-  if (!unmanagedMarkers.every((marker) => content.includes(marker))) return null;
+  while (searchFrom < content.length) {
+    const start = content.indexOf(protocolIntro, searchFrom);
+    if (start === -1) return null;
 
-  const memoryFormatStart = content.indexOf('Memory entry format:', start);
-  if (memoryFormatStart === -1) return null;
+    const nextManagedBlock = content.indexOf(START_MARKER, start);
+    const sectionEnd = nextManagedBlock === -1 ? content.length : nextManagedBlock;
+    const section = content.slice(start, sectionEnd);
+    if (!unmanagedMarkers.every((marker) => section.includes(marker))) {
+      searchFrom = start + protocolIntro.length;
+      continue;
+    }
 
-  const codeFenceStart = content.indexOf('```markdown', memoryFormatStart);
-  if (codeFenceStart === -1) return null;
+    const memoryFormatStart = content.indexOf('Memory entry format:', start);
+    if (memoryFormatStart === -1 || memoryFormatStart > sectionEnd) {
+      searchFrom = start + protocolIntro.length;
+      continue;
+    }
 
-  const codeFenceEnd = content.indexOf('\n```', codeFenceStart + '```markdown'.length);
-  if (codeFenceEnd === -1) return null;
+    const codeFenceStart = content.indexOf('```markdown', memoryFormatStart);
+    if (codeFenceStart === -1 || codeFenceStart > sectionEnd) {
+      searchFrom = start + protocolIntro.length;
+      continue;
+    }
 
-  return {
-    start,
-    end: codeFenceEnd + '\n```'.length,
-  };
+    const codeFenceEnd = content.indexOf('\n```', codeFenceStart + '```markdown'.length);
+    if (codeFenceEnd === -1 || codeFenceEnd > sectionEnd) {
+      searchFrom = start + protocolIntro.length;
+      continue;
+    }
+
+    return {
+      start,
+      end: codeFenceEnd + '\n```'.length,
+    };
+  }
+
+  return null;
+}
+
+function hasUnmanagedProtocolBlock(content) {
+  return findUnmanagedProtocolRange(content) !== null;
+}
+
+function hasCurrentManagedProtocolBlock(content, block) {
+  const start = content.indexOf(START_MARKER);
+  const end = content.indexOf(END_MARKER);
+  if (start === -1 || end === -1 || end <= start) return false;
+
+  const existingBlock = content.slice(start, end + END_MARKER.length).trim();
+  return existingBlock === block.trim();
+}
+
+function removeUnmanagedProtocolBlock(content) {
+  const unmanagedRange = findUnmanagedProtocolRange(content);
+  if (!unmanagedRange) return content;
+
+  const before = content.slice(0, unmanagedRange.start).trimEnd();
+  const after = content.slice(unmanagedRange.end).trimStart();
+  return `${before}${before && after ? '\n\n' : ''}${after}`;
 }
 
 function ensureDir(path, fix, changes) {
@@ -328,8 +373,10 @@ export default function doctor(args) {
     const hasMemoryFlow = existing.includes('YYYY-Month/YYYY-MM-DD-HHMM-topic.md');
     const hasContinuity = existing.includes(agent.continuity);
     const hasSupplyChainSafety = existing.includes('third-party packages that have existed for less than 14 days');
+    const hasUnmanagedDuplicate = hasProtocol && hasUnmanagedProtocolBlock(existing);
+    const hasCurrentProtocol = hasCurrentManagedProtocolBlock(existing, protocolBlock(agent));
 
-    if (!hasProtocol || !hasMemoryFlow || !hasContinuity || !hasSupplyChainSafety) {
+    if (!hasProtocol || !hasMemoryFlow || !hasContinuity || !hasSupplyChainSafety || hasUnmanagedDuplicate || !hasCurrentProtocol) {
       if (fix) {
         const next = upsertProtocolBlock(existing, protocolBlock(agent));
         writeFileSync(entrypointPath, next, 'utf-8');
