@@ -80,19 +80,21 @@ nexus init
 
 Existing files are not overwritten.
 
-### `nexus doctor [--fix]`
+### `nexus doctor [--fix] [--json]`
 
 Check repo coordination health.
 
 ```bash
 nexus doctor
 nexus doctor --fix
+nexus doctor --json
 ```
 
 Doctor reports grouped issues:
 
 - missing Nexus files
 - package script exfiltration and install-hook risks
+- package privacy risks for local/private files
 - stale locks
 - missing agent instructions
 - missing continuity and memory scaffolds
@@ -100,18 +102,32 @@ Doctor reports grouped issues:
 
 With `--fix`, Nexus creates safe missing scaffolds and updates managed protocol blocks in agent instruction files. It does not erase existing agent notes.
 
-### `nexus soul [--file <path>]`
+With `--json`, Nexus prints the same health sections as structured JSON for tools such as Inkobytes reports.
+
+### `nexus soul [--file <path>] [--status | --remove]`
 
 Apply a local soul overlay to agent instruction files.
 
 ```bash
 nexus soul
+nexus soul --status
+nexus soul --remove
 nexus soul --file .nexus/local/my-agent-overlay.md
 ```
 
 By default, Nexus creates `.nexus/local/agent-overlay.md` if it does not exist, then inserts that file above the managed Nexus protocol block in `.codex/AGENTS.md`, `.claude/CLAUDE.md`, and `.gemini/GEMINI.md`. Edit the overlay file locally, then rerun `nexus soul` to refresh the inserted blocks.
 
 The overlay content is local repo state, not package content. `nexus doctor` ignores soul blocks and only manages the public Nexus protocol block.
+
+### `nexus resume`
+
+Print a local repo-state summary for a fresh agent session.
+
+```bash
+nexus resume
+```
+
+Resume reports only local facts: repo path, branch, last commits, dirty files, active locks, continuity state, and the latest local memory entry path. It does not duplicate Inkobytes task plans, decision notes, artifacts, or long-term memory.
 
 ### `nexus claim <path> <agent> "<intent>"`
 
@@ -138,6 +154,7 @@ nexus release src/lib/components/login/ "feat: login form"
 ```
 
 Nexus stages only the released path before committing, which helps avoid stowaway changes from other agents.
+If Git's index is temporarily locked by another release, Nexus waits briefly and retries before failing with a clearer message.
 
 ### `nexus next <agent>`
 
