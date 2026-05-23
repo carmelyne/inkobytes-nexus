@@ -43,11 +43,11 @@ test('persona creates and applies a local overlay outside doctor-managed block',
 
     captureLogs(() => persona([]));
 
-    const overlay = readFileSync(join(root, '.nexus', 'local', 'besh-agent-overlay.md'), 'utf-8');
+    const overlay = readFileSync(join(root, '.nexus', 'local', 'agent-overlay.md'), 'utf-8');
     const codexGuide = readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8');
 
     assert.match(overlay, /Local Persona Overlay/);
-    assert.match(codexGuide, /NEXUS-LOCAL-PERSONA:START \.nexus\/local\/besh-agent-overlay\.md/);
+    assert.match(codexGuide, /NEXUS-LOCAL-PERSONA:START \.nexus\/local\/agent-overlay\.md/);
     assert.ok(codexGuide.indexOf('NEXUS-LOCAL-PERSONA:START') < codexGuide.indexOf('NEXUS-AGENT-PROTOCOL:START'));
     assert.match(captureLogs(() => doctor([])), /All checked Nexus categories are ready/);
   });
@@ -58,7 +58,7 @@ test('persona refreshes existing overlay blocks from local file', () => {
     captureLogs(() => init([]));
     captureLogs(() => persona([]));
 
-    writeFileSync(join(root, '.nexus', 'local', 'besh-agent-overlay.md'), '# Besh Overlay\n\nWarm pair-dev tone.\n', 'utf-8');
+    writeFileSync(join(root, '.nexus', 'local', 'agent-overlay.md'), '# Agent Overlay\n\nWarm pair-dev tone.\n', 'utf-8');
     captureLogs(() => persona([]));
 
     const codexGuide = readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8');
