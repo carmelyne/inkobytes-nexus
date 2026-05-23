@@ -10,7 +10,7 @@ const COMMANDS = {
   status: () => import('../src/commands/status.js'),
   clean: () => import('../src/commands/clean.js'),
   next: () => import('../src/commands/next.js'),
-  persona: () => import('../src/commands/persona.js'),
+  soul: () => import('../src/commands/soul.js'),
   help: () => import('../src/commands/help.js'),
 };
 
@@ -58,13 +58,13 @@ Commands:
   status                            Show current blackboard state
   clean [--stale | <path>]          Prune locks (surgical, stale, or nuke)
   next <agent>                      Suggest next safe task from queue
-  persona [--file <path>]           Apply local persona overlay to agent files
+  soul [--file <path>]              Apply local soul overlay to agent files
   help                              Show this help
 
 Examples:
   nexus init
   nexus doctor --fix
-  nexus persona
+  nexus soul
   nexus claim src/lib/components/login/ @Claude "Building login UI"
   nexus release src/lib/components/login/ "feat: login form component"
   nexus clean --stale
