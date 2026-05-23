@@ -109,7 +109,7 @@ nexus persona
 nexus persona --file .nexus/local/my-agent-overlay.md
 ```
 
-By default, Nexus creates `.nexus/local/besh-agent-overlay.md` if it does not exist, then inserts that file above the managed Nexus protocol block in `.codex/AGENTS.md`, `.claude/CLAUDE.md`, and `.gemini/GEMINI.md`. Edit the overlay file locally, then rerun `nexus persona` to refresh the inserted blocks.
+By default, Nexus creates `.nexus/local/agent-overlay.md` if it does not exist, then inserts that file above the managed Nexus protocol block in `.codex/AGENTS.md`, `.claude/CLAUDE.md`, and `.gemini/GEMINI.md`. Edit the overlay file locally, then rerun `nexus persona` to refresh the inserted blocks.
 
 The overlay content is local repo state, not package content. `nexus doctor` ignores persona blocks and only manages the public Nexus protocol block.
 
