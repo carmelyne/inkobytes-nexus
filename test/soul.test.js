@@ -66,3 +66,30 @@ test('soul refreshes existing overlay blocks from local file', () => {
     assert.equal(codexGuide.match(/NEXUS-LOCAL-SOUL:START/g).length, 1);
   });
 });
+
+test('soul status reports overlay state', () => {
+  inTempRepo((root) => {
+    captureLogs(() => init([]));
+    captureLogs(() => soul([]));
+
+    const output = captureLogs(() => soul(['--status']));
+
+    assert.match(output, /Nexus soul status/);
+    assert.match(output, /\.codex\/AGENTS\.md: applied/);
+  });
+});
+
+test('soul remove deletes overlay blocks but keeps overlay file', () => {
+  inTempRepo((root) => {
+    captureLogs(() => init([]));
+    captureLogs(() => soul([]));
+
+    const output = captureLogs(() => soul(['--remove']));
+    const codexGuide = readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8');
+    const overlay = readFileSync(join(root, '.nexus', 'local', 'agent-overlay.md'), 'utf-8');
+
+    assert.match(output, /Removed local soul overlay/);
+    assert.doesNotMatch(codexGuide, /NEXUS-LOCAL-SOUL/);
+    assert.match(overlay, /Local Soul Overlay/);
+  });
+});
