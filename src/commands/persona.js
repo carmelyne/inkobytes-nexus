@@ -6,7 +6,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { cwd } from 'process';
 
-const DEFAULT_OVERLAY_PATH = '.nexus/local/besh-agent-overlay.md';
+const DEFAULT_OVERLAY_PATH = '.nexus/local/agent-overlay.md';
 const START_MARKER_PREFIX = '<!-- NEXUS-LOCAL-PERSONA:START';
 const START_MARKER = `${START_MARKER_PREFIX} ${DEFAULT_OVERLAY_PATH} -->`;
 const END_MARKER = '<!-- NEXUS-LOCAL-PERSONA:END -->';
