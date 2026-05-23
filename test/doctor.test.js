@@ -241,3 +241,36 @@ test('doctor reports package script exfiltration risks', () => {
     assert.match(output, /network download command/);
   });
 });
+
+test('doctor --json emits structured sections for integrations', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+
+    const output = captureLogs(() => doctor(['--json']));
+    const report = JSON.parse(output);
+
+    assert.ok(report.repo.endsWith(root.replace('/private', '')));
+    assert.equal(report.fix, false);
+    assert.ok(Array.isArray(report.sections.Security));
+    assert.ok(Array.isArray(report.sections['Package Privacy']));
+  });
+});
+
+test('doctor reports package privacy risks from package files allowlist', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, 'package.json'), JSON.stringify({
+      files: ['bin/', '.nexus/local/', '.codex/'],
+    }), 'utf-8');
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /Package Privacy/);
+    assert.match(output, /\.nexus\/local/);
+    assert.match(output, /\.codex/);
+  });
+});
