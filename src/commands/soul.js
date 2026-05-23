@@ -25,11 +25,12 @@ sit outside the public Nexus protocol block.
 
 function parseArgs(args) {
   const fileIndex = args.indexOf('--file');
-  if (fileIndex === -1) return { overlayPath: DEFAULT_OVERLAY_PATH };
+  const mode = args.includes('--status') ? 'status' : args.includes('--remove') ? 'remove' : 'apply';
+  if (fileIndex === -1) return { overlayPath: DEFAULT_OVERLAY_PATH, mode };
   if (!args[fileIndex + 1]) {
-    throw new Error('Usage: nexus soul [--file <path>]');
+    throw new Error('Usage: nexus soul [--file <path>] [--status | --remove]');
   }
-  return { overlayPath: args[fileIndex + 1] };
+  return { overlayPath: args[fileIndex + 1], mode };
 }
 
 function localSoulBlock(overlayPath, content) {
@@ -59,10 +60,59 @@ function upsertSoulBlock(existing, overlayPath, overlayContent) {
   return `${block}\n\n${existing.trimStart()}`;
 }
 
+function removeSoulBlock(existing) {
+  const start = existing.indexOf(START_MARKER_PREFIX);
+  const end = existing.indexOf(END_MARKER);
+  if (start === -1 || end === -1 || end <= start) return existing;
+
+  const before = existing.slice(0, start).trimEnd();
+  const after = existing.slice(end + END_MARKER.length).trimStart();
+  return `${before}${before && after ? '\n\n' : ''}${after ? `${after}\n` : ''}`;
+}
+
+function hasSoulBlock(existing) {
+  const start = existing.indexOf(START_MARKER_PREFIX);
+  const end = existing.indexOf(END_MARKER);
+  return start !== -1 && end !== -1 && end > start;
+}
+
 export default function soul(args) {
   const root = cwd();
-  const { overlayPath } = parseArgs(args);
+  const { overlayPath, mode } = parseArgs(args);
   const fullOverlayPath = join(root, overlayPath);
+
+  if (mode === 'status') {
+    console.log('Nexus soul status');
+    console.log(`Overlay: ${overlayPath} (${existsSync(fullOverlayPath) ? 'exists' : 'missing'})`);
+
+    for (const entrypoint of AGENT_ENTRYPOINTS) {
+      const path = join(root, entrypoint);
+      const state = existsSync(path) && hasSoulBlock(readFileSync(path, 'utf-8')) ? 'applied' : 'missing';
+      console.log(`  - ${entrypoint}: ${state}`);
+    }
+    return;
+  }
+
+  if (mode === 'remove') {
+    const removed = [];
+    for (const entrypoint of AGENT_ENTRYPOINTS) {
+      const path = join(root, entrypoint);
+      if (!existsSync(path)) continue;
+      const existing = readFileSync(path, 'utf-8');
+      const next = removeSoulBlock(existing);
+      if (next === existing) continue;
+      writeFileSync(path, next, 'utf-8');
+      removed.push(entrypoint);
+    }
+
+    if (removed.length) {
+      console.log('Removed local soul overlay:');
+      for (const entrypoint of removed) console.log(`  - ${entrypoint}`);
+    } else {
+      console.log('No local soul overlay blocks found.');
+    }
+    return;
+  }
 
   mkdirSync(dirname(fullOverlayPath), { recursive: true });
 
