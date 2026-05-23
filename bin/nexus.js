@@ -10,6 +10,7 @@ const COMMANDS = {
   status: () => import('../src/commands/status.js'),
   clean: () => import('../src/commands/clean.js'),
   next: () => import('../src/commands/next.js'),
+  resume: () => import('../src/commands/resume.js'),
   soul: () => import('../src/commands/soul.js'),
   help: () => import('../src/commands/help.js'),
 };
@@ -52,18 +53,22 @@ Usage: nexus <command> [options]
 
 Commands:
   init                              Scaffold Nexus files into current repo
-  doctor [--fix]                    Check or repair agent protocol files
+  doctor [--fix] [--json]           Check or repair agent protocol files
   claim <path> <agent> "<intent>"   Lock a file or directory
   release <path> "<commit msg>"     Unlock, auto-commit, and log
   status                            Show current blackboard state
   clean [--stale | <path>]          Prune locks (surgical, stale, or nuke)
   next <agent>                      Suggest next safe task from queue
-  soul [--file <path>]              Apply local soul overlay to agent files
+  resume                            Summarize local repo state
+  soul [--file <path>] [--status | --remove]
+                                    Manage local soul overlay in agent files
   help                              Show this help
 
 Examples:
   nexus init
   nexus doctor --fix
+  nexus doctor --json
+  nexus resume
   nexus soul
   nexus claim src/lib/components/login/ @Claude "Building login UI"
   nexus release src/lib/components/login/ "feat: login form component"
