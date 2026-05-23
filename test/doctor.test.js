@@ -130,6 +130,85 @@ Keep this note.
   });
 });
 
+test('doctor --fix removes duplicate unmarked text when managed block already exists', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    mkdirSync(join(root, '.codex', 'memories', '2026-May'), { recursive: true });
+    writeFileSync(join(root, '.codex', 'CONTINUITY.md'), '# CONTINUITY\n', 'utf-8');
+    writeFileSync(join(root, '.codex', 'memories', 'INDEX.md'), '- 2026-May/test.md\n', 'utf-8');
+
+    const unmarked = `# Codex Agent Guide
+
+This project uses Nexus for multi-agent coordination.
+
+## Start Here
+
+1. Read \`_NEXUS_CONSTITUTION.md\`.
+
+## Nexus Rules
+
+- Claim before editing shared project files: \`nexus claim <path> @Agent "intent"\`.
+
+## Supply-Chain Safety
+
+- Do not install third-party packages that have existed for less than 14 days.
+
+## Agent-Local Files
+
+\`.codex/CONTINUITY.md\` and \`.codex/memories/INDEX.md\` are agent-local handoff files.
+
+## Memory Flow
+
+- On session start, read \`.codex/memories/INDEX.md\`.
+
+Memory entry format:
+
+\`\`\`markdown
+# YYYY-MM-DD — HH:MM — <topic>
+\`\`\`
+`;
+
+    writeFileSync(join(root, '.codex', 'AGENTS.md'), unmarked, 'utf-8');
+    captureLogs(() => doctor(['--fix']));
+
+    const managed = readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8');
+    writeFileSync(join(root, '.codex', 'AGENTS.md'), `${unmarked}\n${managed}`, 'utf-8');
+
+    captureLogs(() => doctor(['--fix']));
+
+    const next = readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8');
+    assert.equal(next.match(/This project uses Nexus for multi-agent coordination\./g).length, 1);
+    assert.equal(next.match(/NEXUS-AGENT-PROTOCOL:START/g).length, 1);
+  });
+});
+
+test('doctor --fix refreshes stale managed instructions when template changes', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+
+    captureLogs(() => doctor(['--fix']));
+    const entrypointPath = join(root, '.codex', 'AGENTS.md');
+    const current = readFileSync(entrypointPath, 'utf-8');
+    writeFileSync(
+      entrypointPath,
+      current.replace('Use `nexus next @Agent` for the next safe queue task.', 'Use `nexus next @Agent` for queue work.'),
+      'utf-8',
+    );
+
+    const report = captureLogs(() => doctor([]));
+    assert.match(report, /\.codex\/AGENTS\.md needs Nexus protocol block update/);
+
+    captureLogs(() => doctor(['--fix']));
+    const next = readFileSync(entrypointPath, 'utf-8');
+    assert.match(next, /Use `nexus next @Agent` for the next safe queue task\./);
+    assert.doesNotMatch(next, /Use `nexus next @Agent` for queue work\./);
+  });
+});
+
 test('doctor reports legacy helper references before fixing them', () => {
   inTempRepo((root) => {
     writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), 'Use ./_nexus_claim.sh now.\n', 'utf-8');
