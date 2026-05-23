@@ -276,11 +276,13 @@ function ensureFile(path, content, fix, changes) {
 
 export default function doctor(args) {
   const fix = args.includes('--fix');
+  const json = args.includes('--json');
   const root = cwd();
   const sections = {
     'Nexus Files': [],
     'Agent Instructions': [],
     Security: [],
+    'Package Privacy': [],
     'Legacy Helpers': [],
     Continuity: [],
     Memories: [],
@@ -289,8 +291,10 @@ export default function doctor(args) {
   const changes = [];
   const config = getConfig(root);
 
-  console.log(`Nexus doctor${fix ? ' --fix' : ''}`);
-  console.log(`Repo: ${root}\n`);
+  if (!json) {
+    console.log(`Nexus doctor${fix ? ' --fix' : ''}`);
+    console.log(`Repo: ${root}\n`);
+  }
 
   const nexusProtocolFiles = ['_NEXUS_CONSTITUTION.md', '_NEXUS_QUEUE.md', '_NEXUS_STANDUP.md'];
   const legacyCheckFiles = [
@@ -311,6 +315,10 @@ export default function doctor(args) {
 
   for (const issue of scanPackageSecurity(root)) {
     sections.Security.push(issue);
+  }
+
+  for (const issue of scanPackagePrivacy(root)) {
+    sections['Package Privacy'].push(issue);
   }
 
   for (const agent of AGENTS) {
@@ -433,6 +441,20 @@ export default function doctor(args) {
     }
   }
 
+  if (json) {
+    const problemCount = Object.values(sections)
+      .flat()
+      .filter((entry) => !entry.ok).length;
+    console.log(JSON.stringify({
+      ok: problemCount === 0,
+      repo: root,
+      fix,
+      sections,
+      changes,
+    }, null, 2));
+    return;
+  }
+
   if (changes.length) {
     console.log('Applied fixes:');
     for (const change of changes) console.log(`  - ${change}`);
@@ -532,6 +554,48 @@ function scanPackageSecurity(root) {
         fix: 'Human-review this script for exfiltration risk before an agent runs it.',
       });
       break;
+    }
+  }
+
+  return issues;
+}
+
+const PRIVATE_PACKAGE_PATHS = [
+  '.nexus/local',
+  '.codex',
+  '.claude',
+  '.gemini',
+  'agent-overlay.md',
+  'SOUL.md',
+  'IDENTITY.md',
+  'USER.md',
+];
+
+function scanPackagePrivacy(root) {
+  const packagePath = join(root, 'package.json');
+  if (!existsSync(packagePath)) return [];
+
+  let pkg;
+  try {
+    pkg = JSON.parse(readFileSync(packagePath, 'utf-8'));
+  } catch {
+    return [];
+  }
+
+  const files = Array.isArray(pkg.files) ? pkg.files : [];
+  const issues = [];
+
+  for (const entry of files) {
+    if (typeof entry !== 'string') continue;
+    const normalized = entry.replace(/^\.\//, '').replace(/\/$/, '');
+    for (const privatePath of PRIVATE_PACKAGE_PATHS) {
+      if (normalized === privatePath || normalized.startsWith(`${privatePath}/`) || normalized.endsWith(`/${privatePath}`)) {
+        issues.push({
+          issue: `package.json files includes private/local path: ${entry}`,
+          fix: 'Remove private local agent state from package.json files before publishing.',
+        });
+        break;
+      }
     }
   }
 
