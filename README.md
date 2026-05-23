@@ -100,18 +100,18 @@ Doctor reports grouped issues:
 
 With `--fix`, Nexus creates safe missing scaffolds and updates managed protocol blocks in agent instruction files. It does not erase existing agent notes.
 
-### `nexus persona [--file <path>]`
+### `nexus soul [--file <path>]`
 
-Apply a local persona overlay to agent instruction files.
+Apply a local soul overlay to agent instruction files.
 
 ```bash
-nexus persona
-nexus persona --file .nexus/local/my-agent-overlay.md
+nexus soul
+nexus soul --file .nexus/local/my-agent-overlay.md
 ```
 
-By default, Nexus creates `.nexus/local/agent-overlay.md` if it does not exist, then inserts that file above the managed Nexus protocol block in `.codex/AGENTS.md`, `.claude/CLAUDE.md`, and `.gemini/GEMINI.md`. Edit the overlay file locally, then rerun `nexus persona` to refresh the inserted blocks.
+By default, Nexus creates `.nexus/local/agent-overlay.md` if it does not exist, then inserts that file above the managed Nexus protocol block in `.codex/AGENTS.md`, `.claude/CLAUDE.md`, and `.gemini/GEMINI.md`. Edit the overlay file locally, then rerun `nexus soul` to refresh the inserted blocks.
 
-The overlay content is local repo state, not package content. `nexus doctor` ignores persona blocks and only manages the public Nexus protocol block.
+The overlay content is local repo state, not package content. `nexus doctor` ignores soul blocks and only manages the public Nexus protocol block.
 
 ### `nexus claim <path> <agent> "<intent>"`
 
