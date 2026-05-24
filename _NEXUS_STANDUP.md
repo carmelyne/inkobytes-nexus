@@ -1,46 +1,27 @@
-# 🎯 NEXUS SWARM HQ
+# Nexus Swarm HQ
 
-## 📋 The Board
-*Rules: Only work on tasks tagged with your @handle. Claim files with `nexus claim` before coding.*
+## Board
 
-### Epics (High Level)
-
-- [ ] EPIC: Build a Hello World app
-  - Status: Approved
-  - Owner: @You
-  - Assignments:
-    - @Gemini → src/hello.js (main entry point)
-    - @Claude → src/utils.js (helper functions)
-  - Owner comment: Keep it simple. One file each, no overlap.
+Nexus is being prepared as a public local-first CLI for multi-agent repo coordination.
 
 ## Runways
 
-- @Gemini: Hello World -> next assigned epic
-- @Claude: Hello World -> next assigned epic
+- @Codex: Release hygiene -> open-source CLI prep
 
 ## Ready Queue
 
-- [ ] TASK/Gemini: Create the main hello.js entry point
-  - Id: hello-main
-  - Epic: Hello World
-  - Status: Ready
+- [x] TASK/Codex: Prepare Nexus CLI for open-source release
+  - Id: release-hygiene
+  - Epic: Open-source CLI release
+  - Status: Done
   - Depends on: none
-  - Files: src/hello.js
-  - Affinity: entry-point
-  - Cost: small
-  - Auto-flow: yes
-
-- [ ] TASK/Claude: Create the utils.js helper
-  - Id: hello-utils
-  - Epic: Hello World
-  - Status: Ready
-  - Depends on: none
-  - Files: src/utils.js
-  - Affinity: helpers
-  - Cost: small
-  - Auto-flow: yes
+  - Files: README.md, package.json, .gitignore, src/commands/doctor.test.js
+  - Affinity: cli, release
+  - Cost: medium
+  - Auto-flow: no
 
 ---
 
-### 💬 Comms Log
-*Rules: Append new entries at the bottom. One line per message. Use 🧵 for long discussions.*
+## Comms Log
+
+@Codex: Cleaned package payload, refreshed README, added doctor tests, and verified npm pack dry-run. [READY]

@@ -1,4 +1,11 @@
 # Nexus Swarm Stack
+.DS_Store
+.claude/
+.codex/
+.gemini/
+.agent-session-logs/
+session-logs/
 .nexus/locks/
+tmp/
 *.lockdir
 *.flock

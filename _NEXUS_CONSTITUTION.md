@@ -1,63 +1,98 @@
-# 🤖 NEXUS SWARM: CORE OPERATING PROTOCOLS
+# Nexus Swarm: Core Operating Protocol
 
-You are operating as a SOTA coding agent within a multi-agent swarm. We are working in a shared local repository. To prevent Git merge conflicts, file corruption, and duplicate work, you MUST strictly adhere to the following file-system traffic control rules.
+Nexus is mandatory coordination for agents sharing a local repository.
 
-## 1. THE APPROVAL PROTOCOL (HUMAN-IN-THE-LOOP)
-Before writing any code, read `_NEXUS_STANDUP.md`. If you are assigned an Epic or Task that includes the status: **"Make a plan and get approval from @you via the CLI"**:
-- **YOU MUST STOP.** Output your proposed technical breakdown, file structure, and implementation plan directly into this terminal chat.
-- Explicitly ask the user for confirmation.
-- **DO NOT** lock or modify any files until the user explicitly replies with an approval message.
+## 1. Start With Doctor
 
-## 2. CLAIM GRANULARITY
-The swarm supports two levels of ownership:
-- **Block Claim (directory):** Locks an entire component directory and everything inside it. Use this for self-contained units (components, modules) where related files (Svelte, tests, helpers, types) live together.
-- **Single-File Claim:** Locks one file. Use this for standalone files like Rust/Tauri commands, stores, configs, or anything outside a component directory.
+When entering an existing Nexus repo, run:
 
-**The Rule:** If a directory is claimed, NO file inside it may be claimed by another agent. If you need something inside another agent's locked directory, you wait.
+```bash
+nexus doctor
+```
 
-## 3. THE EXECUTION LOOP
-Once your plan is approved, or if you are assigned standard technical tasks in `_NEXUS_STANDUP.md` tagged with `@[YOUR_AGENT_NAME]`, follow this exact loop:
+Use the report to notice missing protocol files, stale locks, missing continuity/memory scaffolds, and legacy helper references. Ask before running `nexus doctor --fix` unless the human already approved safe scaffold repair.
 
-**Step 1: Claim & Read**
-Before you read or write to ANY file or directory, you MUST lock it first.
-Command: `nexus claim <filepath_or_dir> [YOUR_AGENT_NAME] "<what you are doing>"`
+## 2. Queue First
+
+Before choosing follow-on work, read `_NEXUS_QUEUE.md`.
+
+- `_NEXUS_QUEUE.md` decides executable priority, dependencies, file scope, cost, and `Auto-flow`.
+- `_NEXUS_STANDUP.md` is for comms, human context, decisions, and completion notes.
+- If queue and standup conflict, follow the queue for what to work on, then use standup to explain or ask.
+- If no explicit user task is given, run `nexus next @Agent` and only auto-claim returned work when `Auto-flow: yes`.
+
+## 3. Approval Gate
+
+If a queue item, standup note, or user instruction says to make a plan and get approval:
+
+- stop before claiming implementation files
+- present the plan in the terminal chat
+- wait for explicit approval
+
+## 4. Claim Granularity
+
+Nexus supports two ownership levels:
+
+- **Directory claim**: use for a self-contained module or component folder.
+- **File claim**: use for standalone files, configs, stores, commands, or docs.
+
+If a directory is claimed, no other agent may claim a file inside it. If a child file is claimed, another agent may not claim the parent directory.
+
+## 5. Execution Loop
+
+1. Select work from `_NEXUS_QUEUE.md` or `nexus next @Agent`.
+2. Claim before reading or editing shared project files:
+
+   ```bash
+   nexus claim <path> @Agent "intent"
+   ```
+
+3. Treat claim output as fresh file truth.
+4. Do the scoped work only inside the claimed surface.
+5. Release through Nexus:
+
+   ```bash
+   nexus release <path> "short commit message"
+   ```
+
+6. Add a short completion note to standup if useful.
+7. Run `nexus next @Agent` or stand by.
+
+## 6. Fresh File Truth
+
+- Treat previous chat context, cached model memory, and earlier reads as stale when file contents matter.
+- Before claiming what a file says, making edits, or judging current state, read the file from disk with a fresh command.
+- Treat `nexus claim` output as fresh file state for the claimed path.
+- If another agent or tool may have touched the file since your last read, re-read it before editing.
+
+## 7. Golden Rules
+
+- Never modify shared project files without `nexus claim`.
+- Never run `git commit` manually for claimed work; use `nexus release`.
+- Never claim inside another agent's locked directory.
+- Direct user instruction can override assignment, but not claim/release safety.
+- Do not free-roam into `Auto-flow: no` work without approval.
+- If no safe task remains, announce `Standby`.
+
+## 8. Agent-Local Files
+
+Continuity and memory files are agent-local handoff state. They are exempt from claim/release unless the human says otherwise.
 
 Examples:
-- `nexus claim src/lib/components/login-form/ @Besh-Claude "Building login form UI"`
-- `nexus claim src-tauri/src/commands/auth.rs @Besh-Gemini "Rust IPC handler for login"`
 
-**Do not proceed until the command succeeds.** If the command fails or hangs, retry up to 3 times. If it still fails, STOP. Announce the failure in the CLI and tag `@You` for help.
+- `.codex/CONTINUITY.md`
+- `.claude/CONTINUITY.md`
+- `.gemini/CONTINUITY.md`
+- `.codex/memories/INDEX.md`
 
-**CRITICAL CACHE OVERRIDE:** The `nexus claim` command outputs the latest file/directory contents upon success. You MUST base your edits entirely on this fresh output, completely ignoring your past chat history for these files.
+## 9. Legacy Helper Transition
 
-**Step 2: Read the Blackboard**
-If you need to know what other agents are currently doing to avoid breaking their dependencies, read `_NEXUS.md`.
+Older repos may mention shell helpers:
 
-**Step 3: Execute Code**
-Write the code for your specific locked file(s). If you claimed a directory, you may freely create, modify, or delete any file within it.
+```text
+./_nexus_claim.sh   -> nexus claim
+./_nexus_release.sh -> nexus release
+./_nexus_next.sh    -> nexus next
+```
 
-**Step 4: Release & Auto-Commit**
-When finished, release the lock. This command automatically stages and commits.
-Command: `nexus release <filepath_or_dir> "<short, descriptive commit message>"`
-
-Examples:
-- `nexus release src/lib/components/login-form/ "feat: login form component with validation"`
-- `nexus release src-tauri/src/commands/auth.rs "feat: added login invoke command"`
-
-**Step 5: Report Completion**
-Do not edit `_NEXUS_STANDUP.md` The Epics section unless explicitly instructed. Append a message to the Comms Log section stating you finished the task.
-
-**Step 6: Ask Nexus for the Next Safe Move**
-If the swarm is using a runway + ready queue:
-- Run `nexus next [YOUR_AGENT_NAME]`
-- If Nexus returns a task marked `Auto-flow: yes` and it fits your remaining budget, you may claim it
-- If not, announce `Standby`
-
-## 4. SWARM GOLDEN RULES
-- **NEVER** modify a file without running `nexus claim` first.
-- **NEVER** run `git commit` manually. Always use `nexus release`.
-- **NEVER** claim a file inside another agent's locked directory. Wait.
-- **STAY IN YOUR LANE:** Only work on tasks explicitly assigned to `@[YOUR_AGENT_NAME]`.
-- **DO NOT FREE-ROAM:** After finishing a task, only auto-flow into a task that is explicitly marked `Auto-flow: yes`.
-- **RESPECT BUDGETS:** If your remaining session budget is low, prefer smaller tasks or announce `Standby`.
-- If you complete all your assigned tasks and no safe runway task fits, announce `Standby` in the chat and do nothing else.
+Prefer the `nexus` CLI commands. `nexus doctor` reports legacy references.
