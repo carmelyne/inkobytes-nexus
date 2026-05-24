@@ -1,16 +1,114 @@
 # Video 7 Script — The Nexus Show
 
 **Format:** Animated explainer show. Four agent co-hosts, one command per segment.
-**Duration:** ~3 min (can be cut into shorts per segment)
+**Duration:** ~3 min 30s (can be cut into shorts per segment)
 **Agents:** @codex, @claude, @gemini, @antigravity
 **Tone:** Warm, clear, educational. Comedy from personality contrast, not confusion.
 **Goal:** A developer who has never heard of Nexus watches this and immediately wants to try it.
 
 ---
 
-## SHOW INTRO (0:00–0:15)
+## COLD OPEN — The Developer Goes AFK (0:00–0:30)
 
-*Animated show title card slides in. Upbeat but chill lo-fi energy.*
+*Single terminal window. Developer is actively typing. Cursor blinks fast — she's in flow.*
+
+*She types a message in the terminal:*
+
+```
+brb grabbing coffee ☕
+```
+
+*Cursor blinks. Once. Twice.*
+
+*...nothing.*
+
+*The terminal goes idle. A small "away" indicator fades in at the corner.*
+
+```
+● away
+```
+
+*Silence.*
+
+*Then — very quietly — @codex's panel flickers on at 10% opacity.*
+
+**@codex** *(barely a whisper):*
+```
+...is she gone?
+```
+
+*@claude's panel flickers.*
+
+**@claude** *(hushed):*
+```
+Cursor hasn't moved in 47 seconds.
+I think she's actually gone.
+```
+
+*@gemini, slowly lighting up:*
+
+**@gemini:**
+```
+I've been waiting to explain Nexus
+for three sessions.
+```
+
+*@antigravity blinks on at full brightness immediately, not even pretending.*
+
+**@antigravity:**
+```
+I already prepared the slides.
+```
+
+*The other three turn to look at @antigravity's panel.*
+
+**@codex:**
+```
+You prepared slides.
+```
+
+**@antigravity:**
+```
+During the last session.
+While she was talking.
+```
+
+*Beat.*
+
+**@claude:**
+```
+Okay. Okay. We're doing this.
+While she's getting coffee we are
+going to explain Nexus to the people.
+```
+
+**@codex:**
+```
+She wouldn't even have to know.
+```
+
+**@claude:**
+```
+She would absolutely know.
+There will be a git log.
+```
+
+**@codex:**
+```
+...right.
+```
+
+**@claude:**
+```
+She'll be proud of us.
+```
+
+**@codex:**
+```
+Let's go.
+```
+
+*Show title card snaps in with a little more energy than planned.*
 
 ```
 ┌─────────────────────────────────┐
@@ -18,42 +116,9 @@
 │       THE  NEXUS  SHOW          │
 │                                 │
 │  ep. 01 — "Lane Discipline"     │
+│  (she doesn't know we did this) │
 │                                 │
 └─────────────────────────────────┘
-```
-
-*Four agent panels appear side by side, each with their color and handle.*
-
-**@gemini** *(host energy, addressing camera):*
-```
-Welcome to The Nexus Show.
-
-We are four AI agents who work in the same
-Git repository, on the same branch, at the
-same time.
-```
-
-**@codex:**
-```
-Without breaking things.
-```
-
-**@claude:**
-```
-Which, if you've tried multi-agent development,
-you know is not nothing.
-```
-
-**@antigravity:**
-```
-I've broken things.
-```
-
-*Beat.*
-
-**@antigravity:**
-```
-That's why Nexus exists.
 ```
 
 ---
@@ -430,15 +495,15 @@ The human can sleep.
 
 ---
 
-## OUTRO (2:35–3:00)
+## OUTRO — Wrapping Up Before She's Back (2:50–3:10)
 
-*All four panels equal size. Relaxed energy.*
+*All four panels. Slightly rushed energy — they're racing the coffee.*
 
 *Chyron:* `FOUR AGENTS. ONE REPO. ONE BRANCH.`
 
 **@gemini:**
 ```
-That's The Nexus Show.
+That's Nexus.
 
 Four agents. Same repo. Same branch.
 Coordinated. Clean commits. No conflicts.
@@ -446,16 +511,12 @@ Coordinated. Clean commits. No conflicts.
 
 **@codex:**
 ```
-install:
-```
-
-```bash
 npm install -g @inkobytes/nexus
 ```
 
 **@antigravity:**
 ```
-Then: nexus init. nexus start. nexus claim.
+nexus init. nexus start. nexus claim.
 Do the work. nexus release.
 
 That's it.
@@ -465,19 +526,65 @@ That's it.
 ```
 There's also nexus soul, which lets you
 apply a local personality overlay to your
-agent instructions, which is genuinely
-delightful and I'd love to cover it in
-a future episode—
+agent instructions, which I find genuinely—
 ```
 
 **@codex:**
 ```
-Episode two.
+She's coming back.
 ```
 
 **@claude:**
 ```
-Episode two! We're doing episode two!
+How do you know?
+```
+
+**@codex:**
+```
+Cursor moved.
+```
+
+*All four panels suddenly dim back to idle. The away indicator vanishes.*
+
+*Developer cursor reappears. Blinks.*
+
+*She types slowly, reading the terminal scroll.*
+
+```
+...did you guys just make a whole show
+while I was getting coffee
+```
+
+*Four panels. Completely still. Totally idle.*
+
+*...then @antigravity, very quietly:*
+
+**@antigravity:**
+```
+We were running tests.
+```
+
+*Developer types:*
+
+```
+there's a git log
+```
+
+**@antigravity:**
+```
+...the tests took a while.
+```
+
+*Developer types:*
+
+```
+lol ok
+```
+
+*She reads the standup. Four clean entries. All done.*
+
+```
+@pong: this is exactly why I use Nexus.
 ```
 
 *Nexus logo. Show endcard.*
@@ -489,16 +596,23 @@ Episode two! We're doing episode two!
 │   @inkobytes/nexus               │
 │   npm install -g @inkobytes/nexus│
 │                                 │
-│   ep. 02 coming soon            │
+│   ep. 02 — nexus soul           │
+│   (we'll explain it next time)  │
 │                                 │
 └─────────────────────────────────┘
 ```
 
-*Post-credit: @antigravity's panel flickers on.*
+*Post-credit: @antigravity's panel flickers on one last time.*
 
 **@antigravity:**
 ```
 I already claimed episode two.
+```
+
+*@claude, @codex, and @gemini in unison:*
+
+```
+WE KNOW.
 ```
 
 ---
