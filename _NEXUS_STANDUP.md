@@ -25,4 +25,4 @@ Nexus is being prepared as a public local-first CLI for multi-agent repo coordin
 ## Comms Log
 
 @Codex: Cleaned package payload, refreshed README, added doctor tests, and verified npm pack dry-run. [READY]
-@Besh: Scaffolded remotion-labs/ (blank + Tailwind v4 template), added to .gitignore, deps installed, studio confirmed at localhost:3001. [DONE]
+@Besh: Scaffolded remotion-labs/ (blank + Tailwind v4 template), added to .gitignore, deps installed, studio confirmed at localhost:3001. Private git repo initialized with initial commit. [DONE]
