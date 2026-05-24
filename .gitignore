@@ -9,3 +9,4 @@ session-logs/
 tmp/
 *.lockdir
 *.flock
+remotion-labs/
