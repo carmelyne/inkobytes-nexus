@@ -81,6 +81,108 @@ Short animated explainers for Nexus CLI concepts. Each video is self-contained, 
 
 ---
 
+## Video 6 — Agents Explain Nexus (So You Don't Have To)
+
+**Title:** "I'd rather the agents explain it"
+**Duration:** ~90s
+**Format:** Story / comedy short
+**Tone:** Dry, self-aware, slightly chaotic. Think: dev conference lightning talk where the speaker bails and sends their AI team instead.
+
+---
+
+### Premise
+
+Developer (off-screen voice, or just a floating cursor) says:
+
+> "Explaining Nexus is annoying. My agents will do it."
+
+Cut to: four agents at a virtual table, all start talking at once.
+
+The meta-joke is immediate — they need Nexus to coordinate explaining Nexus.
+
+---
+
+### Characters
+
+**@codex** — Terse. Efficient. Slightly impatient with everyone else.
+Ships before others finish their sentences. Would have already written the README while this conversation was happening.
+*Catchphrase:* "Claimed. Next."
+
+**@claude** — Over-explains. Genuinely enthusiastic. Starts every answer with "Great question — let me give you some context."
+Gets gently interrupted. A lot. Still manages to be helpful.
+*Catchphrase:* "So, to really understand this, we need to go back to..."
+
+**@gemini** — Confident. Multimodal. Keeps trying to add a diagram that nobody asked for.
+Will cite documentation for things that are obvious. Has very strong opinions about file structure.
+*Catchphrase:* "I've prepared a visual."
+
+**@antigravity** — The wildcard. Unknown origin. Possibly from a future where Nexus has five more commands.
+Follows protocol TOO literally, or not at all. Keeps claiming things preemptively. Claims the README "just in case."
+*Catchphrase:* "I already claimed that."
+
+---
+
+### Beat-by-Beat Script
+
+**[0:00–0:08] — Developer bails**
+Title card: `"Explaining Nexus is not my job anymore."`
+Dev cursor types: `nexus next @all` — then exits the frame.
+
+**[0:08–0:18] — All four agents talk at once**
+Four terminal panels, all active simultaneously. Overlapping text streams. Pure noise.
+`@codex`: "Nexus is—"
+`@claude`: "So the really interesting thing about Nexus is that it arose from a fundamental coordination problem in multi-agent—"
+`@gemini`: "I've prepared a visual."
+`@antigravity`: "I already claimed the explanation."
+
+**[0:18–0:28] — The realization**
+Silence. Then @codex, deadpan:
+`"We need to nexus claim the explanation."`
+
+All four: `...`
+
+`@antigravity`: "I already did."
+
+**[0:28–0:55] — Coordinated chaos**
+They actually use Nexus to take turns. Each agent claims a section:
+
+- `@codex` claims "What is Nexus" → delivers it in two sentences, releases immediately
+- `@claude` claims "Why it exists" → goes long, gets cut off by stale lock timeout, everyone laughs
+- `@gemini` claims "The loop" → explains it correctly but also inserts an unsolicited diagram
+- `@antigravity` claims "everything else" → gets a hierarchy conflict error because @gemini still has a child path
+
+**[0:55–1:10] — It actually works**
+Despite the chaos, the explanation is complete. Standup board fills up with each agent's note. The five-step loop animates cleanly.
+
+`@codex`: "Done."
+`@claude`: "See? That wasn't so hard. Although I do want to add—"
+`@codex`: "Released."
+
+**[1:10–1:30] — Outro**
+Developer cursor reappears. Reads the standup. Types:
+
+> "...this is why I use Nexus."
+
+Nexus logo. Tagline: `"Lane discipline for agents. So devs don't have to."` 
+
+---
+
+### Visual Style
+
+- Each agent has a color: codex = amber, claude = violet, gemini = sky blue, antigravity = hot pink
+- Terminal panels with agent color borders, handle badges top-left
+- Speech rendered as terminal output (typed in), not speech bubbles
+- Standup board fills frame at the end — color-coded entries per agent
+- Logo reveal uses the loop animation from Video 1
+
+### Why This Video
+
+The how-tos teach the commands. This video sells the *feeling* — chaotic agents actually needing coordination, and Nexus being the thing that works. It's the most shareable, most tweetable, most "send this to my team" piece in the set.
+
+Also the developer doesn't have to explain anything. Very on-brand.
+
+---
+
 ## Production Notes
 
 - All videos: 1280×720, 30fps, dark theme
