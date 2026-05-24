@@ -46,5 +46,7 @@ test('init creates managed agent guides that doctor accepts', () => {
     assert.match(output, /All checked Nexus categories are ready/);
     assert.equal(codexGuide.match(/NEXUS-AGENT-PROTOCOL:START/g).length, 1);
     assert.equal(codexGuide.match(/This project uses Nexus for multi-agent coordination\./g).length, 1);
+    assert.match(codexGuide, /### Fresh File Truth/);
+    assert.match(codexGuide, /cached model memory/);
   });
 });

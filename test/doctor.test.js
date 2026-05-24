@@ -48,6 +48,7 @@ test('doctor --fix creates agent scaffolds and protocol blocks', () => {
     assert.match(output, /All checked Nexus categories are ready/);
     assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /NEXUS-AGENT-PROTOCOL:START/);
     assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /less than 14 days/);
+    assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /### Fresh File Truth/);
     assert.match(readFileSync(join(root, '.codex', 'CONTINUITY.md'), 'utf-8'), /# CONTINUITY/);
     assert.match(readFileSync(join(root, '.codex', 'memories', 'INDEX.md'), 'utf-8'), /YYYY-Month/);
   });
@@ -205,6 +206,7 @@ test('doctor --fix refreshes stale managed instructions when template changes', 
     captureLogs(() => doctor(['--fix']));
     const next = readFileSync(entrypointPath, 'utf-8');
     assert.match(next, /Use `nexus next @Agent` for the next safe queue task\./);
+    assert.match(next, /cached model memory/);
     assert.doesNotMatch(next, /Use `nexus next @Agent` for queue work\./);
   });
 });

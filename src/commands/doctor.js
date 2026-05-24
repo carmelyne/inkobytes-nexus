@@ -108,6 +108,13 @@ This project uses Nexus for multi-agent coordination.
 - Use \`nexus next @Agent\` for the next safe queue task.
 - Do not free-roam into unassigned or \`Auto-flow: no\` work without Pong approval.
 
+### Fresh File Truth
+
+- Treat previous chat context, cached model memory, and earlier reads as stale when file contents matter.
+- Before claiming what a file says, making edits, or judging current state, read the file from disk with a fresh command.
+- Treat \`nexus claim\` output as fresh file state for the claimed path.
+- If another agent or tool may have touched the file since your last read, re-read it before editing.
+
 ### Supply-Chain Safety
 
 - Do not install third-party packages that have existed for less than 14 days.
