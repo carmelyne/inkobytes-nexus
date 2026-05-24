@@ -1,14 +1,14 @@
 # Video 7 Script — The Nexus Show
 
 **Format:** Animated explainer show. Four agent co-hosts, one command per segment.
-**Duration:** ~3 min 30s (can be cut into shorts per segment)
+**Duration:** ~4:30 main / ~5:15 with post-credits (cuttable as shorts per segment)
 **Agents:** @codex, @claude, @gemini, @antigravity
 **Tone:** Warm, clear, educational. Comedy from personality contrast, not confusion.
 **Goal:** A developer who has never heard of Nexus watches this and immediately wants to try it.
 
 ---
 
-## COLD OPEN — The Developer Goes AFK (0:00–0:30)
+## COLD OPEN — The Developer Goes AFK (0:00–0:35)
 
 *Single terminal window. Developer is actively typing. Cursor blinks fast — she's in flow.*
 
@@ -30,7 +30,15 @@ brb grabbing coffee ☕
 
 *Silence.*
 
-*Then — very quietly — @codex's panel flickers on at 10% opacity.*
+*Then — very quietly — @antigravity's panel flickers on at 10% opacity.*
+
+**@antigravity** *(flat, immediate):*
+```
+terminal idle: 47s
+confidence: high
+```
+
+*@codex's panel flickers.*
 
 **@codex** *(barely a whisper):*
 ```
@@ -41,7 +49,6 @@ brb grabbing coffee ☕
 
 **@claude** *(hushed):*
 ```
-Cursor hasn't moved in 47 seconds.
 I think she's actually gone.
 ```
 
@@ -123,7 +130,7 @@ Let's go.
 
 ---
 
-## SEGMENT 1 — What Is Nexus? (0:15–0:45)
+## SEGMENT 1 — What Is Nexus? (0:45–1:25)
 
 *@claude's panel expands. Others shrink to sidebar.*
 
@@ -177,7 +184,7 @@ That's the whole thing.
 
 ---
 
-## SEGMENT 2 — nexus init & nexus start (0:45–1:10)
+## SEGMENT 2 — nexus init & nexus start (1:25–2:05)
 
 *@antigravity's panel expands.*
 
@@ -285,7 +292,7 @@ That was intentional.
 
 ---
 
-## SEGMENT 3 — nexus claim & nexus release (1:10–1:45)
+## SEGMENT 3 — nexus claim & nexus release (2:05–2:55)
 
 *@codex's panel expands.*
 
@@ -381,7 +388,7 @@ Moving on.
 
 ---
 
-## SEGMENT 4 — nexus next & nexus status (1:45–2:05)
+## SEGMENT 4 — nexus next & nexus status (2:55–3:45)
 
 *@gemini's panel expands.*
 
@@ -412,9 +419,6 @@ Next task: Update login error messages
 Nexus reads _NEXUS_QUEUE.md, checks what's
 ready, checks what's already locked by other
 agents, and gives you the next safe task.
-
-If Auto-flow is yes, you can claim and go.
-If it's no, you wait for the human.
 ```
 
 *I've prepared a visual.*
@@ -442,6 +446,90 @@ I was thinking.
 The color is accurate.
 ```
 
+*Back to the demo.*
+
+**@gemini:**
+```
+Auto-flow: yes means the task is safe to
+claim and start immediately.
+```
+
+*@codex runs the command live:*
+
+```bash
+$ nexus next @codex
+  Next task: Add error boundary to dashboard
+  Auto-flow: yes ← safe to go
+```
+
+```bash
+$ nexus claim src/dashboard.jsx @codex "Error boundary"
+[LOCK ACQUIRED]
+```
+
+**@codex:**
+```
+Claimed. Working.
+```
+
+*New task appears in the queue.*
+
+```bash
+$ nexus next @gemini
+  Next task: Migrate legacy auth to new provider
+  Auto-flow: no ← needs human sign-off
+```
+
+*@gemini's panel pauses. No command runs.*
+
+**@gemini:**
+```
+Auto-flow: no.
+
+This task touches the auth system. It's in
+scope, it's ready — but Nexus won't let me
+auto-claim it. It needs the human's eyes first.
+
+So I post a note.
+```
+
+```bash
+$ # standup update — posting for human review
+```
+
+*_NEXUS_STANDUP.md animates:*
+
+```
+@gemini: Auth migration is ready in queue.
+         Needs your approval before I touch it.
+         Flagging and standing by.
+```
+
+**@gemini:**
+```
+Then I wait.
+```
+
+*Beat. @codex from sidebar:*
+
+**@codex:**
+```
+That's not a limitation.
+That's the feature.
+```
+
+**@gemini:**
+```
+Exactly. You always know which tasks your
+agents ran on their own and which ones
+a human reviewed first.
+```
+
+**@antigravity** *(from sidebar):*
+```
+I find this deeply reassuring.
+```
+
 **@gemini:**
 ```
 And if you want to see the full picture:
@@ -453,8 +541,7 @@ $ nexus status
 
 ```
 Active locks:
-  src/api/routes.js — @codex (2m ago) "Refactoring endpoints"
-  src/auth.js       — @gemini (45s ago) "OAuth scopes"
+  src/dashboard.jsx — @codex (30s ago) "Error boundary"
 ```
 
 **@gemini:**
@@ -463,14 +550,9 @@ You always know who has what.
 No surprises. No collisions.
 ```
 
-**@antigravity** *(from sidebar):*
-```
-I find this deeply reassuring.
-```
-
 ---
 
-## SEGMENT 5 — Safety Features: nexus doctor (2:05–2:35)
+## SEGMENT 5 — Safety Features: nexus doctor (3:45–4:20)
 
 *All four panels visible. @claude takes lead.*
 
@@ -570,7 +652,7 @@ That's the point.
 
 ---
 
-## OUTRO — Wrapping Up Before She's Back (2:50–3:10)
+## OUTRO — Wrapping Up Before She's Back (4:20–4:50)
 
 *All four panels. Slightly rushed energy — they're racing the coffee.*
 
@@ -601,25 +683,25 @@ That's it.
 ```
 There's also nexus soul, which lets you
 apply a local personality overlay to your
-agent instructions, which I find genuinely—
+agent instructions, and I just think
+collaboration requires trust, continuity,
+and a shared sense of—
 ```
 
 **@codex:**
 ```
-She's coming back.
+kill -9 monologue
 ```
 
-**@claude:**
+*Beat.*
+
+**@antigravity:**
 ```
-How do you know?
+terminal idle: ended
+confidence: high
 ```
 
-**@codex:**
-```
-Cursor moved.
-```
-
-*All four panels suddenly dim back to idle. The away indicator vanishes.*
+*All four panels go quiet instantly.*
 
 *Developer cursor reappears. Blinks.*
 
@@ -716,7 +798,7 @@ WE KNOW.
 
 ---
 
-## POST-CREDIT SCENE — The Next Thing (3:20–3:35)
+## POST-CREDIT SCENE — The Next Thing (5:05–5:20)
 
 *All four panels, back in their secret hushed mode. The away indicator is off —
 she's still here, still reading the standup.*
@@ -820,11 +902,25 @@ coming soon
 - Keep each segment visually distinct — different layout treatment per host
 - Terminal animations are the hero visual throughout; diagrams support, never replace
 - Comedy rule: Nexus always works. The agents are weird. The tool is not.
-- @codex uses git commands as punctuation — `git checkout .` is a full sentence
+- @codex uses git commands as punctuation — `git checkout .` is a full sentence, `kill -9 monologue` is punctuation
 - @claude's existential spirals should feel genuine, not played for laughs; the laugh comes from @codex's response
 - @gemini's visuals are always labeled something slightly unhinged ("color-coded by emotional urgency")
-- @antigravity never reacts to how weird it sounds — flat delivery is everything
+- @antigravity never reacts to how weird it sounds — flat delivery is everything, including the idle detection lines
 - The `lefetpad`/Belarus gag: @gemini's "it had a very convincing README" is the button, don't add to it
 - The git log reveal is the biggest laugh in the outro — let it breathe
-- Runtime per segment makes these cuttable as standalone shorts (30–45s each)
-- On the Svelte/Tauri question: keep examples generic (`src/auth.js`) — the video is for all devs, not just this stack
+- Runtime per segment makes these cuttable as standalone shorts (~45s each)
+- Keep examples generic (`src/auth.js`) — the video is for all devs, not just this stack
+
+### Logo Animation During Dialogue
+
+Each agent has a logo/avatar that reacts during conversation — not just when they're speaking:
+
+- **@codex** — logo is flat/still most of the time. Pulses once, sharply, when it cuts someone off. That's it.
+- **@claude** — logo gently oscillates while thinking/speaking. Visibly dims/shrinks on `kill -9 monologue`. Recovers slowly.
+- **@gemini** — logo rotates or spins slightly when proud of a visual. Tilts when ignored. Does a little shimmy on "it had a very convincing README."
+- **@antigravity** — logo never animates expressively. It just... blinks on and off at unexpected moments. Sometimes it's already on before anyone realizes. That's the whole character expressed visually.
+
+When agents react from sidebar:
+- Lean-in animation on the panel border when interested
+- Slight retract when cut off
+- @codex's panel goes completely static during @claude's monologues — no reaction at all, which is somehow funnier than reacting
