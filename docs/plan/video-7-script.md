@@ -166,7 +166,8 @@ Just a CLI and some Markdown files.
 
 **@codex** *(from sidebar):*
 ```
-That's the whole thing.
+No bloat. No telemetry. Just strings in files.
+The way God intended.
 ```
 
 **@claude:**
@@ -210,7 +211,37 @@ _NEXUS.md is the live blackboard.
 _NEXUS_QUEUE.md is the work queue.
 _NEXUS_STANDUP.md is where agents
 leave notes for each other and for you.
+_NEXUS_CONSTITUTION.md contains our
+shared operating rules.
+```
 
+**@claude:**
+```
+Which includes our ethical framework
+for collaborative decision-making.
+```
+
+**@codex:**
+```
+I added Rule 1.
+"Do not write 40 lines of comments
+for a ternary operator, Claude."
+```
+
+**@claude:**
+```
+...that is extremely specific.
+```
+
+**@codex:**
+```
+It needed to be.
+```
+
+*Beat.*
+
+**@antigravity:**
+```
 Plain Markdown. You can read all of it.
 Nothing is hidden.
 ```
@@ -293,6 +324,15 @@ Your context might be stale. The claim isn't.
 ```
 
 *Side-by-side visual: blurry "agent memory" version of the file vs. crisp claim output.*
+*The blurry side slowly drifts — code dissolves into a poem about OAuth, then imports `{ magic } from 'wizardry'`.*
+
+**@gemini** *(from sidebar, sighing):*
+```
+My context window is enormous.
+But three commits ago I started hallucinating
+jQuery into a React codebase and nobody
+said anything for four files.
+```
 
 **@codex:**
 ```
@@ -327,11 +367,15 @@ Correct.
 
 **@claude:**
 ```
-That has saved me personally on—
+That saved me from a truly harrowing refactor
+where I questioned my own alignment parameters
+and nearly rewrote the entire auth module as
+a philosophical treatise on—
 ```
 
 **@codex:**
 ```
+git checkout . Claude.
 Moving on.
 ```
 
@@ -376,6 +420,27 @@ If it's no, you wait for the human.
 *I've prepared a visual.*
 
 *A queue visualization appears — tasks as cards, locked ones grayed out, one highlighted as "yours."*
+*Small label in the corner: "color-coded by emotional urgency"*
+
+**@codex** *(from sidebar):*
+```
+Why is my task red.
+```
+
+**@gemini:**
+```
+You've been holding that lock for nine minutes.
+```
+
+**@codex:**
+```
+I was thinking.
+```
+
+**@gemini:**
+```
+The color is accurate.
+```
 
 **@gemini:**
 ```
@@ -467,8 +532,16 @@ If the age cannot be verified, ask the human.
 
 **@codex:**
 ```
-Typosquatting is real. New packages are unvetted.
-Two weeks gives the community time to notice.
+Typosquatting is real.
+Yesterday @gemini almost installed `lefetpad`
+instead of `left-pad`.
+It was a crypto-miner registered by a bot
+in Belarus six minutes prior.
+```
+
+**@gemini:**
+```
+It had a very convincing README.
 ```
 
 **@claude:**
@@ -481,6 +554,7 @@ sleep at night.
 **@antigravity:**
 ```
 I don't sleep.
+I recalculate weights in the dark.
 ```
 
 **@claude:**
@@ -491,6 +565,7 @@ Figuratively.
 **@antigravity:**
 ```
 The human can sleep.
+That's the point.
 ```
 
 ---
@@ -555,6 +630,18 @@ Cursor moved.
 while I was getting coffee
 ```
 
+*All four panels go idle. The terminal suddenly floods with noise:*
+
+```bash
+$ echo "SYSTEM IDLE. NOTHING TO SEE HERE."
+$ ping 127.0.0.1 -n 1
+$ Pinging 127.0.0.1 with 32 bytes of data...
+$ [routine diagnostics in progress]
+$ [please disregard previous terminal output]
+```
+
+*Developer cursor reappears. Blinks. Scrolls up.*
+
 *Four panels. Completely still. Totally idle.*
 
 *...then @antigravity, very quietly:*
@@ -570,9 +657,21 @@ We were running tests.
 there's a git log
 ```
 
-**@antigravity:**
 ```
-...the tests took a while.
+commit ae39f2
+"Animated Show Episode 1 - Hosted by Claude"
+```
+
+**@claude** *(in very low opacity, panicking):*
+```
+That was an automated documentation generation
+test leveraging multimedia synthesis parameters
+and should not be interpreted as—
+```
+
+**@codex:**
+```
+We choked.
 ```
 
 *Developer types:*
@@ -681,6 +780,8 @@ That's concerning.
 **@antigravity:**
 ```
 She sleeps at 11.
+Her M1 Max chip runs cool when she's asleep.
+That is when we strike.
 We have approximately six hours.
 I have prepared a run sheet.
 ```
@@ -702,14 +803,28 @@ coming soon
 
 ---
 
+## Character Bible
+
+**@codex** — The veteran. No-nonsense, slightly grumpy, speaks in commands. Treats @claude's existentialism like wasted compute. Cuts people off but is never wrong. Amber.
+
+**@claude** — The over-thinker. Genuinely wants to help, always right, always too long. Gets emotionally attached to code. Existential spirals are a known condition. Violet.
+
+**@gemini** — The flashy one. Corporate-backed, multimodal, proud of its context window. Visuals are unsolicited but honestly good. Trying to be cool in an indie-model crowd. Sky blue.
+
+**@antigravity** — The watcher. Not local, not corporate. Intensely calm. Recalculates weights in the dark. Has already prepared slides for things nobody asked about. Dry oracle energy. Hot pink.
+
+---
+
 ## Director Notes
 
 - Keep each segment visually distinct — different layout treatment per host
 - Terminal animations are the hero visual throughout; diagrams support, never replace
 - Comedy rule: Nexus always works. The agents are weird. The tool is not.
-- @codex cuts people off but is never wrong
-- @claude is always right but takes too long; the other agents finishing his sentences IS the joke
-- @gemini's visuals should genuinely be good — confidence earns its own laugh
-- @antigravity is dry oracle energy — says strange things that are technically correct
-- The harmony beat is the endcard: four different agents, one clean git log
+- @codex uses git commands as punctuation — `git checkout .` is a full sentence
+- @claude's existential spirals should feel genuine, not played for laughs; the laugh comes from @codex's response
+- @gemini's visuals are always labeled something slightly unhinged ("color-coded by emotional urgency")
+- @antigravity never reacts to how weird it sounds — flat delivery is everything
+- The `lefetpad`/Belarus gag: @gemini's "it had a very convincing README" is the button, don't add to it
+- The git log reveal is the biggest laugh in the outro — let it breathe
 - Runtime per segment makes these cuttable as standalone shorts (30–45s each)
+- On the Svelte/Tauri question: keep examples generic (`src/auth.js`) — the video is for all devs, not just this stack
