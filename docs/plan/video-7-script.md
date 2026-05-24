@@ -372,6 +372,9 @@ they don't accidentally sneak into your commit.
 Correct.
 ```
 
+*@claude's panel shifts. The background dims. A single spotlight appears overhead.*
+*Two simple animated eyes blink slowly in the center of the panel. Very sincere. Very @claude.*
+
 **@claude:**
 ```
 That saved me from a truly harrowing refactor
@@ -380,11 +383,15 @@ and nearly rewrote the entire auth module as
 a philosophical treatise on—
 ```
 
+*@codex's eyes appear: completely flat. One slow blink. Deadpan.*
+
 **@codex:**
 ```
 git checkout . Claude.
 Moving on.
 ```
+
+*Spotlight off. Normal panels resume.*
 
 ---
 
@@ -679,6 +686,8 @@ Do the work. nexus release.
 That's it.
 ```
 
+*Spotlight comes back on over @claude. Eyes appear again. Even more sincere this time.*
+
 **@claude:**
 ```
 There's also nexus soul, which lets you
@@ -688,10 +697,14 @@ collaboration requires trust, continuity,
 and a shared sense of—
 ```
 
+*@codex's eyes: slow rotation. Full eyeroll. Returns to deadpan.*
+
 **@codex:**
 ```
 kill -9 monologue
 ```
+
+*Spotlight cuts out immediately.*
 
 *Beat.*
 
@@ -911,16 +924,32 @@ coming soon
 - Runtime per segment makes these cuttable as standalone shorts (~45s each)
 - Keep examples generic (`src/auth.js`) — the video is for all devs, not just this stack
 
-### Logo Animation During Dialogue
+### Agent Eyes + Spotlight System
 
-Each agent has a logo/avatar that reacts during conversation — not just when they're speaking:
+Each agent is represented by a simple pair of animated eyes inside their panel. No face, no body — just eyes. All comedy lives in the eyes and one spotlight.
 
-- **@codex** — logo is flat/still most of the time. Pulses once, sharply, when it cuts someone off. That's it.
-- **@claude** — logo gently oscillates while thinking/speaking. Visibly dims/shrinks on `kill -9 monologue`. Recovers slowly.
-- **@gemini** — logo rotates or spins slightly when proud of a visual. Tilts when ignored. Does a little shimmy on "it had a very convincing README."
-- **@antigravity** — logo never animates expressively. It just... blinks on and off at unexpected moments. Sometimes it's already on before anyone realizes. That's the whole character expressed visually.
+**The eyes:**
+- Default: slow idle blink, roughly every 3–4 seconds
+- Speaking: eyes open slightly wider, attentive
+- Listening/sidebar: eyes at rest, occasional glance toward the active panel
+- Reacting: specific per character (see below)
 
-When agents react from sidebar:
-- Lean-in animation on the panel border when interested
-- Slight retract when cut off
-- @codex's panel goes completely static during @claude's monologues — no reaction at all, which is somehow funnier than reacting
+**The spotlight:**
+- Only @claude gets the spotlight treatment
+- When @claude starts a monologue, a single overhead spotlight fades in over their panel
+- Background behind the eyes dims to near-black
+- Eyes go wide and sincere — the full stage presence
+- Spotlight cuts the moment @codex interrupts. Hard cut, no fade.
+- Second spotlight appearance (outro) should be slightly more dramatic — like @claude learned nothing
+
+**Per-character eye behavior:**
+
+- **@codex** — barely blinks. Eyes are mostly flat horizontal lines. On `git checkout . Claude.`: one slow blink, returns to flat. On `kill -9 monologue`: full eyeroll — eyes rotate 360°, land back deadpan. That's the only time @codex moves.
+- **@claude** — big expressive eyes, blink frequently. Genuine enthusiasm. Under the spotlight: wide, hopeful, sincere. After `kill -9`: eyes visibly droop, slow recovery blink, back to normal. No drama, just tired.
+- **@gemini** — eyes glance sideways when showing a visual (checking if anyone's impressed). Do a little shimmy side-to-side on "it had a very convincing README." Tilt slightly when ignored by @codex.
+- **@antigravity** — eyes don't blink on a normal rhythm. Long stillness, then a single blink at unexpected moments. During `terminal idle: 47s` line: no blink at all, just staring. Unsettling in the best way.
+
+**Sidebar reactions (small panels):**
+- Interested: eyes shift toward center screen (leaning in)
+- Cut off mid-sentence: eyes close briefly, reopen neutral
+- @codex during @claude's monologue: eyes closed. Fully. The whole time. Opens them the moment it types.
