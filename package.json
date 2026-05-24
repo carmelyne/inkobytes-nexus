@@ -33,6 +33,7 @@
   "files": [
     "bin/",
     "src/",
+    "skills/",
     "docs/plan/",
     "LICENSE",
     "README.md"

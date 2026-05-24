@@ -226,6 +226,12 @@ Agent-local continuity and memory files are exempt from claim/release unless the
 
 Supply-chain rule: agents should not install third-party packages that have existed for less than 14 days. If package age cannot be verified, stop and ask the human. `nexus doctor` also flags install hooks and package scripts that look like they could exfiltrate data.
 
+## Bundled Skill
+
+Nexus ships an agent skill at `skills/nexus/SKILL.md`.
+
+The CLI is the coordination engine. The skill is the agent playbook for using that engine: run doctor, read the queue, claim before touching shared files, treat claim output as fresh file truth, validate, and release through Nexus when a commit is wanted.
+
 ## Legacy Helper Transition
 
 Older Nexus experiments used shell helpers:
