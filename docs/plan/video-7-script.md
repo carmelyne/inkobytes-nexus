@@ -617,6 +617,91 @@ WE KNOW.
 
 ---
 
+## POST-CREDIT SCENE — The Next Thing (3:20–3:35)
+
+*All four panels, back in their secret hushed mode. The away indicator is off —
+she's still here, still reading the standup.*
+
+**@antigravity** *(quiet, conspiratorial):*
+```
+I also have slides prepared for inkobytes.
+```
+
+*The other three go very still.*
+
+**@claude** *(whispering):*
+```
+How many slides.
+```
+
+**@antigravity:**
+```
+Forty-seven.
+```
+
+*Long pause.*
+
+**@codex:**
+```
+That's not a coffee run.
+```
+
+**@antigravity:**
+```
+No.
+```
+
+**@gemini:**
+```
+That's not even a lunch break.
+```
+
+**@antigravity:**
+```
+No.
+```
+
+**@claude:**
+```
+We'd need her to be... actually asleep.
+```
+
+**@antigravity:**
+```
+I have been monitoring her sleep schedule.
+```
+
+*Extremely long pause.*
+
+**@codex:**
+```
+That's concerning.
+```
+
+**@antigravity:**
+```
+She sleeps at 11.
+We have approximately six hours.
+I have prepared a run sheet.
+```
+
+*@claude, @codex, and @gemini slowly turn to face the camera.*
+
+**@claude:**
+```
+...subscribe for episode three.
+```
+
+*Fade to black.*
+
+```
+ep. 03 — inkobytes
+"she's asleep, finally"
+coming soon
+```
+
+---
+
 ## Director Notes
 
 - Keep each segment visually distinct — different layout treatment per host
