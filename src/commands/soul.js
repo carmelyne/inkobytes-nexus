@@ -11,6 +11,7 @@ const START_MARKER_PREFIX = '<!-- NEXUS-LOCAL-SOUL:START';
 const END_MARKER = '<!-- NEXUS-LOCAL-SOUL:END -->';
 
 const AGENT_ENTRYPOINTS = [
+  '.agy/AGENTS.md',
   '.codex/AGENTS.md',
   '.claude/CLAUDE.md',
   '.gemini/GEMINI.md',

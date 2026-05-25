@@ -44,4 +44,5 @@ test('package ships bundled Nexus skill', () => {
   assert.ok(pkg.files.includes('skills/'));
   assert.match(skill, /^---\nname: nexus/m);
   assert.match(skill, /fresh file truth/);
+  assert.doesNotMatch(skill, /preflight/);
 });

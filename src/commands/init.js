@@ -5,6 +5,7 @@
 import { existsSync, mkdirSync, writeFileSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { cwd } from 'process';
+import { AGENT_SCOPE_ENTRIES } from '../lib/agentScopes.js';
 
 const TEMPLATES = {
   '_NEXUS.md': '',
@@ -59,7 +60,20 @@ const TEMPLATES = {
 `,
 
   '_NEXUS_REPORT.md': `# 📋 NEXUS REPORT
-*Auto-generated. Do not edit manually.*
+Repo-local release receipts and done-review notes live here.
+
+Each \`nexus release\` appends a lightweight backup record:
+
+\`\`\`markdown
+Done claim:
+- Changed:
+- Validated:
+- Risk:
+
+Adversarial result:
+- Pass, or:
+- Finding:
+\`\`\`
 
 `,
 
@@ -113,6 +127,7 @@ Before choosing follow-on work, read \`_NEXUS_QUEUE.md\`.
 
 - \`_NEXUS_QUEUE.md\` decides executable priority, dependencies, file scope, cost, and \`Auto-flow\`.
 - \`_NEXUS_STANDUP.md\` is for comms, human context, decisions, and completion notes.
+- \`USER.md\`, when present, is local-only human identity and preference context.
 - If queue and standup conflict, follow the queue for what to work on, then use standup to explain or ask.
 - If no explicit user task is given, run \`nexus next @Agent\` and only auto-claim returned work when \`Auto-flow: yes\`.
 
@@ -166,7 +181,7 @@ If a directory is claimed, no other agent may claim a file inside it. If a child
 
 - Do not install third-party packages that have existed for less than 14 days.
 - Before adding a new dependency, verify its package registry creation date.
-- If the package is younger than 14 days or the age cannot be verified, stop and ask Pong.
+- If the package is younger than 14 days or the age cannot be verified, stop and ask the user.
 - Run \`nexus doctor\` before installs; review any Security findings before running package scripts.
 - Treat install hooks and scripts with network commands, webhooks, raw sockets, SSH, or secret-looking variables as human-review only.
 - Prefer built-in runtime APIs and existing project dependencies when they fit.
@@ -196,30 +211,6 @@ const GITIGNORE_ENTRY = `
 *.lockdir
 *.flock
 `;
-
-const AGENT_SCAFFOLDS = {
-  '.codex': {
-    label: 'Codex',
-    entrypoint: '.codex/AGENTS.md',
-    continuity: '.codex/CONTINUITY.md',
-    memoryIndex: '.codex/memories/INDEX.md',
-    memoryDir: '.codex/memories',
-  },
-  '.claude': {
-    label: 'Claude',
-    entrypoint: '.claude/CLAUDE.md',
-    continuity: '.claude/CONTINUITY.md',
-    memoryIndex: '.claude/memories/INDEX.md',
-    memoryDir: '.claude/memories',
-  },
-  '.gemini': {
-    label: 'Gemini',
-    entrypoint: '.gemini/GEMINI.md',
-    continuity: '.gemini/CONTINUITY.md',
-    memoryIndex: '.gemini/memories/INDEX.md',
-    memoryDir: '.gemini/memories',
-  },
-};
 
 const CONTINUITY_TEMPLATE = `# CONTINUITY
 Goal: Project setup
@@ -289,15 +280,16 @@ This project uses Nexus for multi-agent coordination.
 1. Read \`_NEXUS_CONSTITUTION.md\`.
 2. Read \`_NEXUS_QUEUE.md\` for executable priorities.
 3. Read \`_NEXUS_STANDUP.md\` for comms, decisions, and completion notes.
-4. Read \`${scaffold.continuity}\` for current session state.
-5. Read \`${scaffold.memoryIndex}\` and the latest memory entry when resync is needed.
+4. Read \`USER.md\` if present for local human preferences.
+5. Read \`${scaffold.continuity}\` for current session state.
+6. Read \`${scaffold.memoryIndex}\` and the latest memory entry when resync is needed.
 
 ### Nexus Rules
 
 - Claim before editing shared project files: \`nexus claim <path> @Agent "intent"\`.
 - Release finished work through Nexus: \`nexus release <path> "commit message"\`.
 - Use \`nexus next @Agent\` for the next safe queue task.
-- Do not free-roam into unassigned or \`Auto-flow: no\` work without Pong approval.
+- Do not free-roam into unassigned or \`Auto-flow: no\` work without user approval.
 
 ### Fresh File Truth
 
@@ -306,11 +298,19 @@ This project uses Nexus for multi-agent coordination.
 - Treat \`nexus claim\` output as fresh file state for the claimed path.
 - If another agent or tool may have touched the file since your last read, re-read it before editing.
 
+### Git Write Safety
+
+- Before git writes, verify \`pwd\`, repo root, branch/status, and remotes.
+- Stop if they do not match the requested project.
+- Never infer from similar folder names or cached context.
+- Require explicit confirmation before push/force-push, main/master, remote changes, or deletes.
+- To remove private agent files from git, untrack them; do not delete local folders.
+
 ### Supply-Chain Safety
 
 - Do not install third-party packages that have existed for less than 14 days.
 - Before adding a new dependency, verify its package registry creation date.
-- If the package is younger than 14 days or the age cannot be verified, stop and ask Pong.
+- If the package is younger than 14 days or the age cannot be verified, stop and ask the user.
 - Run \`nexus doctor\` before installs; review any Security findings before running package scripts.
 - Treat install hooks and scripts with network commands, webhooks, raw sockets, SSH, or secret-looking variables as human-review only.
 - Prefer built-in runtime APIs and existing project dependencies when they fit.
@@ -318,7 +318,7 @@ This project uses Nexus for multi-agent coordination.
 ### Agent-Local Files
 
 \`${scaffold.continuity}\` and \`${scaffold.memoryIndex}\` are agent-local handoff files.
-They are exempt from Nexus claim/release unless Pong says otherwise.
+They are exempt from Nexus claim/release unless the user says otherwise.
 
 ### Memory Flow
 
@@ -375,7 +375,8 @@ export default function init(args) {
   // Create agent-local continuity and memory scaffolds.
   // These files are exempt from Nexus claim/release because they are session-local handoff state.
   let agentFilesCreated = 0;
-  for (const [agentDir, scaffold] of Object.entries(AGENT_SCAFFOLDS)) {
+  for (const [, scaffold] of AGENT_SCOPE_ENTRIES) {
+    const agentDir = scaffold.dir;
     const baseDir = join(root, agentDir);
     const memoryDir = join(root, scaffold.memoryDir);
     const memoryMonthDir = join(memoryDir, currentMemoryMonthFolder());

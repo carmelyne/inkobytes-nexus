@@ -4,6 +4,7 @@ import { mkdtempSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { chdir, cwd } from 'process';
+import { spawnSync } from 'child_process';
 import doctor from '../src/commands/doctor.js';
 import { resetConfig } from '../src/lib/config.js';
 
@@ -49,6 +50,11 @@ test('doctor --fix creates agent scaffolds and protocol blocks', () => {
     assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /NEXUS-AGENT-PROTOCOL:START/);
     assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /less than 14 days/);
     assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /### Fresh File Truth/);
+    assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /### Git Write Safety/);
+    assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /Never infer from similar folder names or cached context/);
+    assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /untrack them; do not delete local folders/);
+    assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /Read `USER\.md` if present/);
+    assert.doesNotMatch(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /Pong/);
     assert.match(readFileSync(join(root, '.codex', 'CONTINUITY.md'), 'utf-8'), /# CONTINUITY/);
     assert.match(readFileSync(join(root, '.codex', 'memories', 'INDEX.md'), 'utf-8'), /YYYY-Month/);
   });
@@ -266,13 +272,46 @@ test('doctor reports package privacy risks from package files allowlist', () => 
     writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
     writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
     writeFileSync(join(root, 'package.json'), JSON.stringify({
-      files: ['bin/', '.nexus/local/', '.codex/'],
+      files: ['bin/', '.nexus/local/', '.agy/', '.antigravitycli/', '.codex/'],
     }), 'utf-8');
 
     const output = captureLogs(() => doctor([]));
 
     assert.match(output, /Package Privacy/);
     assert.match(output, /\.nexus\/local/);
+    assert.match(output, /\.agy/);
+    assert.match(output, /\.antigravitycli/);
     assert.match(output, /\.codex/);
+  });
+});
+
+test('doctor reports tracked private agent state without deleting local files', () => {
+  inTempRepo((root) => {
+    spawnSync('git', ['init'], { cwd: root, stdio: 'pipe' });
+    spawnSync('git', ['config', 'user.email', 'test@example.com'], { cwd: root, stdio: 'pipe' });
+    spawnSync('git', ['config', 'user.name', 'Test Agent'], { cwd: root, stdio: 'pipe' });
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    mkdirSync(join(root, '.antigravitycli'), { recursive: true });
+    mkdirSync(join(root, '.codex'), { recursive: true });
+    mkdirSync(join(root, '.claude'), { recursive: true });
+    mkdirSync(join(root, '.gemini'), { recursive: true });
+    writeFileSync(join(root, '.antigravitycli', 'AGENTS.md'), '# Local Antigravity notes\n', 'utf-8');
+    writeFileSync(join(root, '.codex', 'AGENTS.md'), '# Local agent notes\n', 'utf-8');
+    writeFileSync(join(root, '.claude', 'CLAUDE.md'), '# Local Claude notes\n', 'utf-8');
+    writeFileSync(join(root, '.gemini', 'GEMINI.md'), '# Local Gemini notes\n', 'utf-8');
+    writeFileSync(join(root, 'USER.md'), '# Local user\n', 'utf-8');
+    spawnSync('git', ['add', '.antigravitycli/AGENTS.md', '.codex/AGENTS.md', '.claude/CLAUDE.md', '.gemini/GEMINI.md', 'USER.md'], { cwd: root, stdio: 'pipe' });
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /Git Privacy/);
+    assert.match(output, /Git tracks private\/local path: \.antigravitycli\/AGENTS\.md/);
+    assert.match(output, /Git tracks private\/local path: \.codex\/AGENTS\.md/);
+    assert.match(output, /Git tracks private\/local path: \.claude\/CLAUDE\.md/);
+    assert.match(output, /Git tracks private\/local path: \.gemini\/GEMINI\.md/);
+    assert.match(output, /Git tracks private\/local path: USER\.md/);
+    assert.match(output, /git rm --cached -r -- <path>/);
   });
 });

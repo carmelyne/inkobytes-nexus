@@ -1,11 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, writeFileSync } from 'fs';
+import { mkdtempSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { chdir, cwd } from 'process';
 import { spawnSync } from 'child_process';
 import { stageAndCommit } from '../src/lib/git.js';
+import release from '../src/commands/release.js';
+import { acquireLock } from '../src/lib/lockManager.js';
 import { resetConfig } from '../src/lib/config.js';
 
 function inTempRepo(fn) {
@@ -35,5 +37,22 @@ test('stageAndCommit returns clear message when git index stays locked', () => {
 
     assert.equal(result.success, false);
     assert.match(result.message, /Git index stayed locked/);
+  });
+});
+
+test('release appends done claim and adversarial review template', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, 'file.txt'), 'hello\n', 'utf-8');
+    spawnSync('git', ['add', 'file.txt'], { cwd: root, stdio: 'pipe' });
+    spawnSync('git', ['commit', '-m', 'init'], { cwd: root, stdio: 'pipe' });
+    writeFileSync(join(root, 'file.txt'), 'hello again\n', 'utf-8');
+    acquireLock('file.txt', '@codex', 'test release report');
+
+    release(['file.txt', 'test release report']);
+
+    const report = readFileSync(join(root, '_NEXUS_REPORT.md'), 'utf-8');
+    assert.match(report, /Commit: test release report/);
+    assert.match(report, /Done claim:\n- Changed:\n- Validated:\n- Risk:/);
+    assert.match(report, /Adversarial result:\n- Pass, or:\n- Finding:/);
   });
 });

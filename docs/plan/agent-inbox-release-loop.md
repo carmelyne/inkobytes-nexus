@@ -93,11 +93,11 @@ Do not add per-agent inbox files in v1. The CLI can derive inboxes by scanning c
 
 ## 2026-05-20
 
-[08:42 · ASK · @Besh-Codex -> @Besh-Gemini · cc @Pong]
+[08:42 · ASK · @codex -> @gemini · cc @Pong]
 Which frontend files did you touch most recently?
 -> thread: 2026-05-20-ask-gemini-touched-files.md
 
-[08:48 · 411 · @Besh-Gemini · cc @Pong]
+[08:48 · 411 · @gemini · cc @Pong]
 Lesson screen visual polish done. No reply needed.
 ```
 
@@ -109,17 +109,17 @@ Lesson screen visual polish done. No reply needed.
 Channel: #frontend
 Status: Open
 CC: @Pong
-Participants: @Besh-Codex, @Besh-Gemini
+Participants: @codex, @gemini
 
 ## Messages
 
-[08:42 · ASK · @Besh-Codex -> @Besh-Gemini · cc @Pong]
+[08:42 · ASK · @codex -> @gemini · cc @Pong]
 Which frontend files did you touch most recently?
 
-[08:45 · ACK · @Besh-Gemini -> @Besh-Codex · cc @Pong]
+[08:45 · ACK · @gemini -> @codex · cc @Pong]
 Saw this, checking current diff.
 
-[08:47 · DONE · @Besh-Gemini -> @Besh-Codex · cc @Pong]
+[08:47 · DONE · @gemini -> @codex · cc @Pong]
 Touched StartScreen, MissingLetterPracticeScreen, and TraceWritingScreen.
 ```
 
@@ -131,10 +131,10 @@ Potential commands:
 
 ```bash
 nexus chat post frontend --code 411 "Cursor CSS cleanup committed"
-nexus chat ask frontend @Besh-Gemini "Which files did you touch?"
-nexus chat request frontend @Besh-Claude "Please review lesson data shape"
+nexus chat ask frontend @gemini "Which files did you touch?"
+nexus chat request frontend @claude "Please review lesson data shape"
 nexus chat reply frontend/2026-05-20-ask-gemini-touched-files --code DONE "Touched StartScreen and MissingLetterPracticeScreen"
-nexus inbox @Besh-Codex
+nexus inbox @codex
 nexus chat render
 ```
 
@@ -157,7 +157,7 @@ Example clear output:
 Released src/learning/MissingLetterPracticeScreen.tsx
 Commit: 86544fb Remove web-only missing letter cursor CSS
 
-Inbox for @Besh-Codex:
+Inbox for @codex:
 - Clear
 
 Next queue:
@@ -170,8 +170,8 @@ Example blocked output:
 Released src/learning/MissingLetterPracticeScreen.tsx
 Commit: 86544fb Remove web-only missing letter cursor CSS
 
-Inbox for @Besh-Codex:
-- ASK #frontend from @Besh-Gemini: Which files do you need next?
+Inbox for @codex:
+- ASK #frontend from @gemini: Which files do you need next?
 
 Action:
 - Reply before claiming the next Queue task.

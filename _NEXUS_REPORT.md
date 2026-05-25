@@ -32,3 +32,17 @@ Auto-generated release receipts will appear here.
 - [20:16:14] ✅ **test/doctor.test.js** - cover doctor json and package privacy
 - [20:16:18] ✅ **test/soul.test.js** - cover soul status and remove
 - [20:16:22] ✅ **README.md** - document resume doctor json and soul polish
+- [15:42:24] ✅ **.gitignore** - add remotion-labs to gitignore
+- [15:42:29] ✅ **_NEXUS_STANDUP.md** - log Besh remotion-labs setup
+- [15:43:44] ✅ **_NEXUS_STANDUP.md** - log remotion-labs private git init
+- [16:43:03] ✅ **docs/plan/remotion-videos.md** - docs: add Remotion how-to video plan
+- [16:46:22] ✅ **docs/plan/remotion-videos.md** - docs: add agents story video concept (Video 6)
+- [16:53:39] ✅ **docs/plan/video-6-script.md** - docs: add full Video 6 agent dialogue script
+- [16:57:19] ✅ **docs/plan/video-6-script.md** - docs: keep Video 6 script as-is
+- [16:58:55] ✅ **docs/plan/video-7-script.md** - docs: add Video 7 show format script
+- [17:15:06] ✅ **docs/plan/video-7-script.md** - docs: add Toy Story AFK cold open and developer return outro to Video 7
+- [17:19:04] ✅ **docs/plan/video-7-script.md** - docs: add inkobytes sleeping post-credit scene to Video 7
+- [17:28:30] ✅ **docs/plan/video-7-script.md** - docs: integrate Gemini character punch-ups into Video 7 script
+- [17:29:57] ✅ **docs/plan/video-7-script.md** - docs: fix M1 Max -> M1 16gb
+- [19:32:00] ✅ **docs/plan/video-7-script.md** - docs: rewrites — auto-flow beat, kill -9, reply-guy fixes, logo animation notes
+- [19:50:57] ✅ **docs/plan/video-7-script.md** - docs: add spotlight, eye animations, and codex eyeroll to Video 7

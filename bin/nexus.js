@@ -10,7 +10,7 @@ const COMMANDS = {
   status: () => import('../src/commands/status.js'),
   clean: () => import('../src/commands/clean.js'),
   next: () => import('../src/commands/next.js'),
-  resume: () => import('../src/commands/resume.js'),
+  start: () => import('../src/commands/start.js'),
   soul: () => import('../src/commands/soul.js'),
   help: () => import('../src/commands/help.js'),
 };
@@ -59,7 +59,7 @@ Commands:
   status                            Show current blackboard state
   clean [--stale | <path>]          Prune locks (surgical, stale, or nuke)
   next <agent>                      Suggest next safe task from queue
-  resume                            Summarize local repo state
+  start [--agent @handle]           Orient an agent entering this repo
   soul [--file <path>] [--status | --remove]
                                     Manage local soul overlay in agent files
   help                              Show this help
@@ -68,11 +68,11 @@ Examples:
   nexus init
   nexus doctor --fix
   nexus doctor --json
-  nexus resume
+  nexus start
   nexus soul
-  nexus claim src/lib/components/login/ @Claude "Building login UI"
+  nexus claim src/lib/components/login/ @claude "Building login UI"
   nexus release src/lib/components/login/ "feat: login form component"
   nexus clean --stale
-  nexus next @Claude
+  nexus next @claude
 `);
 }

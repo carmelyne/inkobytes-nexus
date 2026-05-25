@@ -42,11 +42,18 @@ test('init creates managed agent guides that doctor accepts', () => {
 
     const output = captureLogs(() => doctor([]));
     const codexGuide = readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8');
+    const agyGuide = readFileSync(join(root, '.agy', 'AGENTS.md'), 'utf-8');
 
     assert.match(output, /All checked Nexus categories are ready/);
     assert.equal(codexGuide.match(/NEXUS-AGENT-PROTOCOL:START/g).length, 1);
     assert.equal(codexGuide.match(/This project uses Nexus for multi-agent coordination\./g).length, 1);
     assert.match(codexGuide, /### Fresh File Truth/);
+    assert.match(codexGuide, /### Git Write Safety/);
+    assert.match(codexGuide, /Never infer from similar folder names or cached context/);
+    assert.match(codexGuide, /untrack them; do not delete local folders/);
     assert.match(codexGuide, /cached model memory/);
+    assert.match(codexGuide, /Read `USER\.md` if present/);
+    assert.doesNotMatch(codexGuide, /Pong/);
+    assert.match(agyGuide, /\.agy\/CONTINUITY\.md/);
   });
 });

@@ -46,7 +46,20 @@ export default function release(args) {
   // Append to report
   const config = getConfig();
   const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false });
-  const reportLine = `- [${timestamp}] ✅ **${target}** - ${commitMsg}\n`;
+  const reportLine = `## [${timestamp}] ${target}
+
+Commit: ${commitMsg}
+
+Done claim:
+- Changed:
+- Validated:
+- Risk:
+
+Adversarial result:
+- Pass, or:
+- Finding:
+
+`;
 
   try {
     appendFileSync(config.report, reportLine, 'utf-8');

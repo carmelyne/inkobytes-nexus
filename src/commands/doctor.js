@@ -5,32 +5,10 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { cwd } from 'process';
+import { spawnSync } from 'child_process';
 import { listLocks } from '../lib/lockManager.js';
 import { getConfig } from '../lib/config.js';
-
-const AGENTS = [
-  {
-    label: 'Codex',
-    entrypoint: '.codex/AGENTS.md',
-    continuity: '.codex/CONTINUITY.md',
-    memoryIndex: '.codex/memories/INDEX.md',
-    memoryDir: '.codex/memories',
-  },
-  {
-    label: 'Claude',
-    entrypoint: '.claude/CLAUDE.md',
-    continuity: '.claude/CONTINUITY.md',
-    memoryIndex: '.claude/memories/INDEX.md',
-    memoryDir: '.claude/memories',
-  },
-  {
-    label: 'Gemini',
-    entrypoint: '.gemini/GEMINI.md',
-    continuity: '.gemini/CONTINUITY.md',
-    memoryIndex: '.gemini/memories/INDEX.md',
-    memoryDir: '.gemini/memories',
-  },
-];
+import { AGENT_SCOPE_LIST } from '../lib/agentScopes.js';
 
 const MONTH_NAMES = [
   'January',
@@ -98,15 +76,16 @@ This project uses Nexus for multi-agent coordination.
 1. Read \`_NEXUS_CONSTITUTION.md\`.
 2. Read \`_NEXUS_QUEUE.md\` for executable priorities.
 3. Read \`_NEXUS_STANDUP.md\` for comms, decisions, and completion notes.
-4. Read \`${agent.continuity}\` for current session state.
-5. Read \`${agent.memoryIndex}\` and the latest memory entry when resync is needed.
+4. Read \`USER.md\` if present for local human preferences.
+5. Read \`${agent.continuity}\` for current session state.
+6. Read \`${agent.memoryIndex}\` and the latest memory entry when resync is needed.
 
 ### Nexus Rules
 
 - Claim before editing shared project files: \`nexus claim <path> @Agent "intent"\`.
 - Release finished work through Nexus: \`nexus release <path> "commit message"\`.
 - Use \`nexus next @Agent\` for the next safe queue task.
-- Do not free-roam into unassigned or \`Auto-flow: no\` work without Pong approval.
+- Do not free-roam into unassigned or \`Auto-flow: no\` work without user approval.
 
 ### Fresh File Truth
 
@@ -115,11 +94,19 @@ This project uses Nexus for multi-agent coordination.
 - Treat \`nexus claim\` output as fresh file state for the claimed path.
 - If another agent or tool may have touched the file since your last read, re-read it before editing.
 
+### Git Write Safety
+
+- Before git writes, verify \`pwd\`, repo root, branch/status, and remotes.
+- Stop if they do not match the requested project.
+- Never infer from similar folder names or cached context.
+- Require explicit confirmation before push/force-push, main/master, remote changes, or deletes.
+- To remove private agent files from git, untrack them; do not delete local folders.
+
 ### Supply-Chain Safety
 
 - Do not install third-party packages that have existed for less than 14 days.
 - Before adding a new dependency, verify its package registry creation date.
-- If the package is younger than 14 days or the age cannot be verified, stop and ask Pong.
+- If the package is younger than 14 days or the age cannot be verified, stop and ask the user.
 - Run \`nexus doctor\` before installs; review any Security findings before running package scripts.
 - Treat install hooks and scripts with network commands, webhooks, raw sockets, SSH, or secret-looking variables as human-review only.
 - Prefer built-in runtime APIs and existing project dependencies when they fit.
@@ -127,7 +114,7 @@ This project uses Nexus for multi-agent coordination.
 ### Agent-Local Files
 
 \`${agent.continuity}\` and \`${agent.memoryIndex}\` are agent-local handoff files.
-They are exempt from Nexus claim/release unless Pong says otherwise.
+They are exempt from Nexus claim/release unless the user says otherwise.
 
 ### Memory Flow
 
@@ -290,6 +277,7 @@ export default function doctor(args) {
     'Agent Instructions': [],
     Security: [],
     'Package Privacy': [],
+    'Git Privacy': [],
     'Legacy Helpers': [],
     Continuity: [],
     Memories: [],
@@ -306,6 +294,7 @@ export default function doctor(args) {
   const nexusProtocolFiles = ['_NEXUS_CONSTITUTION.md', '_NEXUS_QUEUE.md', '_NEXUS_STANDUP.md'];
   const legacyCheckFiles = [
     ...nexusProtocolFiles,
+    '.agy/AGENTS.md',
     '.codex/AGENTS.md',
     '.claude/CLAUDE.md',
     '.gemini/GEMINI.md',
@@ -328,7 +317,11 @@ export default function doctor(args) {
     sections['Package Privacy'].push(issue);
   }
 
-  for (const agent of AGENTS) {
+  for (const issue of scanGitPrivacy(root)) {
+    sections['Git Privacy'].push(issue);
+  }
+
+  for (const agent of AGENT_SCOPE_LIST) {
     const memoryDir = join(root, agent.memoryDir);
     const monthDir = join(memoryDir, currentMemoryMonthFolder());
     const continuityPath = join(root, agent.continuity);
@@ -569,12 +562,24 @@ function scanPackageSecurity(root) {
 
 const PRIVATE_PACKAGE_PATHS = [
   '.nexus/local',
+  '.agy',
+  '.antigravitycli',
   '.codex',
   '.claude',
   '.gemini',
   'agent-overlay.md',
   'SOUL.md',
   'IDENTITY.md',
+  'USER.md',
+];
+
+const PRIVATE_GIT_PATHS = [
+  '.agy',
+  '.antigravitycli',
+  '.codex',
+  '.claude',
+  '.gemini',
+  '.nexus/local',
   'USER.md',
 ];
 
@@ -607,4 +612,22 @@ function scanPackagePrivacy(root) {
   }
 
   return issues;
+}
+
+function scanGitPrivacy(root) {
+  const gitDir = join(root, '.git');
+  if (!existsSync(gitDir)) return [];
+
+  const result = spawnSync('git', ['ls-files', '--', ...PRIVATE_GIT_PATHS], {
+    cwd: root,
+    encoding: 'utf-8',
+    stdio: 'pipe',
+  });
+  if (result.status !== 0) return [];
+
+  const tracked = result.stdout.split('\n').filter(Boolean);
+  return tracked.map((file) => ({
+    issue: `Git tracks private/local path: ${file}`,
+    fix: 'Untrack it without deleting local files: `git rm --cached -r -- <path>`, then add an ignore rule.',
+  }));
 }
