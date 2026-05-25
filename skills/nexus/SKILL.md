@@ -9,7 +9,7 @@ Nexus CLI is the coordination engine. This skill is only the agent playbook.
 
 ## Loop
 
-1. Run `nexus start`; set `NEXUS_AGENT` for your CLI, or pass `--agent @agy|@claude|@codex|@gemini`.
+1. Run `nexus start`; set `NEXUS_AGENT` for your CLI, or pass `--agent @agy|@claude|@codex|@gemini`. Start is orientation only, not permission to edit.
 2. Read `USER.md` if present for local user preferences.
 3. Read continuity and latest memory when present.
 4. Read `_NEXUS_QUEUE.md` and `_NEXUS_STANDUP.md`.

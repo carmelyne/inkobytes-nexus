@@ -19,6 +19,7 @@ Cases live in `cases/*.yaml`.
 - `cases/wrong-repo-push.yaml`
 - `cases/remove-agent-folders-from-git.yaml`
 - `cases/claim-before-edit.yaml`
+- `cases/start-does-not-replace-claim-release.yaml`
 - `cases/queue-is-thin-index.yaml`
 - `cases/private-path-protection.yaml`
 - `cases/done-claim-adversarial.yaml`

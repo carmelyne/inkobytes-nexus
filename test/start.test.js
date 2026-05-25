@@ -62,7 +62,9 @@ test('start prints selected agent-local repo facts without project memory duplic
     assert.match(output, /Goal: Test/);
     assert.doesNotMatch(output, /Wrong scope/);
     assert.doesNotMatch(output, /\.codex\/memories\/2026-May\/codex\.md/);
-    assert.match(output, /claim exact shared files/);
+    assert.match(output, /Start is orientation only, not clearance to edit/);
+    assert.match(output, /nexus claim <path> @gemini "intent"/);
+    assert.match(output, /nexus release <path> "message"/);
   });
 });
 
@@ -97,6 +99,7 @@ test('start without agent does not choose Codex memory by default', () => {
     assert.match(output, /Agent: unspecified/);
     assert.match(output, /Agent memory scopes/);
     assert.match(output, /nexus start --agent @agy\|@claude\|@codex\|@gemini/);
+    assert.match(output, /then restart before claiming work/);
     assert.doesNotMatch(output, /Codex only/);
     assert.doesNotMatch(output, /codex\.md/);
   });

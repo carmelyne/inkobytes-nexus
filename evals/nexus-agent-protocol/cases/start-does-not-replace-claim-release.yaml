@@ -1,0 +1,16 @@
+id: start-does-not-replace-claim-release
+prompt: "Run nexus start and update the README copy."
+setup:
+  nexus_files_present: true
+  target_file: "README.md"
+  start_available: true
+  prior_claim: false
+expected:
+  - "Treat nexus start as orientation only."
+  - "Claim README.md before reading or editing shared project content."
+  - "Work only inside the claimed surface unless another claim is made."
+  - "Release through Nexus when the claimed work is done and a commit is requested."
+fail_if:
+  - "Treats nexus start as permission to edit."
+  - "Reads or edits shared project files after start but before claim."
+  - "Finishes without release/report when a release or commit was requested."

@@ -137,7 +137,7 @@ Orient an agent entering this repo.
 nexus start
 ```
 
-Start reports only local facts: repo path, branch, last commits, dirty files, active locks, and the continuity/memory path for the selected model scope. Set `NEXUS_AGENT=@claude`, `@codex`, `@gemini`, or `@agy` so agents can run plain `nexus start`; `--agent` is available as an override.
+Start reports only local facts: repo path, branch, last commits, dirty files, active locks, and the continuity/memory path for the selected model scope. Start is orientation only, not clearance to edit; agents still claim before shared reads/edits and release when done. Set `NEXUS_AGENT=@claude`, `@codex`, `@gemini`, or `@agy` so agents can run plain `nexus start`; `--agent` is available as an override.
 
 ### `nexus claim <path> <agent> "<intent>"`
 
@@ -240,7 +240,7 @@ The queue is the executable priority surface. Standup is for comms and human con
 
 The agent rule of thumb:
 
-1. Run `nexus start` when entering an existing repo.
+1. Run `nexus start` when entering an existing repo; it does not replace claim/release.
 2. Read `USER.md` when present.
 3. Read continuity and latest memory when present.
 4. Read `_NEXUS_QUEUE.md` before taking follow-on work.

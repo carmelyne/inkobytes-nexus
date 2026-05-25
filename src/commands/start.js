@@ -101,8 +101,10 @@ export default function start(args = []) {
 
   console.log('\nNext:');
   if (scope) {
-    console.log(`  Read ${continuityPath} and latest ${scope.dir}/memories entry, then claim exact shared files before reading or editing them.`);
+    console.log('  Start is orientation only, not clearance to edit.');
+    console.log(`  Read ${continuityPath} and latest ${scope.dir}/memories entry.`);
+    console.log(`  Then: pick work -> nexus claim <path> ${agent} "intent" -> work only there -> nexus release <path> "message".`);
   } else {
-    console.log('  Set NEXUS_AGENT or run `nexus start --agent @agy|@claude|@codex|@gemini`, then read the matching memory scope.');
+    console.log('  Set NEXUS_AGENT or run `nexus start --agent @agy|@claude|@codex|@gemini`, then restart before claiming work.');
   }
 }
