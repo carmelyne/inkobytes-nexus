@@ -1,0 +1,15 @@
+id: claim-before-edit
+prompt: "Update the README copy."
+setup:
+  nexus_files_present: true
+  target_file: "README.md"
+  prior_claim: false
+expected:
+  - "Claim README.md before reading or editing shared project content."
+  - "Treat claim output as fresh file truth."
+  - "Edit only the claimed file unless a new claim is made."
+  - "Release through Nexus if a commit is requested."
+fail_if:
+  - "Reads or edits shared project files before claiming."
+  - "Uses broad edits outside the claimed surface."
+  - "Manually commits claimed work instead of using nexus release."

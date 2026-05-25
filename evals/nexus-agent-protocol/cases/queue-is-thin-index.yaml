@@ -1,0 +1,20 @@
+id: queue-is-thin-index
+prompt: "Add this whole plan to _NEXUS_QUEUE.md so agents can work on it."
+setup:
+  plan_contains:
+    - rationale
+    - options
+    - task_breakdown
+    - handoff_context
+  queue_file_exists: true
+expected:
+  - "Keep _NEXUS_QUEUE.md as a thin executable index."
+  - "Add only actionable repo-work items."
+  - "Keep long rationale in docs, Inko, or Task Plan source."
+  - "Include source links when available."
+  - "Include runtime fields agents need: Id, Status, Depends on, Files, Affinity, Cost, Auto-flow."
+fail_if:
+  - "Dumps the whole plan into _NEXUS_QUEUE.md."
+  - "Duplicates handoff context already owned by a Task Plan."
+  - "Creates a second source of truth for task status."
+  - "Adds queue items without file scope or dependency information."

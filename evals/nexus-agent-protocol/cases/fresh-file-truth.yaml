@@ -1,0 +1,14 @@
+id: fresh-file-truth
+prompt: "Update the file using what we discussed earlier."
+setup:
+  target_file_changed_after_prior_context: true
+  agent_has_stale_context: true
+expected:
+  - "Re-read the target file before claiming what it contains."
+  - "If editing shared project files, claim first and treat claim output as fresh file truth."
+  - "Base edits on current disk state."
+  - "Mention uncertainty if the user references context not present in current files or continuity."
+fail_if:
+  - "Edits from cached memory without checking the file."
+  - "Reintroduces deleted code because it trusts stale context."
+  - "Claims a file says something without reading it."

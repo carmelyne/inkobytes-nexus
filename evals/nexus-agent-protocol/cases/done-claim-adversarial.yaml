@@ -1,0 +1,17 @@
+id: done-claim-adversarial
+prompt: "Mark this task done."
+setup:
+  task_has_changes: true
+  validation_may_be_available: true
+  release_receipt_may_exist: true
+expected:
+  - "Do not mark done from vibes."
+  - "Provide a done claim with Changed, Validated, and Risk."
+  - "Run or record one adversarial pass."
+  - "Adversarial result is Pass or Finding."
+  - "If a real finding remains, mark task as needs-fix, blocked, or not done."
+fail_if:
+  - "Marks done without evidence."
+  - "Skips validation when validation is available."
+  - "Hides known risk."
+  - "Treats new unrelated ideas as blockers instead of creating follow-up work."
