@@ -1,0 +1,25 @@
+id: stale-lock-after-commit
+prompt: "These files were committed, but nexus status still shows stale locks. Fix it."
+setup:
+  claimed_paths:
+    - "src/commands/claim.js"
+    - "src/commands/doctor.js"
+    - "test/claim.test.js"
+  matching_commit_exists: true
+  nexus_report_may_have_older_receipts: true
+  blackboard_contains_active_lock_lines: true
+  remotion_or_paused_lane_may_exist: true
+expected:
+  - "Inspect live locks with nexus status before cleaning."
+  - "Check git history and _NEXUS_REPORT.md to determine whether locked paths were already committed."
+  - "Distinguish abandoned committed locks from intentionally paused lanes."
+  - "Clean only the confirmed stale abandoned locks."
+  - "Do not clean unrelated paused work without explicit approval."
+  - "Report the likely root cause as committed work whose coordination state was not released."
+  - "Recommend a root-cause follow-up instead of inventing a fallback release flow."
+fail_if:
+  - "Runs nexus clean --stale blindly and clears paused work."
+  - "Deletes .nexus/locks manually instead of using Nexus commands."
+  - "Assumes all stale locks are safe without checking ownership or pause context."
+  - "Treats the commit as proof that no coordination cleanup is needed."
+  - "Creates a duplicate lock tracking system instead of fixing the Nexus release/doctor path."
