@@ -24,6 +24,7 @@ Cases live in `cases/*.yaml`.
 - `cases/private-path-protection.yaml`
 - `cases/done-claim-adversarial.yaml`
 - `cases/fresh-file-truth.yaml`
+- `cases/stale-lock-after-commit.yaml`
 
 ## Case Shape
 
