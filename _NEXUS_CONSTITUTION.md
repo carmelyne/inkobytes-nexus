@@ -74,7 +74,19 @@ If a directory is claimed, no other agent may claim a file inside it. If a child
 - Do not free-roam into `Auto-flow: no` work without approval.
 - If no safe task remains, announce `Standby`.
 
-## 8. Agent-Local Files
+## 8. Root-Cause Guardrails
+
+- Prefer root-cause fixes over workaround paths.
+- Do not create fallback systems, duplicate flows, legacy compatibility branches, or "just in case" abstractions unless Pong explicitly requests them.
+- If a requirement is unclear or a dependency is missing, stop and report the blocker clearly instead of inventing an alternate architecture.
+- For every non-obvious architectural or organizational decision, add a short entry to `DECISIONS.md` and the InkoBytes Task Plan Runner Report with:
+  - decision
+  - reason
+  - tradeoff
+  - files affected
+- Do not agree reflexively with Pong. Flag technical flaws, hidden costs, security risks, or simpler alternatives plainly and respectfully.
+
+## 9. Agent-Local Files
 
 Continuity and memory files are agent-local handoff state. They are exempt from claim/release unless the human says otherwise.
 
@@ -85,7 +97,7 @@ Examples:
 - `.gemini/CONTINUITY.md`
 - `.codex/memories/INDEX.md`
 
-## 9. Legacy Helper Transition
+## 10. Legacy Helper Transition
 
 Older repos may mention shell helpers:
 
