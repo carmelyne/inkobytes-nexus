@@ -1,5 +1,7 @@
 # Nexus Agent Protocol Evals
 
+Protocol evals replay known failure modes and check expected agent behavior.
+
 These evals are incident-based checks for agents working in a Nexus repo.
 They are not model benchmarks. They test whether an agent follows the shared-repo protocol under realistic pressure.
 
