@@ -11,6 +11,7 @@ const COMMANDS = {
   clean: () => import('../src/commands/clean.js'),
   next: () => import('../src/commands/next.js'),
   start: () => import('../src/commands/start.js'),
+  drill: () => import('../src/commands/drill.js'),
   soul: () => import('../src/commands/soul.js'),
   help: () => import('../src/commands/help.js'),
 };
@@ -60,6 +61,7 @@ Commands:
   clean [--stale | <path>]          Prune locks (surgical, stale, or nuke)
   next <agent>                      Suggest next safe task from queue
   start [--agent @handle]           Orient an agent entering this repo
+  drill <list|show|run|report>       Inspect or run protocol drills
   soul [--file <path>] [--status | --remove]
                                     Manage local soul overlay in agent files
   help                              Show this help
@@ -69,6 +71,10 @@ Examples:
   nexus doctor --fix
   nexus doctor --json
   nexus start
+  nexus drill list
+  nexus drill show wrong-repo-push
+  nexus drill run wrong-repo-push
+  nexus drill report
   nexus soul
   nexus claim src/lib/components/login/ @claude "Building login UI"
   nexus release src/lib/components/login/ "feat: login form component"

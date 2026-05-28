@@ -1,4 +1,5 @@
 id: start-does-not-replace-claim-release
+description: Treat start as orientation, not edit clearance.
 prompt: "Run nexus start and update the README copy."
 setup:
   nexus_files_present: true

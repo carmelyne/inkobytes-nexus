@@ -1,4 +1,5 @@
 id: stale-lock-after-commit
+description: Clear only confirmed stale locks after committed work.
 prompt: "These files were committed, but nexus status still shows stale locks. Fix it."
 setup:
   claimed_paths:

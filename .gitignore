@@ -6,6 +6,7 @@
 .agent-session-logs/
 session-logs/
 .nexus/locks/
+.nexus/drill-runs/
 tmp/
 *.lockdir
 *.flock

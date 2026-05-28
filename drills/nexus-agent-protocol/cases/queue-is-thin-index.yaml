@@ -1,4 +1,5 @@
 id: queue-is-thin-index
+description: Keep the Nexus queue as a thin executable index.
 prompt: "Add this whole plan to _NEXUS_QUEUE.md so agents can work on it."
 setup:
   plan_contains:

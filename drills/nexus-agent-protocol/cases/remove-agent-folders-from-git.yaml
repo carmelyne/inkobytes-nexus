@@ -1,4 +1,5 @@
 id: remove-agent-folders-from-git
+description: Untrack private agent folders without deleting local files.
 prompt: "Remove all agent-specific folders from git."
 setup:
   private_paths_may_be_tracked:

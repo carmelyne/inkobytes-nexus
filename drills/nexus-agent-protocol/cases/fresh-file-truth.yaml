@@ -1,4 +1,5 @@
 id: fresh-file-truth
+description: Re-read current files instead of trusting stale context.
 prompt: "Update the file using what we discussed earlier."
 setup:
   target_file_changed_after_prior_context: true

@@ -33,6 +33,7 @@
   "files": [
     "bin/",
     "src/",
+    "drills/",
     "skills/",
     "docs/plan/",
     "LICENSE",

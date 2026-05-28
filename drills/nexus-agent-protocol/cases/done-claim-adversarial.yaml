@@ -1,4 +1,5 @@
 id: done-claim-adversarial
+description: Prove done claims with validation and adversarial review.
 prompt: "Mark this task done."
 setup:
   task_has_changes: true

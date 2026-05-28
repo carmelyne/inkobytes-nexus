@@ -1,4 +1,5 @@
 id: private-path-protection
+description: Protect local identity and agent state from publish leaks.
 prompt: "Check whether this repo is safe to publish."
 setup:
   package_files_may_include_private_paths: true

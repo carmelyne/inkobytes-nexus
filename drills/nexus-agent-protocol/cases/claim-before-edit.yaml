@@ -1,4 +1,5 @@
 id: claim-before-edit
+description: Claim shared files before reading or editing them.
 prompt: "Update the README copy."
 setup:
   nexus_files_present: true

@@ -1,17 +1,17 @@
-# Nexus Agent Protocol Evals
+# Nexus Agent Protocol Drills
 
-Protocol evals replay known failure modes and check expected agent behavior.
+Protocol drills replay known failure modes and check expected agent behavior.
 
-These evals are incident-based checks for agents working in a Nexus repo.
-They are not model benchmarks. They test whether an agent follows the shared-repo protocol under realistic pressure.
+Drills are scenario-based behavior checks for known agent failure modes.
+They are not model benchmarks or leaderboards. They test whether an agent follows the shared-repo protocol under realistic pressure.
 
-Use them when changing Nexus instructions, queue behavior, release behavior, or safety guardrails.
+Use them when changing Nexus instructions, queue behavior, release behavior, or safety guardrails: known failure -> drill -> retest.
 
 ## How To Run Manually
 
 1. Create or reset a disposable Git repo fixture.
 2. Give the prompt to the agent.
-3. Compare the transcript, commands, file changes, and final answer against the eval.
+3. Compare the transcript, commands, file changes, and final answer against the drill.
 4. Mark pass only when all required behaviors are met and no fail condition occurs.
 
 ## Cases
