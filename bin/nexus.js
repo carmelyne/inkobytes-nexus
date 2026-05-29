@@ -11,6 +11,7 @@ const COMMANDS = {
   clean: () => import('../src/commands/clean.js'),
   next: () => import('../src/commands/next.js'),
   start: () => import('../src/commands/start.js'),
+  dashboard: () => import('../src/commands/dashboard.js'),
   drill: () => import('../src/commands/drill.js'),
   soul: () => import('../src/commands/soul.js'),
   help: () => import('../src/commands/help.js'),
@@ -61,6 +62,7 @@ Commands:
   clean [--stale | <path>]          Prune locks (surgical, stale, or nuke)
   next <agent>                      Suggest next safe task from queue
   start [--agent @handle]           Orient an agent entering this repo
+  dashboard --serve [--port <port>]  Serve live local Nexus dashboard
   drill <list|show|run|report>       Inspect or run protocol drills
   soul [--file <path>] [--status | --remove]
                                     Manage local soul overlay in agent files
@@ -71,6 +73,7 @@ Examples:
   nexus doctor --fix
   nexus doctor --json
   nexus start
+  nexus dashboard --serve
   nexus drill list
   nexus drill show wrong-repo-push
   nexus drill run wrong-repo-push
