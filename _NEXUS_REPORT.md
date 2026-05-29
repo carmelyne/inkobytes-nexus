@@ -46,3 +46,107 @@ Auto-generated release receipts will appear here.
 - [17:29:57] ✅ **docs/plan/video-7-script.md** - docs: fix M1 Max -> M1 16gb
 - [19:32:00] ✅ **docs/plan/video-7-script.md** - docs: rewrites — auto-flow beat, kill -9, reply-guy fixes, logo animation notes
 - [19:50:57] ✅ **docs/plan/video-7-script.md** - docs: add spotlight, eye animations, and codex eyeroll to Video 7
+## [15:52:47] _NEXUS_CONSTITUTION.md
+
+Commit: docs: add root-cause guardrails
+
+Done claim:
+- Changed:
+- Validated:
+- Risk:
+
+Adversarial result:
+- Pass, or:
+- Finding:
+
+## [15:52:52] DECISIONS.md
+
+Commit: docs: add decision log
+
+Done claim:
+- Changed:
+- Validated:
+- Risk:
+
+Adversarial result:
+- Pass, or:
+- Finding:
+
+## [16:13:03] evals/nexus-agent-protocol/cases/stale-lock-after-commit.yaml
+
+Commit: eval: add stale lock after commit case
+
+Done claim:
+- Changed:
+- Validated:
+- Risk:
+
+Adversarial result:
+- Pass, or:
+- Finding:
+
+## [16:13:09] evals/nexus-agent-protocol/README.md
+
+Commit: docs: list stale lock eval
+
+Done claim:
+- Changed:
+- Validated:
+- Risk:
+
+Adversarial result:
+- Pass, or:
+- Finding:
+
+## [16:13:12] DECISIONS.md
+
+Commit: docs: record stale lock eval decision
+
+Done claim:
+- Changed:
+- Validated:
+- Risk:
+
+Adversarial result:
+- Pass, or:
+- Finding:
+
+## [16:17:21] evals/nexus-agent-protocol/README.md
+
+Commit: docs: define protocol evals
+
+Done claim:
+- Changed:
+- Validated:
+- Risk:
+
+Adversarial result:
+- Pass, or:
+- Finding:
+
+## [13:01:35] .gitignore
+
+Commit: feat(drill): add protocol drill command family
+
+Done claim:
+- Changed:
+- Validated:
+- Risk:
+
+Adversarial result:
+- Pass, or:
+- Finding:
+
+## [13:01:36] drills
+
+Commit: feat(drill): add protocol drill command family
+
+Done claim:
+- Changed:
+- Validated:
+- Risk:
+
+Adversarial result:
+- Pass, or:
+- Finding:
+

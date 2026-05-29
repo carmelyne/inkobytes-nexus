@@ -1,16 +1,17 @@
 # @inkobytes/nexus
 
-Swarm traffic control for AI coding agents sharing one local repository.
+Agent-team traffic control for AI coding agents sharing one local repository.
 
 Nexus is local-first, Git-backed, Markdown-readable, and built for agent teams that need lane discipline without a server.
+Nexus coordinates small agent teams, or swarm, across separate CLI sessions.
 
 ## Why Nexus Exists
 
 Claude Code, Codex CLI, Gemini CLI, and other agents can all work in the same repo, but they need a shared operating protocol. Without one, agents can collide on files, pollute each other's staging area, lose context, or ask the human to keep the whole work map in their head.
 
-Nexus keeps agents in one shared branch so they do not drift into separate realities. Everyone sees the same files, queue, locks, and latest repo state; claims and scoped release give that shared room enough discipline to stay usable.
+Nexus keeps agents on one shared branch with one shared current state. Everyone sees the same files, queue, locks, and latest repo state; claims and scoped release give that shared room enough discipline to stay usable.
 
-Nexus gives the swarm a simple loop:
+Nexus gives the agent team a simple loop:
 
 ```text
 start -> claim -> work -> release -> next
@@ -138,6 +139,17 @@ nexus start
 ```
 
 Start reports only local facts: repo path, branch, last commits, dirty files, active locks, and the continuity/memory path for the selected model scope. Start is orientation only, not clearance to edit; agents still claim before shared reads/edits and release when done. Set `NEXUS_AGENT=@claude`, `@codex`, `@gemini`, or `@agy` so agents can run plain `nexus start`; `--agent` is available as an override.
+
+### `nexus dashboard --serve [--port <port>]`
+
+Serve a read-only local dashboard for human Nexus status checks.
+
+```bash
+nexus dashboard --serve
+nexus dashboard --serve --port 13787
+```
+
+The dashboard prints both `127.0.0.1` and local-network URLs when available, then shows repo health, active locks, queue items, recent standup lines, recent release notes, and dirty git files. It uses local files as the source of truth and updates the page through server-sent events. The default port is `13787`; if that port is already in use, Nexus tries `13788`, `13789`, and so on. Passing `--port` uses that exact port.
 
 ### `nexus drill <list|show|run|report> [id]`
 
@@ -291,6 +303,8 @@ Use model names as lock handles so ownership stays clear:
 
 Agent-local continuity and memory files are exempt from claim/release unless the human says otherwise.
 
+When a lead agent uses subagents, tools, or parallel workers, the lead still owns the repo effects. Claim the full path scope before delegating shared-file work, give subagents the claimed path and boundaries, re-read affected files before release, and mention delegated work when it changed files, tests, or risk.
+
 Supply-chain rule: agents should not install third-party packages that have existed for less than 14 days. If package age cannot be verified, stop and ask the human. `nexus doctor` also flags install hooks and package scripts that look like they could exfiltrate data.
 
 ## Demo And Video Notes
@@ -334,9 +348,7 @@ Nexus is intentionally boring:
 - no private hidden coordination channel
 - no branch choreography requirement
 
-The current storage substrate is Git. Future Nexit planning explores agent-native zones, hive growth, inspection, publish, and recall, but Nexus keeps today's release path stable.
-
-See `docs/plan/` for current planning notes.
+The current storage substrate is Git. Future Nexit planning explores agent-native zones, inspection, publish, and recall, but Nexus keeps today's release path stable.
 
 ## Development
 

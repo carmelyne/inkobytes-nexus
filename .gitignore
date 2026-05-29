@@ -3,8 +3,11 @@
 .claude/
 .codex/
 .gemini/
+.agy/
 .agent-session-logs/
 session-logs/
+DECISIONS.md
+docs-priv/
 .nexus/locks/
 .nexus/drill-runs/
 tmp/
