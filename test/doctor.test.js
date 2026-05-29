@@ -49,13 +49,16 @@ test('doctor --fix creates agent scaffolds and protocol blocks', () => {
     assert.match(output, /All checked Nexus categories are ready/);
     assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /NEXUS-AGENT-PROTOCOL:START/);
     assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /less than 14 days/);
-    assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /### Fresh File Truth/);
+    assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /### Current File State/);
     assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /### Git Write Safety/);
     assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /Never infer from similar folder names or cached context/);
     assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /untrack them; do not delete local folders/);
     assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /Read `USER\.md` if present/);
     assert.doesNotMatch(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /Pong/);
     assert.match(readFileSync(join(root, '.codex', 'CONTINUITY.md'), 'utf-8'), /# CONTINUITY/);
+    assert.match(readFileSync(join(root, 'DECISIONS.md'), 'utf-8'), /Local agent work decisions live here/);
+    assert.match(readFileSync(join(root, '.gitignore'), 'utf-8'), /DECISIONS\.md/);
+    assert.match(readFileSync(join(root, '.gitignore'), 'utf-8'), /docs-priv\//);
     assert.match(readFileSync(join(root, '.codex', 'memories', 'INDEX.md'), 'utf-8'), /YYYY-Month/);
   });
 });
@@ -133,6 +136,28 @@ Keep this note.
     const next = readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8');
     assert.equal(next.match(/This project uses Nexus for multi-agent coordination\./g).length, 1);
     assert.equal(next.match(/NEXUS-AGENT-PROTOCOL:START/g).length, 1);
+    assert.match(next, /atomic lock-and-read boundary/);
+    assert.match(next, /read a shared file before claiming it, treat that read as stale after claim succeeds/);
+    assert.match(next, /claim appears stale/);
+    assert.match(next, /### Recipes/);
+    assert.match(next, /Recipe routing is defined in `_NEXUS_CONSTITUTION\.md`/);
+    assert.match(next, /If the constitution routes this situation to a recipe, read that recipe before acting/);
+    assert.doesNotMatch(next, /recipes\/task-contract\.md/);
+    assert.match(next, /### Delegated Work/);
+    assert.match(next, /Lead agents own the repo effects of their subagents/);
+    assert.match(next, /Claim the full path scope before delegating shared-file work/);
+    assert.match(next, /Mention delegated work in release or standup notes/);
+    assert.match(next, /Direct user instruction can override queue order/);
+    assert.match(next, /announce `Standby` with what you are waiting for/);
+    assert.match(next, /Agent instruction files are shared protocol files/);
+    assert.match(next, /assigned work zones/);
+    assert.match(next, /nexus doctor` is cheap, local, and idempotent/);
+    assert.match(next, /Security, Package Privacy, Git Privacy, or supply-chain findings/);
+    assert.match(next, /specific version publish date/);
+    assert.match(next, /DECISIONS\.md/);
+    assert.match(next, /mention them in `_NEXUS_STANDUP\.md` only when active agents need to coordinate around them/);
+    assert.match(next, /Memory entries are session handoffs/);
+    assert.match(next, /# YYYY-MM-DD-HHMM - <topic>/);
     assert.match(next, /## Local Notes\n\nKeep this note\./);
   });
 });
@@ -272,7 +297,7 @@ test('doctor reports package privacy risks from package files allowlist', () => 
     writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
     writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
     writeFileSync(join(root, 'package.json'), JSON.stringify({
-      files: ['bin/', '.nexus/local/', '.agy/', '.antigravitycli/', '.codex/'],
+      files: ['bin/', '.nexus/local/', '.agy/', '.antigravitycli/', '.codex/', '.agent-codex/', '.agent-session-logs/', 'session-logs/', 'docs-priv/', 'scratch/', 'DECISIONS.md'],
     }), 'utf-8');
 
     const output = captureLogs(() => doctor([]));
@@ -282,6 +307,12 @@ test('doctor reports package privacy risks from package files allowlist', () => 
     assert.match(output, /\.agy/);
     assert.match(output, /\.antigravitycli/);
     assert.match(output, /\.codex/);
+    assert.match(output, /\.agent-codex/);
+    assert.match(output, /\.agent-session-logs/);
+    assert.match(output, /session-logs/);
+    assert.match(output, /docs-priv/);
+    assert.match(output, /scratch/);
+    assert.match(output, /DECISIONS\.md/);
   });
 });
 
@@ -297,12 +328,23 @@ test('doctor reports tracked private agent state without deleting local files', 
     mkdirSync(join(root, '.codex'), { recursive: true });
     mkdirSync(join(root, '.claude'), { recursive: true });
     mkdirSync(join(root, '.gemini'), { recursive: true });
+    mkdirSync(join(root, '.agent-codex'), { recursive: true });
+    mkdirSync(join(root, '.agent-session-logs'), { recursive: true });
+    mkdirSync(join(root, 'session-logs'), { recursive: true });
+    mkdirSync(join(root, 'docs-priv'), { recursive: true });
+    mkdirSync(join(root, 'scratch'), { recursive: true });
     writeFileSync(join(root, '.antigravitycli', 'AGENTS.md'), '# Local Antigravity notes\n', 'utf-8');
     writeFileSync(join(root, '.codex', 'AGENTS.md'), '# Local agent notes\n', 'utf-8');
     writeFileSync(join(root, '.claude', 'CLAUDE.md'), '# Local Claude notes\n', 'utf-8');
     writeFileSync(join(root, '.gemini', 'GEMINI.md'), '# Local Gemini notes\n', 'utf-8');
+    writeFileSync(join(root, '.agent-codex', 'notes.md'), '# Agent notes\n', 'utf-8');
+    writeFileSync(join(root, '.agent-session-logs', 'run.log'), 'private log\n', 'utf-8');
+    writeFileSync(join(root, 'session-logs', 'run.log'), 'session log\n', 'utf-8');
+    writeFileSync(join(root, 'docs-priv', 'private.md'), '# Private docs\n', 'utf-8');
+    writeFileSync(join(root, 'scratch', 'note.md'), '# Scratch\n', 'utf-8');
+    writeFileSync(join(root, 'DECISIONS.md'), '# Decisions\n', 'utf-8');
     writeFileSync(join(root, 'USER.md'), '# Local user\n', 'utf-8');
-    spawnSync('git', ['add', '.antigravitycli/AGENTS.md', '.codex/AGENTS.md', '.claude/CLAUDE.md', '.gemini/GEMINI.md', 'USER.md'], { cwd: root, stdio: 'pipe' });
+    spawnSync('git', ['add', '.antigravitycli/AGENTS.md', '.codex/AGENTS.md', '.claude/CLAUDE.md', '.gemini/GEMINI.md', '.agent-codex/notes.md', '.agent-session-logs/run.log', 'session-logs/run.log', 'docs-priv/private.md', 'scratch/note.md', 'DECISIONS.md', 'USER.md'], { cwd: root, stdio: 'pipe' });
 
     const output = captureLogs(() => doctor([]));
 
@@ -311,6 +353,12 @@ test('doctor reports tracked private agent state without deleting local files', 
     assert.match(output, /Git tracks private\/local path: \.codex\/AGENTS\.md/);
     assert.match(output, /Git tracks private\/local path: \.claude\/CLAUDE\.md/);
     assert.match(output, /Git tracks private\/local path: \.gemini\/GEMINI\.md/);
+    assert.match(output, /Git tracks private\/local path: \.agent-codex\/notes\.md/);
+    assert.match(output, /Git tracks private\/local path: \.agent-session-logs\/run\.log/);
+    assert.match(output, /Git tracks private\/local path: session-logs\/run\.log/);
+    assert.match(output, /Git tracks private\/local path: docs-priv\/private\.md/);
+    assert.match(output, /Git tracks private\/local path: scratch\/note\.md/);
+    assert.match(output, /Git tracks private\/local path: DECISIONS\.md/);
     assert.match(output, /Git tracks private\/local path: USER\.md/);
     assert.match(output, /git rm --cached -r -- <path>/);
   });

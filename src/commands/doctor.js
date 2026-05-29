@@ -43,6 +43,13 @@ Files:
 - _NEXUS_STANDUP.md
 `;
 
+const LOCAL_DECISIONS_TEMPLATE = `# Decisions
+
+Local agent work decisions live here. This file is gitignored by Nexus.
+`;
+
+const LOCAL_GITIGNORE_LINES = ['DECISIONS.md', 'docs-priv/'];
+
 const MEMORY_INDEX_TEMPLATE = `# Memory Index
 
 Newest first, max 10 visible entries.
@@ -86,13 +93,30 @@ This project uses Nexus for multi-agent coordination.
 - Release finished work through Nexus: \`nexus release <path> "commit message"\`.
 - Use \`nexus next @Agent\` for the next safe queue task.
 - Do not free-roam into unassigned or \`Auto-flow: no\` work without user approval.
+- Direct user instruction can override queue order, but not claim/release, data, security, or approval gates.
+- If no safe task remains, announce \`Standby\` with what you are waiting for, then stop until user input, queue change, or explicit assignment.
 
-### Fresh File Truth
+### Current File State
 
 - Treat previous chat context, cached model memory, and earlier reads as stale when file contents matter.
 - Before claiming what a file says, making edits, or judging current state, read the file from disk with a fresh command.
-- Treat \`nexus claim\` output as fresh file state for the claimed path.
+- Treat \`nexus claim\` as the atomic lock-and-read boundary and its output as fresh file state for the claimed path.
+- If you read a shared file before claiming it, treat that read as stale after claim succeeds.
 - If another agent or tool may have touched the file since your last read, re-read it before editing.
+- If a claim appears stale, do not edit through it; run \`nexus status\` or \`nexus doctor\`, then clean only when ownership is clearly abandoned.
+
+### Recipes
+
+Recipe routing is defined in \`_NEXUS_CONSTITUTION.md\`.
+If the constitution routes this situation to a recipe, read that recipe before acting.
+
+### Delegated Work
+
+- Lead agents own the repo effects of their subagents, tools, and parallel workers.
+- Claim the full path scope before delegating shared-file work.
+- Give subagents the claimed path, intent, non-goals, and boundaries.
+- Re-read affected files after subagent work before final edits, release, or current-state claims.
+- Mention delegated work in release or standup notes when it affected files, tests, or risk.
 
 ### Git Write Safety
 
@@ -101,13 +125,17 @@ This project uses Nexus for multi-agent coordination.
 - Never infer from similar folder names or cached context.
 - Require explicit confirmation before push/force-push, main/master, remote changes, or deletes.
 - To remove private agent files from git, untrack them; do not delete local folders.
+- Agent instruction files are shared protocol files; normal edits require claim/release, while \`nexus doctor --fix\` may update managed protocol blocks after user approval.
+- Agents work inside assigned work zones. If a change crosses work-zone boundaries or alters a shared contract another zone may depend on, announce it in \`_NEXUS_STANDUP.md\` before release and ask if coordination is needed.
 
 ### Supply-Chain Safety
 
 - Do not install third-party packages that have existed for less than 14 days.
-- Before adding a new dependency, verify its package registry creation date.
-- If the package is younger than 14 days or the age cannot be verified, stop and ask the user.
+- Before adding a new dependency, verify the package creation date and the specific version publish date.
+- If the package or version is younger than 14 days, or either date cannot be verified, stop and ask the user.
 - Run \`nexus doctor\` before installs; review any Security findings before running package scripts.
+- \`nexus doctor\` is cheap, local, and idempotent.
+- If \`nexus doctor\` reports Security, Package Privacy, Git Privacy, or supply-chain findings, stop and report before fixing or installing.
 - Treat install hooks and scripts with network commands, webhooks, raw sockets, SSH, or secret-looking variables as human-review only.
 - Prefer built-in runtime APIs and existing project dependencies when they fit.
 
@@ -120,6 +148,8 @@ They are exempt from Nexus claim/release unless the user says otherwise.
 
 - On session start, read \`${agent.memoryIndex}\`.
 - If the index has entries, read the newest \`${agent.memoryDir}/YYYY-Month/YYYY-MM-DD-HHMM-topic.md\` entry.
+- Durable architecture and protocol decisions belong in \`DECISIONS.md\`; mention them in \`_NEXUS_STANDUP.md\` only when active agents need to coordinate around them.
+- Memory entries are session handoffs.
 - On session end, pause, or checkpoint request, create one new memory file:
   \`${agent.memoryDir}/YYYY-Month/YYYY-MM-DD-HHMM-topic.md\`.
 - Add the newest file to the top of \`${agent.memoryIndex}\`.
@@ -129,7 +159,7 @@ They are exempt from Nexus claim/release unless the user says otherwise.
 Memory entry format:
 
 \`\`\`markdown
-# YYYY-MM-DD — HH:MM — <topic>
+# YYYY-MM-DD-HHMM - <topic>
 
 ## Session Summary
 - What we worked on: [<=50 words]
@@ -268,6 +298,21 @@ function ensureFile(path, content, fix, changes) {
   return true;
 }
 
+function ensureGitignoreLines(root, lines, fix, changes) {
+  const path = join(root, '.gitignore');
+  const existing = existsSync(path) ? readFileSync(path, 'utf-8') : '';
+  const missing = lines.filter((line) => !existing.split(/\r?\n/).includes(line));
+  if (missing.length === 0) return true;
+  if (!fix) return false;
+
+  const prefix = existing && !existing.endsWith('\n') ? '\n' : '';
+  const heading = existing.includes('# Nexus local state') ? '' : `${prefix}# Nexus local state\n`;
+  const next = `${existing}${heading}${missing.join('\n')}\n`;
+  writeFileSync(path, next, 'utf-8');
+  changes.push('updated .gitignore');
+  return true;
+}
+
 export default function doctor(args) {
   const fix = args.includes('--fix');
   const json = args.includes('--json');
@@ -319,6 +364,20 @@ export default function doctor(args) {
 
   for (const issue of scanGitPrivacy(root)) {
     sections['Git Privacy'].push(issue);
+  }
+
+  if (!ensureFile(join(root, 'DECISIONS.md'), LOCAL_DECISIONS_TEMPLATE, fix, changes)) {
+    sections['Nexus Files'].push({
+      issue: 'Missing local DECISIONS.md',
+      fix: 'Run `nexus doctor --fix`.',
+    });
+  }
+
+  if (!ensureGitignoreLines(root, LOCAL_GITIGNORE_LINES, fix, changes)) {
+    sections['Git Privacy'].push({
+      issue: '.gitignore is missing Nexus local state entries',
+      fix: 'Run `nexus doctor --fix`.',
+    });
   }
 
   for (const agent of AGENT_SCOPE_LIST) {
@@ -561,6 +620,8 @@ function scanPackageSecurity(root) {
 }
 
 const PRIVATE_PACKAGE_PATHS = [
+  '.agent-*',
+  '.agent-session-logs',
   '.nexus/local',
   '.agy',
   '.antigravitycli',
@@ -568,18 +629,28 @@ const PRIVATE_PACKAGE_PATHS = [
   '.claude',
   '.gemini',
   'agent-overlay.md',
+  'DECISIONS.md',
+  'docs-priv',
   'SOUL.md',
+  'scratch',
+  'session-logs',
   'IDENTITY.md',
   'USER.md',
 ];
 
 const PRIVATE_GIT_PATHS = [
+  '.agent-*',
+  '.agent-session-logs',
   '.agy',
   '.antigravitycli',
   '.codex',
   '.claude',
   '.gemini',
   '.nexus/local',
+  'DECISIONS.md',
+  'docs-priv',
+  'scratch',
+  'session-logs',
   'USER.md',
 ];
 
@@ -601,7 +672,7 @@ function scanPackagePrivacy(root) {
     if (typeof entry !== 'string') continue;
     const normalized = entry.replace(/^\.\//, '').replace(/\/$/, '');
     for (const privatePath of PRIVATE_PACKAGE_PATHS) {
-      if (normalized === privatePath || normalized.startsWith(`${privatePath}/`) || normalized.endsWith(`/${privatePath}`)) {
+      if (matchesPrivatePath(normalized, privatePath)) {
         issues.push({
           issue: `package.json files includes private/local path: ${entry}`,
           fix: 'Remove private local agent state from package.json files before publishing.',
@@ -630,4 +701,14 @@ function scanGitPrivacy(root) {
     issue: `Git tracks private/local path: ${file}`,
     fix: 'Untrack it without deleting local files: `git rm --cached -r -- <path>`, then add an ignore rule.',
   }));
+}
+
+function matchesPrivatePath(normalized, privatePath) {
+  if (privatePath.endsWith('*')) {
+    const prefix = privatePath.slice(0, -1);
+    return normalized.startsWith(prefix);
+  }
+  return normalized === privatePath ||
+    normalized.startsWith(`${privatePath}/`) ||
+    normalized.endsWith(`/${privatePath}`);
 }
