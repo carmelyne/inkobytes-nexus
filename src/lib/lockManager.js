@@ -76,8 +76,9 @@ function isStale(lockPath) {
  * Break a stale lock
  */
 function breakLock(lockPath) {
-  const tsFile = join(lockPath, 'ts');
-  try { unlinkSync(tsFile); } catch { /* ok */ }
+  for (const f of ['ts', 'agent', 'intent']) {
+    try { unlinkSync(join(lockPath, f)); } catch { /* ok */ }
+  }
   try { rmdirSync(lockPath); } catch { /* ok */ }
 }
 
@@ -130,8 +131,10 @@ export function acquireLock(target, agentName, intent) {
     try {
       mkdirSync(lockPath);
 
-      // Write timestamp for stale detection
+      // Write timestamp, agent, and intent for stale detection and dashboard display
       writeFileSync(join(lockPath, 'ts'), String(Math.floor(Date.now() / 1000)), 'utf-8');
+      writeFileSync(join(lockPath, 'agent'), agentName || '', 'utf-8');
+      writeFileSync(join(lockPath, 'intent'), intent || '', 'utf-8');
 
       return {
         success: true,
@@ -164,8 +167,9 @@ export function releaseLock(target) {
     return { success: false, message: `No lock found for: ${normalizedTarget}` };
   }
 
-  const tsFile = join(lockPath, 'ts');
-  try { unlinkSync(tsFile); } catch { /* ok */ }
+  for (const f of ['ts', 'agent', 'intent']) {
+    try { unlinkSync(join(lockPath, f)); } catch { /* ok */ }
+  }
   try {
     rmdirSync(lockPath);
     return { success: true, message: `Lock released for: ${normalizedTarget}` };
@@ -200,7 +204,11 @@ export function listLocks() {
       age = Math.floor(Date.now() / 1000) - lockTs;
     }
 
-    locks.push({ target, age, lockPath });
+    const readMeta = (name) => {
+      try { return readFileSync(join(lockPath, name), 'utf-8').trim(); } catch { return ''; }
+    };
+
+    locks.push({ target, age, lockPath, agent: readMeta('agent'), intent: readMeta('intent') });
   }
 
   return locks;
