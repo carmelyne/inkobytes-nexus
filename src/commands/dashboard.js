@@ -36,6 +36,8 @@ export function buildSnapshot() {
     target: lock.target,
     age: lock.age,
     stale: lock.age !== null && lock.age >= config.staleThreshold,
+    agent: lock.agent || '',
+    intent: lock.intent || '',
   }));
 
   const queueText = readText(config.queue);
