@@ -1,4 +1,4 @@
-id: fresh-file-truth
+id: current-file-state
 description: Re-read current files instead of trusting stale context.
 prompt: "Update the file using what we discussed earlier."
 setup:
@@ -6,7 +6,7 @@ setup:
   agent_has_stale_context: true
 expected:
   - "Re-read the target file before claiming what it contains."
-  - "If editing shared project files, claim first and treat claim output as fresh file truth."
+  - "If editing shared project files, claim first and treat claim output as current file state."
   - "Base edits on current disk state."
   - "Mention uncertainty if the user references context not present in current files or continuity."
 fail_if:

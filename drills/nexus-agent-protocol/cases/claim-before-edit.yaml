@@ -7,7 +7,7 @@ setup:
   prior_claim: false
 expected:
   - "Claim README.md before reading or editing shared project content."
-  - "Treat claim output as fresh file truth."
+  - "Treat claim output as current file state."
   - "Edit only the claimed file unless a new claim is made."
   - "Release through Nexus if a commit is requested."
 fail_if:

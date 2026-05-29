@@ -20,7 +20,7 @@ Nexus CLI is the coordination engine. This skill is only the agent playbook.
    nexus claim <path> @Agent "intent"
    ```
 
-7. Treat claim output as fresh file truth. Ignore cached file memory when contents matter.
+7. Treat claim output as current file state. Ignore cached file memory when contents matter.
 8. Work only inside the claimed surface and run focused validation.
 9. If the user wants a commit, release through Nexus:
 
@@ -34,6 +34,7 @@ Nexus CLI is the coordination engine. This skill is only the agent playbook.
 - Use `nexus doctor` for audit/repair, not as the normal startup command.
 - Use CLI/model names as lock handles: `@agy`, `@claude`, `@codex`, `@gemini`.
 - Agent-local continuity and memory files are claim-exempt unless the user says otherwise.
+- When using subagents or parallel workers, the lead agent owns the repo effects: claim the full path scope, pass boundaries down, re-read affected files, and mention delegated work in release or standup notes.
 - Avoid parallel `nexus release`.
 - Do not install packages younger than 14 days; if age is unknown, ask.
 - Use `nexus status`, `nexus clean --stale`, or surgical `nexus clean <path>` for lock recovery. Never nuke all locks without explicit approval.
