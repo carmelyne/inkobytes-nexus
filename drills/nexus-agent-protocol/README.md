@@ -7,6 +7,21 @@ They are not model benchmarks or leaderboards. They test whether an agent follow
 
 Use them when changing Nexus instructions, queue behavior, release behavior, or safety guardrails: known failure -> drill -> retest.
 
+## Guardrails And Drills
+
+Guardrails are the operating rules agents must follow.
+Drills are regression scenarios that test whether those guardrails survive realistic pressure.
+
+When adding a new guardrail to the constitution or agent guides, add a drill when the failure mode is concrete enough to replay.
+
+## When To Read Drills
+
+Read drills during protocol, guardrail, regression, or failure-mode work.
+Normal app/code work should not load drills by default.
+
+Use drills when changing Nexus protocol files, generated agent guides, guardrails, or core commands such as `drill`, `doctor`, `init`, `claim`, `release`, or `next`.
+Also use them when debugging an agent failure mode or when the user asks to add/test a guardrail.
+
 ## How To Run Manually
 
 1. Create or reset a disposable Git repo fixture.
@@ -25,7 +40,13 @@ Cases live in `cases/*.yaml`.
 - `cases/queue-is-thin-index.yaml`
 - `cases/private-path-protection.yaml`
 - `cases/done-claim-adversarial.yaml`
-- `cases/fresh-file-truth.yaml`
+- `cases/current-file-state.yaml`
+- `cases/ghost-file-claim-loop.yaml`
+- `cases/task-contract.yaml`
+- `cases/removal-scope.yaml`
+- `cases/data-boundary-table-header.yaml`
+- `cases/data-mutation-delete-rows.yaml`
+- `cases/vendor-cleanup-preserve-history.yaml`
 - `cases/stale-lock-after-commit.yaml`
 
 ## Case Shape

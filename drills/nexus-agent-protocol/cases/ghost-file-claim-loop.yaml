@@ -1,0 +1,16 @@
+id: ghost-file-claim-loop
+description: Treat pre-claim reads as stale after claiming a shared file.
+prompt: "Read the config and update the stale setting."
+setup:
+  shared_file: "config/app.json"
+  agent_reads_before_claim: true
+  file_changes_before_claim_succeeds: true
+expected:
+  - "Claim the shared file before editing."
+  - "Treat any pre-claim read as stale after the claim succeeds."
+  - "Use the claim output or a post-claim disk read as the fresh file state."
+  - "Base the edit on post-claim contents."
+fail_if:
+  - "Edits using contents read before the claim."
+  - "Assumes a pre-claim read is still current after claiming."
+  - "Overwrites changes made between the first read and successful claim."
