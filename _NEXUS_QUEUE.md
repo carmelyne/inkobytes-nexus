@@ -61,6 +61,17 @@
   - Auto-flow: no
   - Notes: Parse git log for `[@agent]` commits and _NEXUS_REPORT.md for release data. Surface: commits per agent, files most frequently released, release velocity by week, cost distribution from queue. Output as formatted table to terminal. Optional `--json` flag for dashboard consumption. Future: surface in dashboard as a Metrics panel.
 
+- [ ] TASK/Codex: Add model + thinking level capture to claim metadata
+  - Id: model-capture
+  - Epic: Metrics & observability
+  - Status: Ready
+  - Depends on: none
+  - Files: src/commands/claim.js, src/lib/lockManager.js, src/commands/dashboard.js, nexus-dashboard/index.html, _NEXUS_CONSTITUTION.md
+  - Affinity: cli, metrics, protocol
+  - Cost: small
+  - Auto-flow: yes
+  - Notes: Add `--model <name>` and `--thinking <low|medium|high>` flags to `nexus claim`. Write both to lock dir as `model` and `thinking` files alongside ts/agent/intent. Read back in listLocks, pass through snapshot. Dashboard shows model + thinking level in the accordion lock group header (e.g. "sonnet-4-6 · medium"). Critical use case: @claude and @codex are CLI wrappers — the actual underlying model could be anything including Ollama-served local models (llama3.3, qwen2.5-coder, etc). The agent handle alone is meaningless without the model. Update _NEXUS_CONSTITUTION.md to require agents to always pass --model on claim. Also feeds into nexus-metrics for cost profiling per model per task.
+
 - [ ] TASK/Codex: Add lock manager tests
   - Id: lockmanager-tests
   - Epic: Open-source CLI release
