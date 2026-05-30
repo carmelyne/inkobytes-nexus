@@ -492,6 +492,104 @@
         text-decoration: line-through;
       }
 
+      /* ── Task header row ── */
+      .task-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+      .task-header .task-title {
+        flex: 1;
+        margin-bottom: 0;
+      }
+      .task-peek {
+        flex-shrink: 0;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--muted-2);
+        padding: 0 2px;
+        font-size: 14px;
+        line-height: 1;
+        margin-top: 0px;
+        transition: color 0.15s;
+      }
+      .task-peek:hover { color: var(--accent); }
+
+      /* ── Task detail popover ── */
+      .task-popover {
+        position: fixed;
+        inset: unset;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        margin: 0;
+        width: min(440px, calc(100vw - 32px));
+        background: var(--panel-s);
+        border: 1px solid var(--line-2);
+        border-radius: var(--r);
+        box-shadow: var(--sh-lg);
+        padding: 20px 22px;
+        font-family: var(--f-body);
+        color: var(--ink-2);
+      }
+      .task-popover::backdrop {
+        background: rgba(12, 26, 22, 0.15);
+        backdrop-filter: blur(2px);
+      }
+      .task-pop-title {
+        font-family: var(--f-head);
+        font-size: 14.5px;
+        font-weight: 700;
+        color: var(--ink);
+        margin-bottom: 14px;
+        line-height: 1.35;
+        padding-right: 8px;
+      }
+      .task-pop-row {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 7px;
+        font-size: 12.5px;
+      }
+      .task-pop-label {
+        font-family: var(--f-head);
+        font-size: 9.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.13em;
+        color: var(--muted-2);
+        min-width: 72px;
+        padding-top: 2px;
+        flex-shrink: 0;
+      }
+      .task-pop-val {
+        color: var(--ink-2);
+        line-height: 1.5;
+      }
+      .task-pop-val code {
+        font-family: var(--f-mono);
+        font-size: 11px;
+        background: rgba(21, 50, 35, 0.06);
+        padding: 1px 5px;
+        border-radius: 4px;
+      }
+      .task-pop-notes {
+        margin-top: 13px;
+        padding-top: 13px;
+        border-top: 1px solid var(--line);
+      }
+      .task-pop-notes .task-pop-label {
+        display: block;
+        margin-bottom: 6px;
+      }
+      .task-pop-notes .task-pop-val {
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.65;
+      }
+
       /* ── Pills ── */
       .pill {
         display: inline-flex;
@@ -994,8 +1092,9 @@
           const groups = {};
           for (const lock of data.locks) {
             const key = lock.agent || 'unknown';
-            if (!groups[key]) groups[key] = { locks: [], subagents: lock.subagents || 0 };
+            if (!groups[key]) groups[key] = { locks: [], subagents: 0 };
             groups[key].locks.push(lock);
+            if ((lock.subagents || 0) > groups[key].subagents) groups[key].subagents = lock.subagents;
           }
           const chevron = '<svg class="lock-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>';
           document.getElementById('locks').innerHTML = Object.entries(groups).map(([agent, group]) => {
@@ -1100,9 +1199,40 @@
         );
       }
 
+      function popRow(label, val) {
+        return '<div class="task-pop-row"><span class="task-pop-label">' + label + '</span><span class="task-pop-val">' + val + '</span></div>';
+      }
+
       function renderTask(task) {
         const done = task.checked ? ' is-done' : '';
-        return '<div class="task' + done + '"><div class="task-title"><strong>' + escapeHtml(task.title) + '</strong></div><span class="pill">' + escapeHtml(task.agent) + '</span><span class="pill">' + escapeHtml(task.status || 'unknown') + '</span><span class="pill">auto ' + escapeHtml(task.autoFlow || 'no') + '</span><br><code>' + escapeHtml(task.files || 'no files') + '</code></div>';
+        const popId = 'tp-' + (task.id || Math.random().toString(36).slice(2, 9));
+
+        const rows = [
+          task.epic    && popRow('Epic',      escapeHtml(task.epic)),
+          task.cost    && popRow('Cost',      escapeHtml(task.cost)),
+          task.autoFlow && popRow('Auto-flow', escapeHtml(task.autoFlow)),
+          task.depends && popRow('Depends',   escapeHtml(task.depends)),
+          task.files   && popRow('Files',     '<code>' + escapeHtml(task.files) + '</code>'),
+        ].filter(Boolean).join('');
+
+        const notes = task.notes
+          ? '<div class="task-pop-notes"><span class="task-pop-label">Notes</span><div class="task-pop-val">' + escapeHtml(task.notes) + '</div></div>'
+          : '';
+
+        const popover = '<div id="' + popId + '" popover class="task-popover">'
+          + '<div class="task-pop-title">' + escapeHtml(task.title) + '</div>'
+          + rows + notes
+          + '</div>';
+
+        return '<div class="task' + done + '">'
+          + '<div class="task-header"><div class="task-title"><strong>' + escapeHtml(task.title) + '</strong></div>'
+          + '<button class="task-peek" popovertarget="' + popId + '" title="Task details">ⓘ</button></div>'
+          + '<span class="pill">' + escapeHtml(task.agent) + '</span>'
+          + '<span class="pill">' + escapeHtml(task.status || 'unknown') + '</span>'
+          + '<span class="pill">auto ' + escapeHtml(task.autoFlow || 'no') + '</span>'
+          + '<br><code>' + escapeHtml(task.files || 'no files') + '</code>'
+          + popover
+          + '</div>';
       }
 
       function normalizeAgent(agent) {
