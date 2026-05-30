@@ -507,25 +507,80 @@
         letter-spacing: 0.01em;
       }
 
-      /* ── Locks ── */
-      .lock {
+      /* ── Accordion locks ── */
+      .lock-group {
         border-top: 1px solid var(--line);
-        padding: 10px 0;
+      }
+      .lock-group:first-child { border-top: 0; }
+
+      .lock-group-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 0;
+        cursor: pointer;
+        user-select: none;
+        list-style: none;
+      }
+      .lock-group-header::-webkit-details-marker { display: none; }
+
+      .lock-group-agent {
+        font-family: var(--f-mono);
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--accent);
+        background: var(--accent-dim);
+        padding: 2px 8px;
+        border-radius: var(--r-pill);
       }
 
-      .lock:first-child {
-        border-top: 0;
-        padding-top: 0;
+      .lock-group-subagents {
+        font-family: var(--f-mono);
+        font-size: 10px;
+        color: var(--accent);
+        opacity: 0.75;
       }
+
+      .lock-group-count {
+        font-size: 11px;
+        color: var(--muted-2);
+        margin-left: auto;
+        margin-right: 4px;
+      }
+
+      .lock-chevron {
+        width: 12px;
+        height: 12px;
+        stroke: var(--muted-2);
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        fill: none;
+        flex-shrink: 0;
+        transition: transform 0.2s ease;
+      }
+
+      details[open] .lock-chevron {
+        transform: rotate(180deg);
+      }
+
+      .lock-group-body {
+        padding-bottom: 6px;
+      }
+
+      .lock {
+        border-top: 1px solid var(--line);
+        padding: 8px 0 8px 10px;
+      }
+      .lock:first-child { border-top: 0; padding-top: 0; }
 
       .lock-link {
         font-weight: 600;
         color: var(--accent);
         text-decoration: none;
         font-family: var(--f-mono);
-        font-size: 12.5px;
+        font-size: 12px;
       }
-
       .lock-link:hover {
         text-decoration: underline;
         text-underline-offset: 3px;
@@ -535,27 +590,18 @@
         display: flex;
         align-items: center;
         gap: 6px;
-        margin: 4px 0 2px;
-      }
-
-      .lock-agent {
-        font-family: var(--f-mono);
-        font-size: 11px;
-        background: var(--accent-dim);
-        color: var(--accent);
-        padding: 2px 7px;
-        border-radius: var(--r-pill);
+        margin: 3px 0 2px;
       }
 
       .lock-intent {
-        font-size: 12px;
+        font-size: 11.5px;
         color: var(--muted);
         font-style: italic;
       }
 
       .lock-age {
-        font-size: 12px;
-        color: var(--muted);
+        font-size: 11.5px;
+        color: var(--muted-2);
       }
 
       .lock-stale {
@@ -567,10 +613,9 @@
       .lock-subagents {
         font-family: var(--f-mono);
         font-size: 10px;
-        font-weight: 500;
         color: var(--accent);
         opacity: 0.8;
-        margin-left: 5px;
+        margin-left: 4px;
       }
 
       /* ── Feed / Timeline ── */
@@ -943,18 +988,39 @@
             const lethal = /tracked private|exposed|secret|credential/i.test(item);
             return '<li' + (lethal ? ' class="lethal"' : '') + '>' + escapeHtml(item) + '</li>';
           }).join('') + '</ul>';
-        document.getElementById('locks').innerHTML = data.locks.length
-          ? data.locks.map(lock => {
-            const href = 'vscode://file' + escapeHtml(repoRoot + '/' + lock.target);
-            const intent = lock.intent ? '<span class="lock-intent">' + escapeHtml(lock.intent) + '</span>' : '';
-            const staleTag = lock.stale ? '<span class="lock-stale">stale</span>' : '';
-            return '<div class="lock">'
-              + '<a class="lock-link" href="' + href + '">' + escapeHtml(lock.target) + '</a>'
-              + '<div class="lock-meta"><span class="lock-agent">' + escapeHtml(lock.agent || 'unknown') + (lock.subagents > 0 ? ' <span class="lock-subagents">+subagents (' + lock.subagents + ')</span>' : '') + '</span>' + intent + '</div>'
-              + '<div class="lock-age">Age: ' + formatAge(lock.age) + staleTag + '</div>'
-              + '</div>';
-          }).join('')
-          : '<p class="muted">No active locks.</p>';
+        if (!data.locks.length) {
+          document.getElementById('locks').innerHTML = '<p class="muted">No active locks.</p>';
+        } else {
+          const groups = {};
+          for (const lock of data.locks) {
+            const key = lock.agent || 'unknown';
+            if (!groups[key]) groups[key] = { locks: [], subagents: lock.subagents || 0 };
+            groups[key].locks.push(lock);
+          }
+          const chevron = '<svg class="lock-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>';
+          document.getElementById('locks').innerHTML = Object.entries(groups).map(([agent, group]) => {
+            const subagentsTag = group.subagents > 0 ? '<span class="lock-group-subagents">+subagents (' + group.subagents + ')</span>' : '';
+            const files = group.locks.map(lock => {
+              const href = 'vscode://file' + escapeHtml(repoRoot + '/' + lock.target);
+              const intent = lock.intent ? '<div class="lock-meta"><span class="lock-intent">' + escapeHtml(lock.intent) + '</span></div>' : '';
+              const staleTag = lock.stale ? '<span class="lock-stale">stale</span>' : '';
+              return '<div class="lock">'
+                + '<a class="lock-link" href="' + href + '">' + escapeHtml(lock.target) + '</a>'
+                + intent
+                + '<div class="lock-age">Age: ' + formatAge(lock.age) + staleTag + '</div>'
+                + '</div>';
+            }).join('');
+            return '<details class="lock-group" open>'
+              + '<summary class="lock-group-header">'
+              + '<span class="lock-group-agent">' + escapeHtml(agent) + '</span>'
+              + subagentsTag
+              + '<span class="lock-group-count">' + group.locks.length + ' file' + (group.locks.length !== 1 ? 's' : '') + '</span>'
+              + chevron
+              + '</summary>'
+              + '<div class="lock-group-body">' + files + '</div>'
+              + '</details>';
+          }).join('');
+        }
         renderQueuePanel(data);
         updateAgentStatus(data);
         fillFeed('standup', data.standup);
