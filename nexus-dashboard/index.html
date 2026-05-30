@@ -1069,13 +1069,20 @@
       let currentSnapshot = null;
       let queueView = { mode: 'queue', agent: null };
       let repoRoot = '';
+      let lastQueueSig = '';
+      let lastLocksSig = '';
 
       async function load() {
         const data = await fetch('/api/snapshot').then(r => r.json());
         currentSnapshot = data;
         repoRoot = data.repo;
-        document.getElementById('repo').textContent = data.repo + ' . ' + data.branch;
+
+        // Always update the timestamp — it's benign
         document.getElementById('updated').textContent = 'Updated ' + new Date(data.generatedAt).toLocaleTimeString();
+
+        // Don't re-render DOM while user has a popover open or is working in DevTools
+        if (document.querySelector('.task-popover:popover-open')) return;
+        document.getElementById('repo').textContent = data.repo + ' . ' + data.branch;
         document.getElementById('health').textContent = data.health.ok ? 'Healthy' : 'Needs attention';
         document.getElementById('health').className = data.health.ok ? 'status' : 'status warn';
         document.querySelector('.status-wrap [data-icon]').dataset.icon = data.health.ok ? 'circle-check' : 'triangle-alert';
@@ -1086,7 +1093,11 @@
             const lethal = /tracked private|exposed|secret|credential/i.test(item);
             return '<li' + (lethal ? ' class="lethal"' : '') + '>' + escapeHtml(item) + '</li>';
           }).join('') + '</ul>';
-        if (!data.locks.length) {
+        const newLocksSig = JSON.stringify(data.locks);
+        const locksChanged = newLocksSig !== lastLocksSig;
+        if (locksChanged) lastLocksSig = newLocksSig;
+
+        if (locksChanged && !data.locks.length) {
           document.getElementById('locks').innerHTML = '<p class="muted">No active locks.</p>';
         } else {
           const groups = {};
@@ -1097,7 +1108,7 @@
             if ((lock.subagents || 0) > groups[key].subagents) groups[key].subagents = lock.subagents;
           }
           const chevron = '<svg class="lock-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>';
-          document.getElementById('locks').innerHTML = Object.entries(groups).map(([agent, group]) => {
+          locksChanged && (document.getElementById('locks').innerHTML = Object.entries(groups).map(([agent, group]) => {
             const subagentsTag = group.subagents > 0 ? '<span class="lock-group-subagents">+subagents (' + group.subagents + ')</span>' : '';
             const files = group.locks.map(lock => {
               const href = 'vscode://file' + escapeHtml(repoRoot + '/' + lock.target);
@@ -1118,9 +1129,14 @@
               + '</summary>'
               + '<div class="lock-group-body">' + files + '</div>'
               + '</details>';
-          }).join('');
+          }).join(''));
         }
-        renderQueuePanel(data);
+
+        const newQueueSig = JSON.stringify(data.queue);
+        if (newQueueSig !== lastQueueSig) {
+          lastQueueSig = newQueueSig;
+          renderQueuePanel(data);
+        }
         updateAgentStatus(data);
         fillFeed('standup', data.standup);
         fillFeed('releases', data.releases);
