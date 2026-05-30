@@ -70,7 +70,18 @@
   - Affinity: cli, metrics, protocol
   - Cost: small
   - Auto-flow: yes
-  - Notes: Add `--model <name>` and `--thinking <low|medium|high>` flags to `nexus claim`. Write both to lock dir as `model` and `thinking` files alongside ts/agent/intent. Read back in listLocks, pass through snapshot. Dashboard shows model + thinking level in the accordion lock group header (e.g. "sonnet-4-6 · medium"). Critical use case: @claude and @codex are CLI wrappers — the actual underlying model could be anything including Ollama-served local models (llama3.3, qwen2.5-coder, etc). The agent handle alone is meaningless without the model. Update _NEXUS_CONSTITUTION.md to require agents to always pass --model on claim. Also feeds into nexus-metrics for cost profiling per model per task.
+  - Notes: Add `--model <name>` and `--thinking <low|medium|high>` flags to `nexus claim`. Write both to lock dir as `model` and `thinking` files. Read back in listLocks, pass through snapshot. Dashboard shows in accordion header (e.g. "sonnet-4-6 · medium"). IMPORTANT: --model is an operator declaration, not agent self-report. Local/Ollama models running inside Claude Code or Codex CLI have no intrinsic self-knowledge — a llama3.3 given a "you are Claude" system prompt will report itself as Claude. Only the human operator knows the real model. Add `nexus doctor` warning when recent claims have no --model set. Update _NEXUS_CONSTITUTION.md to document this. Feeds nexus-metrics for cost profiling per model.
+
+- [ ] TASK/@claude: Research local model tooling compatibility with Nexus
+  - Id: local-model-tooling
+  - Epic: Local model support
+  - Status: Ready
+  - Depends on: none
+  - Files: docs/local-model-compat.md
+  - Affinity: research, local-models, tooling
+  - Cost: medium
+  - Auto-flow: no
+  - Notes: The blocker for local models (Ollama, llama.cpp, lm-studio) in agent CLIs is not capability — it's tool/function call support. Known failure modes: inconsistent tool call JSON schema, no MCP protocol support, broken structured output, tool result format mismatches that crash the agent loop. Research and document: (1) which local models currently support tool calling reliably enough for Nexus commands (claim/release are just shell — the issue is the agent loop in Claude Code / Codex CLI itself), (2) what the actual failure surface looks like, (3) whether a Nexus-specific compatibility shim or reduced-tool mode could help. Output: compatibility matrix + recommended local models for swarm use. This is an open problem — document what we know, what we don't, and where the gap is.
 
 - [ ] TASK/Codex: Add lock manager tests
   - Id: lockmanager-tests
