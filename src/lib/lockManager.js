@@ -76,7 +76,7 @@ function isStale(lockPath) {
  * Break a stale lock
  */
 function breakLock(lockPath) {
-  for (const f of ['ts', 'agent', 'intent']) {
+  for (const f of ['ts', 'agent', 'intent', 'subagents']) {
     try { unlinkSync(join(lockPath, f)); } catch { /* ok */ }
   }
   try { rmdirSync(lockPath); } catch { /* ok */ }
@@ -86,7 +86,7 @@ function breakLock(lockPath) {
  * Attempt to acquire a lock on a file or directory.
  * Returns { success, message, staleAge? }
  */
-export function acquireLock(target, agentName, intent) {
+export function acquireLock(target, agentName, intent, subagents = 0) {
   const config = getConfig();
   const normalizedTarget = normalizeTarget(target);
   const lockPath = getLockPath(normalizedTarget);
@@ -131,10 +131,11 @@ export function acquireLock(target, agentName, intent) {
     try {
       mkdirSync(lockPath);
 
-      // Write timestamp, agent, and intent for stale detection and dashboard display
+      // Write timestamp, agent, intent, and subagents for stale detection and dashboard display
       writeFileSync(join(lockPath, 'ts'), String(Math.floor(Date.now() / 1000)), 'utf-8');
       writeFileSync(join(lockPath, 'agent'), agentName || '', 'utf-8');
       writeFileSync(join(lockPath, 'intent'), intent || '', 'utf-8');
+      if (subagents > 0) writeFileSync(join(lockPath, 'subagents'), String(subagents), 'utf-8');
 
       return {
         success: true,
@@ -167,7 +168,7 @@ export function releaseLock(target) {
     return { success: false, message: `No lock found for: ${normalizedTarget}` };
   }
 
-  for (const f of ['ts', 'agent', 'intent']) {
+  for (const f of ['ts', 'agent', 'intent', 'subagents']) {
     try { unlinkSync(join(lockPath, f)); } catch { /* ok */ }
   }
   try {
@@ -208,7 +209,8 @@ export function listLocks() {
       try { return readFileSync(join(lockPath, name), 'utf-8').trim(); } catch { return ''; }
     };
 
-    locks.push({ target, age, lockPath, agent: readMeta('agent'), intent: readMeta('intent') });
+    const subagentsRaw = readMeta('subagents');
+    locks.push({ target, age, lockPath, agent: readMeta('agent'), intent: readMeta('intent'), subagents: subagentsRaw ? parseInt(subagentsRaw, 10) : 0 });
   }
 
   return locks;
