@@ -83,6 +83,17 @@
   - Auto-flow: no
   - Notes: The blocker for local models (Ollama, llama.cpp, lm-studio) in agent CLIs is not capability — it's tool/function call support. Known failure modes: inconsistent tool call JSON schema, no MCP protocol support, broken structured output, tool result format mismatches that crash the agent loop. Research and document: (1) which local models currently support tool calling reliably enough for Nexus commands (claim/release are just shell — the issue is the agent loop in Claude Code / Codex CLI itself), (2) what the actual failure surface looks like, (3) whether a Nexus-specific compatibility shim or reduced-tool mode could help. Output: compatibility matrix + recommended local models for swarm use. This is an open problem — document what we know, what we don't, and where the gap is.
 
+- [ ] TASK/@claude: Design and implement promptCHMOD — file permission model for agents
+  - Id: prompt-chmod
+  - Epic: Security & trust
+  - Status: Ready
+  - Depends on: none
+  - Files: src/commands/chmod.js, src/lib/permissions.js, bin/nexus.js, _NEXUS_CHMOD.md, _NEXUS_CONSTITUTION.md
+  - Affinity: cli, security, protocol
+  - Cost: medium
+  - Auto-flow: no
+  - Notes: Apply Unix permission model (rwx) to agent file access. r = use as context/reference, w = modify (already enforced by claim), x = treat as authoritative instructions (the prompt injection surface). Define `_NEXUS_CHMOD.md` as the permission matrix — human-readable, human-owned. Example: `_NEXUS_STANDUP.md → rw- claiming agent, r-- others` (read for context, x bit off = don't execute as instructions). `_NEXUS_CONSTITUTION.md → r-- all` (reference only, never execute). `nexus chmod` command sets permissions. `nexus doctor` warns when an agent reads a file with x bit off but treats it as instructions, or reads without declared r permission. `nexus start` surfaces the permission matrix to the agent at session start. Core insight: claim/release already enforces w. promptCHMOD closes Gap 1 — prompt injection via shared files — by making the x bit explicit and human-controlled. Legible to all SOTA models instantly because every engineer knows chmod.
+
 - [ ] TASK/@claude: Add nexus db protect — backup before migration
   - Id: nexus-db-protect
   - Epic: Recoverability
