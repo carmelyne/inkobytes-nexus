@@ -196,7 +196,8 @@ export function listLocks() {
       if (!statSync(lockPath).isDirectory()) continue;
     } catch { continue; }
 
-    const target = lockNameToTarget(entry);
+    let target;
+    try { target = lockNameToTarget(entry); } catch { continue; }
     const tsFile = join(lockPath, 'ts');
     let age = null;
 
