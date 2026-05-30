@@ -542,54 +542,108 @@
       }
       .task-pop-title {
         font-family: var(--f-head);
-        font-size: 14.5px;
+        font-size: 15px;
         font-weight: 700;
         color: var(--ink);
         margin-bottom: 14px;
         line-height: 1.35;
         padding-right: 8px;
       }
-      .task-pop-row {
+
+      /* ── Meta chips row ── */
+      .pop-meta {
         display: flex;
-        gap: 10px;
-        margin-bottom: 7px;
-        font-size: 12.5px;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 12px;
       }
-      .task-pop-label {
+      .pop-meta-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: rgba(21, 50, 35, 0.055);
+        border-radius: var(--r-pill);
+        padding: 4px 10px 4px 7px;
+        font-size: 11.5px;
+        color: var(--ink-2);
+        position: relative;
+        cursor: default;
+      }
+      .pop-meta-item svg {
+        flex-shrink: 0;
+        color: var(--muted-2);
+      }
+      .pop-meta-item[data-tip]:hover svg {
+        color: var(--accent);
+      }
+      /* CSS tooltip */
+      .pop-meta-item[data-tip]::before {
+        content: attr(data-tip);
+        position: absolute;
+        bottom: calc(100% + 5px);
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--ink);
+        color: #fff;
+        font-size: 10px;
+        font-family: var(--f-head);
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        padding: 3px 8px;
+        border-radius: 5px;
+        white-space: nowrap;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.12s;
+        z-index: 10;
+      }
+      .pop-meta-item[data-tip]:hover::before { opacity: 1; }
+
+      /* ── Files row ── */
+      .pop-files {
+        display: flex;
+        align-items: flex-start;
+        gap: 7px;
+        background: rgba(21, 50, 35, 0.04);
+        border-radius: var(--r-sm);
+        padding: 8px 10px;
+        margin-bottom: 13px;
+        font-family: var(--f-mono);
+        font-size: 11px;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+      .pop-files svg { flex-shrink: 0; margin-top: 1px; color: var(--muted-2); }
+
+      /* ── Notes ── */
+      .pop-notes {
+        border-top: 1px solid var(--line);
+        padding-top: 13px;
+      }
+      .pop-notes-label {
         font-family: var(--f-head);
         font-size: 9.5px;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.13em;
         color: var(--muted-2);
-        min-width: 72px;
-        padding-top: 2px;
-        flex-shrink: 0;
+        margin-bottom: 7px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
       }
-      .task-pop-val {
-        color: var(--ink-2);
-        line-height: 1.5;
-      }
-      .task-pop-val code {
-        font-family: var(--f-mono);
-        font-size: 11px;
-        background: rgba(21, 50, 35, 0.06);
-        padding: 1px 5px;
-        border-radius: 4px;
-      }
-      .task-pop-notes {
-        margin-top: 13px;
-        padding-top: 13px;
-        border-top: 1px solid var(--line);
-      }
-      .task-pop-notes .task-pop-label {
-        display: block;
-        margin-bottom: 6px;
-      }
-      .task-pop-notes .task-pop-val {
+      .pop-notes-body {
         font-size: 12.5px;
         color: var(--ink-2);
         line-height: 1.7;
+      }
+      .pop-notes-body code {
+        font-family: var(--f-mono);
+        font-size: 11px;
+        background: rgba(21, 50, 35, 0.07);
+        padding: 1px 5px;
+        border-radius: 4px;
+        color: var(--accent-2);
       }
 
       /* ── Pills ── */
@@ -1221,29 +1275,45 @@
         return escapeHtml(text).replace(/`([^`]+)`/g, '<code>$1</code>');
       }
 
-      function popRow(label, val) {
-        return '<div class="task-pop-row"><span class="task-pop-label">' + label + '</span><span class="task-pop-val">' + val + '</span></div>';
+      function metaChip(tip, svgPath, val) {
+        return '<span class="pop-meta-item" data-tip="' + tip + '">'
+          + '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + svgPath + '</svg>'
+          + escapeHtml(val)
+          + '</span>';
       }
+
+      const ICONS = {
+        epic:    '<path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r="1" fill="currentColor" stroke="none"/>',
+        cost:    '<path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
+        auto:    '<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>',
+        depends: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+        files:   '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>',
+        notes:   '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+      };
 
       function renderTask(task) {
         const done = task.checked ? ' is-done' : '';
         const popId = 'tp-' + (task.id || Math.random().toString(36).slice(2, 9));
 
-        const rows = [
-          task.epic    && popRow('Epic',      escapeHtml(task.epic)),
-          task.cost    && popRow('Cost',      escapeHtml(task.cost)),
-          task.autoFlow && popRow('Auto-flow', escapeHtml(task.autoFlow)),
-          task.depends && popRow('Depends',   escapeHtml(task.depends)),
-          task.files   && popRow('Files',     '<code>' + escapeHtml(task.files) + '</code>'),
+        const chips = [
+          task.epic     && metaChip('Epic',       ICONS.epic,    task.epic),
+          task.cost     && metaChip('Cost',        ICONS.cost,    task.cost),
+          task.autoFlow && metaChip('Auto-flow',   ICONS.auto,    task.autoFlow),
+          task.depends  && task.depends !== 'none' && metaChip('Depends on', ICONS.depends, task.depends),
         ].filter(Boolean).join('');
 
-        const notes = task.notes
-          ? '<div class="task-pop-notes"><span class="task-pop-label">Notes</span><div class="task-pop-val">' + formatNotes(task.notes) + '</div></div>'
+        const filesRow = task.files
+          ? '<div class="pop-files"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + ICONS.files + '</svg><span>' + escapeHtml(task.files) + '</span></div>'
+          : '';
+
+        const notesRow = task.notes
+          ? '<div class="pop-notes"><div class="pop-notes-label"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + ICONS.notes + '</svg>Notes</div><div class="pop-notes-body">' + formatNotes(task.notes) + '</div></div>'
           : '';
 
         const popover = '<div id="' + popId + '" popover class="task-popover">'
           + '<div class="task-pop-title">' + escapeHtml(task.title) + '</div>'
-          + rows + notes
+          + (chips ? '<div class="pop-meta">' + chips + '</div>' : '')
+          + filesRow + notesRow
           + '</div>';
 
         return '<div class="task' + done + '">'
