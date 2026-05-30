@@ -195,10 +195,13 @@ function parseQueue(content) {
         agent: task[2].trim(),
         title: task[3].trim(),
         id: '',
+        epic: '',
         status: '',
+        depends: '',
         files: '',
         cost: '',
         autoFlow: '',
+        notes: '',
       };
       continue;
     }
@@ -208,10 +211,13 @@ function parseQueue(content) {
     if (!field) continue;
     const key = field[1].toLowerCase();
     if (key === 'id') current.id = field[2];
+    if (key === 'epic') current.epic = field[2];
     if (key === 'status') current.status = field[2];
+    if (key === 'depends on') current.depends = field[2];
     if (key === 'files') current.files = field[2];
     if (key === 'cost') current.cost = field[2];
     if (key === 'auto-flow') current.autoFlow = field[2];
+    if (key === 'notes') current.notes = field[2];
   }
 
   if (current) tasks.push(current);
