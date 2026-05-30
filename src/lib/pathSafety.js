@@ -37,5 +37,5 @@ export function targetToLockName(target) {
 
 export function lockNameToTarget(lockName) {
   const base = lockName.replace(/\.lock$/, '').replaceAll('~', '%');
-  return decodeURIComponent(base);
+  return normalizeTarget(decodeURIComponent(base));
 }
