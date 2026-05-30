@@ -35,8 +35,11 @@ export default function claim(args) {
   const agent = args[1] || 'UnknownAgent';
   const intent = args[2] || 'Modifying file';
 
+  const subagentsIndex = args.indexOf('--subagents');
+  const subagents = subagentsIndex !== -1 ? parseInt(args[subagentsIndex + 1], 10) || 0 : 0;
+
   if (!target) {
-    console.error('Usage: nexus claim <filepath_or_dir> <agent> "<intent>"');
+    console.error('Usage: nexus claim <filepath_or_dir> <agent> "<intent>" [--subagents <n>]');
     process.exit(1);
   }
 
@@ -47,7 +50,7 @@ export default function claim(args) {
     process.exit(1);
   }
 
-  const result = acquireLock(target, agent, intent);
+  const result = acquireLock(target, agent, intent, subagents);
 
   if (!result.success) {
     console.error(`[ERROR] ${result.message}`);
