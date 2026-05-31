@@ -4,6 +4,7 @@ import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { chdir, cwd } from 'process';
+import { spawnSync } from 'child_process';
 import {
   acquireLock,
   getLockPath,
@@ -41,6 +42,28 @@ test('acquireLock writes timestamp, agent, intent, subagent, model, and thinking
     assert.equal(readFileSync(join(lockPath, 'subagents'), 'utf-8'), '2');
     assert.equal(readFileSync(join(lockPath, 'model'), 'utf-8'), 'gpt-5-codex');
     assert.equal(readFileSync(join(lockPath, 'thinking'), 'utf-8'), 'medium');
+    assert.equal(readFileSync(join(lockPath, 'claim-head'), 'utf-8'), 'unknown');
+  });
+});
+
+test('acquireLock records current git HEAD when available', () => {
+  inTempRepo((root) => {
+    spawnSync('git', ['init'], { cwd: root, stdio: 'pipe' });
+    spawnSync('git', ['config', 'user.email', 'test@example.com'], { cwd: root, stdio: 'pipe' });
+    spawnSync('git', ['config', 'user.name', 'Test Agent'], { cwd: root, stdio: 'pipe' });
+    writeFileSync(join(root, 'file.txt'), 'hello\n', 'utf-8');
+    spawnSync('git', ['add', 'file.txt'], { cwd: root, stdio: 'pipe' });
+    spawnSync('git', ['commit', '-m', 'init'], { cwd: root, stdio: 'pipe' });
+    const head = spawnSync('git', ['rev-parse', 'HEAD'], {
+      cwd: root,
+      encoding: 'utf-8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).stdout.trim();
+
+    const result = acquireLock('file.txt', '@codex', 'test claim head');
+
+    assert.equal(result.success, true);
+    assert.equal(readFileSync(join(getLockPath('file.txt'), 'claim-head'), 'utf-8'), head);
   });
 });
 
@@ -72,6 +95,7 @@ test('listLocks reads lock metadata and defaults missing subagents to zero', () 
     assert.equal(locks[0].subagents, 0);
     assert.equal(locks[0].model, 'gpt-5-codex');
     assert.equal(locks[0].thinking, 'medium');
+    assert.equal(locks[0].claimHead, 'unknown');
     assert.equal(typeof locks[0].age, 'number');
   });
 });
