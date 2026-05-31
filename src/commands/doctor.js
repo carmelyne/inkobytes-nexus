@@ -328,6 +328,7 @@ export default function doctor(args) {
     Continuity: [],
     Memories: [],
     Locks: [],
+    'Generated Artifacts': [],
     promptCHMOD: [],
     'Queue Authorship': [],
   };
@@ -367,6 +368,10 @@ export default function doctor(args) {
 
   for (const issue of scanGitPrivacy(root)) {
     sections['Git Privacy'].push(issue);
+  }
+
+  for (const issue of scanGeneratedArtifacts(root)) {
+    sections['Generated Artifacts'].push(issue);
   }
 
   if (!ensureFile(join(root, 'DECISIONS.md'), LOCAL_DECISIONS_TEMPLATE, fix, changes)) {
@@ -822,6 +827,61 @@ function scanGitPrivacy(root) {
     issue: `Git tracks private/local path: ${file}`,
     fix: 'Untrack it without deleting local files: `git rm --cached -r -- <path>`, then add an ignore rule.',
   }));
+}
+
+function scanGeneratedArtifacts(root) {
+  const gitDir = join(root, '.git');
+  if (!existsSync(gitDir)) return [];
+
+  const result = spawnSync('git', ['status', '--porcelain', '--untracked-files=all'], {
+    cwd: root,
+    encoding: 'utf-8',
+    stdio: 'pipe',
+  });
+  if (result.status !== 0) return [];
+
+  const seen = new Set();
+  const artifacts = [];
+  for (const line of result.stdout.split('\n')) {
+    if (!line.startsWith('?? ')) continue;
+    const file = parseGitStatusPath(line.slice(3).trim());
+    const ownerPath = generatedArtifactOwnerPath(file);
+    if (!ownerPath || seen.has(ownerPath)) continue;
+    seen.add(ownerPath);
+    artifacts.push({
+      issue: `Untracked generated-looking artifact needs owner decision: ${ownerPath}`,
+      fix: 'Decide keep/delete/ignore, or claim and release it intentionally. Nexus will not delete it automatically.',
+    });
+  }
+  return artifacts;
+}
+
+function generatedArtifactOwnerPath(file) {
+  const normalized = file.replace(/\\/g, '/');
+  if (/(^|\/)(dist|build|coverage|tmp|temp|exports?|reports?|ledgers?|screenshots?)(\/|$)/i.test(normalized)) {
+    return firstPathSegment(normalized);
+  }
+  if (/(^|\/)[^/]*\bcopy\b[^/]*(\/|$)/i.test(normalized)) {
+    return firstPathSegment(normalized);
+  }
+  if (/\.(png|jpe?g|gif|webp|pdf|log|tmp)$/i.test(normalized)) {
+    return normalized;
+  }
+  return '';
+}
+
+function parseGitStatusPath(file) {
+  if (!file.startsWith('"') || !file.endsWith('"')) return file;
+
+  try {
+    return JSON.parse(file);
+  } catch {
+    return file.slice(1, -1);
+  }
+}
+
+function firstPathSegment(file) {
+  return file.split('/')[0];
 }
 
 function matchesPrivatePath(normalized, privatePath) {
