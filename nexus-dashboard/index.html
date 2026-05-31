@@ -57,10 +57,66 @@
           </div>
         </header>
         <div id="health-alert" class="health-alert" hidden>
-           <!-- ...alert content kept -->
+          <div class="health-alert-inner">
+            <span class="health-alert-icon">🔴</span>
+            <div class="health-alert-body">
+              <div class="health-alert-title">Health issues detected</div>
+              <ul id="health-alert-list"></ul>
+            </div>
+          </div>
         </div>
         <div class="dashboard-grid">
-           <!-- ...rest of dashboard sections wrapped here -->
+          <section class="now-section">
+            <h2><span data-icon="lock"></span>Active</h2>
+            <div id="locks"></div>
+          </section>
+          <section class="ring-section">
+            <h2><span data-icon="activity"></span>Progress</h2>
+            <div id="ring-chart"></div>
+          </section>
+          <section class="chart-sm">
+            <h2><span data-icon="tag"></span>By Epic</h2>
+            <div id="chart-epic"></div>
+          </section>
+          <section class="chart-sm">
+            <h2><span data-icon="bar-chart-2"></span>Cost Split</h2>
+            <div id="chart-cost"></div>
+          </section>
+          <section class="chart-sm">
+            <h2><span data-icon="users"></span>By Agent</h2>
+            <div id="chart-agent"></div>
+          </section>
+          <section class="wide queue-section">
+            <div class="queue-tabs">
+              <button class="tab-button queue-tab active" data-queue-mode="queue"><span
+                  data-icon="list-checks"></span>Queue</button>
+              <span class="next-label">Next for:</span>
+              <button class="tab-button agent-tab" data-next-agent="@codex">codex <span class="presence-dot"></span></button>
+              <button class="tab-button agent-tab" data-next-agent="@gemini">gemini <span class="presence-dot"></span></button>
+              <button class="tab-button agent-tab" data-next-agent="@claude">claude <span class="presence-dot"></span></button>
+              <button class="tab-button agent-tab" data-next-agent="@agy">agy <span class="presence-dot"></span></button>
+              <button class="tab-button queue-tab ledger-tab" data-queue-mode="ledger"><svg
+                  xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" />
+                  <path d="M8 11h8" />
+                  <path d="M8 7h6" />
+                </svg>Nexus Ledger</button>
+            </div>
+            <div id="queue" class="queue-panel"></div>
+          </section>
+          <section>
+            <h2><span data-icon="messages-square"></span>Standup</h2>
+            <dl id="standup"></dl>
+          </section>
+          <section>
+            <h2><span data-icon="ship"></span>Recent Releases</h2>
+            <dl id="releases"></dl>
+          </section>
+          <section class="wide terminal-section">
+            <h2><span data-icon="git-branch"></span>Git Status</h2>
+            <div id="git"></div>
+          </section>
         </div>
       </main>
     </div>
