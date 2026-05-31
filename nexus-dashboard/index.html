@@ -240,9 +240,10 @@
         });
 
         if (queueView.mode === 'queue') {
-          document.getElementById('queue').innerHTML = data.queue.length
-            ? data.queue.map(renderTask).join('')
-            : '<p class="muted">No queue tasks found.</p>';
+          const openTasks = (data.queue || []).filter(task => !task.checked);
+          document.getElementById('queue').innerHTML = openTasks.length
+            ? openTasks.map(renderTask).join('')
+            : '<p class="muted">No open queue tasks. Completed work is in Nexus Ledger.</p>';
           return;
         }
 
@@ -254,7 +255,7 @@
         }
 
         const agentTasks = data.queue.filter(task =>
-          normalizeAgent(task.agent) === normalizeAgent(queueView.agent)
+          !task.checked && normalizeAgent(task.agent) === normalizeAgent(queueView.agent)
         );
         const autoYes = agentTasks.filter(t => t.autoFlow === 'yes' && t.status === 'Ready');
         const autoNo = agentTasks.filter(t => t.autoFlow !== 'yes');
