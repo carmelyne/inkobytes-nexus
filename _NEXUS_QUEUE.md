@@ -108,10 +108,10 @@
   - Auto-flow: no
   - Notes: When a lock appears stale, show enough context to decide safely: agent, age, claim-time HEAD, current HEAD, model/thinking if present, and last heartbeat if presence exists. Do not auto-encourage cleanup when the agent may simply be timed out or reset. Recoverability principle: stale-lock cleanup must be an informed recovery action, not a reflex.
 
-- [ ] TASK/Codex: Add generated artifact ownership checks
+- [x] TASK/Codex: Add generated artifact ownership checks
   - Id: generated-artifact-ownership
   - Epic: Same-branch recoverability
-  - Status: Ready
+  - Status: Done
   - Depends on: none
   - Files: src/commands/doctor.js, src/commands/status.js, test/doctor.test.js, test/status.test.js
   - Affinity: cli, artifacts, recoverability
