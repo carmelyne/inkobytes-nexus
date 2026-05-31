@@ -46,6 +46,8 @@ Local agent work decisions live here. This file is gitignored by Nexus.
   - Affinity: entry-point
   - Cost: small
   - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
 
 - [ ] TASK/Agent-2: Create the utils.js helper
   - Id: hello-utils
@@ -56,6 +58,8 @@ Local agent work decisions live here. This file is gitignored by Nexus.
   - Affinity: helpers
   - Cost: small
   - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
 
 ---
 
@@ -100,6 +104,8 @@ Adversarial result:
   - Affinity: entry-point
   - Cost: small
   - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
 
 - [ ] TASK/Agent-2: Create the utils.js helper
   - Id: hello-utils
@@ -110,6 +116,8 @@ Adversarial result:
   - Affinity: helpers
   - Cost: small
   - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
 `,
 
   '_NEXUS_CHMOD.md': DEFAULT_MATRIX,
