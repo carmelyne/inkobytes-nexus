@@ -6,6 +6,32 @@
 
 ## Ready Queue
 
+- [x] TASK/Codex: Release dashboard docs and reset recovery cleanup
+  - Id: dashboard-docs-release-cleanup
+  - Epic: Open-source CLI release
+  - Status: Done
+  - Depends on: dashboard-cli-docs-page
+  - Files: README.md, _NEXUS.md, _NEXUS_QUEUE.md, _NEXUS_REPORT.md, _NEXUS_LEDGER.md, bin/nexus.js, nexus-dashboard/docs/index.html, nexus-dashboard/index.html, nexus-dashboard/style.css, src/commands/claim.js, src/commands/dashboard.js, src/commands/init.js, test/claim.test.js
+  - Affinity: release, dashboard, docs, recoverability
+  - Cost: medium
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Capture the reset recovery and release-readiness cleanup so dashboard docs, claim flag guardrails, and init scaffold drift fixes appear in metrics and ledger history.
+
+- [x] TASK/Codex: Add CLI Docs dashboard page
+  - Id: dashboard-cli-docs-page
+  - Epic: Dashboard observability
+  - Status: Done
+  - Depends on: none
+  - Files: nexus-dashboard/docs/index.html, nexus-dashboard/index.html, nexus-dashboard/style.css, src/commands/dashboard.js
+  - Affinity: dashboard, docs, ux
+  - Cost: medium
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Add a `/docs/index.html` page that uses the same dashboard frame, sidebar, and top header. Main content should show an alphabetical list of Nexus CLI commands with short descriptions of what each command does. Add a right-side table of contents linking to every command. Keep the sidebar CLI Docs link wired to this page.
+
 - [x] TASK/@gemini: Add agent presence check-in/check-out system
   - Id: agent-presence
   - Epic: Dashboard observability
