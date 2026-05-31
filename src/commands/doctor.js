@@ -548,6 +548,7 @@ export default function doctor(args) {
     } else {
       sections['Queue Authorship'].push({
         issue: 'All auto-flow tasks in Ready Queue have Review: approved',
+        fix: 'No action needed.',
         ok: true,
       });
     }
