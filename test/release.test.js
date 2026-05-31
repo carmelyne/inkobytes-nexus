@@ -54,5 +54,7 @@ test('release appends done claim and adversarial review template', () => {
     assert.match(report, /Commit: test release report/);
     assert.match(report, /Done claim:\n- Changed:\n- Validated:\n- Risk:/);
     assert.match(report, /Adversarial result:\n- Pass, or:\n- Finding:/);
+    const log = spawnSync('git', ['log', '-1', '--pretty=%s'], { cwd: root, encoding: 'utf-8' }).stdout.trim();
+    assert.equal(log, '[@codex] test release report');
   });
 });
