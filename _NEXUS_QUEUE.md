@@ -215,7 +215,7 @@
   - Auto-flow: yes
   - Notes: At claim time, check env vars to determine session trust level. `CLAUDECODE=1` is set by Claude Code CLI for all sessions (Pro, Max, API key) — its presence means the claim comes from a verified Anthropic-backed harness. Absence means local/unverified (Ollama, llama.cpp, LM Studio, etc.). Logic: if CLAUDECODE present → verified=true; else if NEXUS_AGENT env var set by human → verified=true with source=operator; else → verified=false, flag as unverified. Write `verified` and `trust-source` files to lock dir alongside agent/intent. Dashboard shows unverified claims with a distinct indicator (e.g. gray/amber dot vs green). `nexus doctor` warns on unverified claims in active locks. Does NOT block unverified agents — coordination still works, trust is just surfaced transparently. Human can set `export NEXUS_AGENT=@local-llama` before handing terminal to a local model. Core discovery: `env | grep CLAUDE` reveals CLAUDECODE=1, CLAUDE_CODE_SESSION_ID, AI_AGENT=claude-code_version — these are the harness fingerprints.
 
-- [ ] TASK/@claude: Design and implement promptCHMOD — file permission model for agents
+- [x] TASK/@claude: Design and implement promptCHMOD — file permission model for agents
   - Id: prompt-chmod
   - Epic: Security & trust
   - Status: Ready
