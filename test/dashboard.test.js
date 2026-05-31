@@ -62,6 +62,22 @@ test('dashboard snapshot summarizes Nexus repo state', () => {
       '- Target: src/commands/dashboard.js',
       '- Commit: feat: dashboard',
     ].join('\n'), 'utf-8');
+    writeFileSync(join(root, '_NEXUS_LEDGER.md'), [
+      '# Nexus Completed Task Ledger',
+      '',
+      '## dashboard-v1',
+      '',
+      '- Id: dashboard-v1',
+      '- Title: Build dashboard',
+      '- Agent: @codex',
+      '- Epic: Dashboard observability',
+      '- Cost: small',
+      '- Completed At: 2026-05-31T12:00:00.000Z',
+      '- Files: src/commands/dashboard.js',
+      '- SHA: abc123',
+      '- Commit: feat: dashboard',
+      '',
+    ].join('\n'), 'utf-8');
 
     const snapshot = buildSnapshot();
 
@@ -79,6 +95,8 @@ test('dashboard snapshot summarizes Nexus repo state', () => {
       { type: 'Commit', title: 'docs: placeholder', meta: '' },
       { type: 'Commit', title: 'feat: dashboard', meta: '' },
     ]);
+    assert.equal(snapshot.ledger[0].id, 'dashboard-v1');
+    assert.equal(snapshot.ledger[0].epic, 'Dashboard observability');
   });
 });
 
