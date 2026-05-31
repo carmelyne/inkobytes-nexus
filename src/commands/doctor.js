@@ -329,6 +329,7 @@ export default function doctor(args) {
     Memories: [],
     Locks: [],
     promptCHMOD: [],
+    'Queue Authorship': [],
   };
   const changes = [];
   const config = getConfig(root);
@@ -531,6 +532,27 @@ export default function doctor(args) {
     }
   }
 
+  // Queue authorship gate — warn on auto-flow tasks in Ready Queue missing Review: approved
+  const queuePath = join(root, '_NEXUS_QUEUE.md');
+  if (existsSync(queuePath)) {
+    const queueContent = readFileSync(queuePath, 'utf-8');
+    const readySection = extractReadyQueueSection(queueContent);
+    const unapproved = findUnapprovedAutoFlow(readySection);
+    if (unapproved.length) {
+      for (const id of unapproved) {
+        sections['Queue Authorship'].push({
+          issue: `Task "${id}" is auto-flow: yes in Ready Queue but missing Review: approved — nexus next will skip it`,
+          fix: 'Add "- Review: approved" and "- Approved by: human" to the task, or move it to ## Proposed Queue.',
+        });
+      }
+    } else {
+      sections['Queue Authorship'].push({
+        issue: 'All auto-flow tasks in Ready Queue have Review: approved',
+        ok: true,
+      });
+    }
+  }
+
   for (const relativePath of legacyCheckFiles) {
     const path = join(root, relativePath);
     if (!existsSync(path)) continue;
@@ -594,6 +616,54 @@ export default function doctor(args) {
   }
 
   console.log('All checked Nexus categories are ready.');
+}
+
+function extractReadyQueueSection(content) {
+  const lines = content.split('\n');
+  let inSection = false;
+  const result = [];
+  for (const line of lines) {
+    if (line.startsWith('## ')) { inSection = line.trim() === '## Ready Queue'; continue; }
+    if (inSection) result.push(line);
+  }
+  return result.join('\n');
+}
+
+function findUnapprovedAutoFlow(sectionContent) {
+  const unapproved = [];
+  const lines = sectionContent.split('\n');
+  let currentId = '';
+  let isAutoFlow = false;
+  let hasReview = false;
+
+  for (const line of lines) {
+    const taskMatch = line.match(/^- \[[ ]\] TASK\/.+?:\s*(.+)/);
+    if (taskMatch) {
+      if (currentId && isAutoFlow && !hasReview) unapproved.push(currentId);
+      currentId = '';
+      isAutoFlow = false;
+      hasReview = false;
+      continue;
+    }
+    if (line.match(/^- \[x\]/)) {
+      if (currentId && isAutoFlow && !hasReview) unapproved.push(currentId);
+      currentId = '';
+      isAutoFlow = false;
+      hasReview = false;
+      continue;
+    }
+    if (!line.trim().startsWith('- ')) continue;
+    const kv = line.trim().replace(/^-\s*/, '');
+    const colonIdx = kv.indexOf(':');
+    if (colonIdx === -1) continue;
+    const key = kv.slice(0, colonIdx).trim().toLowerCase();
+    const val = kv.slice(colonIdx + 1).trim().toLowerCase();
+    if (key === 'id') currentId = val;
+    if (key === 'auto-flow' && val === 'yes') isAutoFlow = true;
+    if (key === 'review' && val === 'approved') hasReview = true;
+  }
+  if (currentId && isAutoFlow && !hasReview) unapproved.push(currentId);
+  return unapproved;
 }
 
 function replaceLegacyHelperCommands(content) {
