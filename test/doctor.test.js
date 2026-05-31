@@ -363,3 +363,20 @@ test('doctor reports tracked private agent state without deleting local files', 
     assert.match(output, /git rm --cached -r -- <path>/);
   });
 });
+
+test('doctor reports active locks missing model metadata', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    mkdirSync(join(root, '.nexus', 'locks', 'file.txt.lock'), { recursive: true });
+    writeFileSync(join(root, '.nexus', 'locks', 'file.txt.lock', 'ts'), String(Math.floor(Date.now() / 1000)), 'utf-8');
+    writeFileSync(join(root, '.nexus', 'locks', 'file.txt.lock', 'agent'), '@codex', 'utf-8');
+    writeFileSync(join(root, '.nexus', 'locks', 'file.txt.lock', 'intent'), 'test missing model', 'utf-8');
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /Active lock on file\.txt has no --model metadata/);
+    assert.match(output, /only the human operator can declare the real model/);
+  });
+});
