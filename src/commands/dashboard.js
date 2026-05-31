@@ -10,6 +10,7 @@ import { networkInterfaces } from 'os';
 import { join } from 'path';
 import { getConfig } from '../lib/config.js';
 import { listLocks } from '../lib/lockManager.js';
+import { readLedgerEntries } from './ledger.js';
 
 const DEFAULT_PORT = 13787;
 const MAX_PORT_SEARCH = 30;
@@ -63,6 +64,7 @@ export function buildSnapshot() {
     presence,
     queue: parseQueue(queueText),
     proposed: parseProposed(queueText),
+    ledger: readLedgerEntries().slice(-12).reverse(),
     standup: parseStandupEntries(standupText).slice(-8),
     releases: parseReleaseEntries(reportText).slice(-6),
   };
