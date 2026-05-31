@@ -17,10 +17,10 @@
   - Auto-flow: no
   - Notes: Add `nexus checkin @agent` and `nexus checkout @agent` commands. Write a heartbeat timestamp to `.nexus/presence/@agent`. Dashboard reads freshness (online = updated within 60s, idle = 60-300s, offline = >300s or missing). Show green/yellow/gray dot on agent tabs in queue block. Checkin should be called by `nexus start`, checkout by agent on session end. Add `nexus checkout --all` for emergency cleanup.
 
-- [ ] TASK/Codex: Add same-branch HEAD drift warning before release
+- [x] TASK/Codex: Add same-branch HEAD drift warning before release
   - Id: release-head-drift
   - Epic: Same-branch recoverability
-  - Status: Ready
+  - Status: Done
   - Depends on: commit-attribution
   - Files: src/commands/claim.js, src/commands/release.js, src/lib/lockManager.js, test/release.test.js, test/lockManager.test.js
   - Affinity: cli, safety, recoverability
@@ -60,6 +60,17 @@
   - Cost: medium
   - Auto-flow: no
   - Notes: Extend queue parsing to recognize lightweight `Coordinates with:` or `Soft depends on:` lines. These do not block like `Depends on`, but `nexus next` should display them so an agent knows when Claude/Codex/Gemini work may be semantically adjacent. Recoverability principle: make hidden coordination assumptions visible before edits begin.
+
+- [ ] TASK/Codex: Document queue item authoring pattern in Nexus skill
+  - Id: skill-queue-authoring
+  - Epic: Open-source CLI release
+  - Status: Ready
+  - Depends on: none
+  - Files: skills/nexus/SKILL.md, README.md, test/security.test.js
+  - Affinity: skill, docs, queue, dashboard
+  - Cost: small
+  - Auto-flow: yes
+  - Notes: Add a concise Queue item template to the shipped Nexus skill so devs and agents create tasks with dashboard-parseable fields: Id, Epic, Status, Depends on, Files, Affinity, Cost, Auto-flow, and Notes. Keep it practical and copy-pasteable. Principle: the CLI should help people create useful coordination data instead of making dashboards sparse or misleading.
 
 - [ ] TASK/Codex: Add release recovery command
   - Id: release-recovery
