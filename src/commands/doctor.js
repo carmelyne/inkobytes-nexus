@@ -485,6 +485,12 @@ export default function doctor(args) {
           ok: true,
         });
       }
+      if (!lock.verified) {
+        sections.Locks.push({
+          issue: `Unverified claim on ${lock.target} by ${lock.agent} (trust: ${lock.trustSource}) — no CLAUDECODE or NEXUS_AGENT env detected at claim time`,
+          fix: 'If this is a local/unverified model, set NEXUS_AGENT=@handle before claiming. If unexpected, inspect the lock.',
+        });
+      }
     }
   }
 
