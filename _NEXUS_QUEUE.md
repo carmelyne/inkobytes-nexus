@@ -6,7 +6,7 @@
 
 ## Ready Queue
 
-- [ ] TASK/@claude: Add agent presence check-in/check-out system
+- [ ] TASK/@gemini: Add agent presence check-in/check-out system
   - Id: agent-presence
   - Epic: Dashboard observability
   - Status: Ready
