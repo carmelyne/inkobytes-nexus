@@ -1264,7 +1264,7 @@
     </div>
     <main>
       <section class="now-section">
-        <h2><span data-icon="lock"></span>Now</h2>
+        <h2><span data-icon="lock"></span>Active</h2>
         <div id="locks"></div>
       </section>
       <section class="ring-section">
@@ -1604,7 +1604,7 @@
         el.innerHTML = '<div class="vchart-wrap"><div class="vchart-bars">' + cols + '</div></div>';
       }
 
-      const AGENT_COLORS = { claude: '#0e7480', codex: '#4f6ef7', gemini: '#9333ea', agy: '#d97706' };
+      const AGENT_COLORS = { claude: '#F4845F', codex: '#2dd4bf', gemini: '#0EA5E9', agy: '#d97706' };
       function renderAgentBars(queue) {
         const el = document.getElementById('chart-agent');
         if (!queue.length) { el.innerHTML = '<p class="muted">No tasks yet.</p>'; return; }
