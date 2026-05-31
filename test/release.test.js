@@ -54,6 +54,7 @@ test('release appends structured report entry', () => {
     assert.match(report, /## \[\d\d:\d\d:\d\d\] file\.txt/);
     assert.match(report, /- Agent: @codex/);
     assert.match(report, /- Target: file\.txt/);
+    assert.match(report, /- SHA: [0-9a-f]{40}/);
     assert.match(report, /- Commit: test release report/);
     assert.doesNotMatch(report, /Done claim:/);
     assert.doesNotMatch(report, /Adversarial result:/);
