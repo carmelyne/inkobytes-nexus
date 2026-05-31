@@ -34,12 +34,15 @@ test('dashboard snapshot summarizes Nexus repo state', () => {
     writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
     writeFileSync(join(root, '_NEXUS_QUEUE.md'), [
       '# Queue',
+      '## Ready Queue',
       '- [ ] TASK/@codex: Build dashboard',
       '  - Id: dashboard-v1',
       '  - Status: Ready',
       '  - Files: src/commands/dashboard.js',
       '  - Cost: small',
       '  - Auto-flow: yes',
+      '  - Review: approved',
+      '  - Approved by: human',
     ].join('\n'), 'utf-8');
     writeFileSync(join(root, '_NEXUS_STANDUP.md'), [
       '# Standup',
