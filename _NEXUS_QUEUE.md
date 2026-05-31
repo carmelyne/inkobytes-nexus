@@ -39,10 +39,10 @@
   - Auto-flow: yes
   - Notes: Change commit format from `[Agent] message` to `[@agent] message` so every release is attributable. `release.js` reads the agent from the lock file (already stored as `agent` metadata) and passes it to `stageAndCommit`. Update `stageAndCommit` signature to accept optional agent param. This unlocks per-agent git metrics from day forward.
 
-- [ ] TASK/Codex: Unify _NEXUS_REPORT.md into single structured format
+- [x] TASK/Codex: Unify _NEXUS_REPORT.md into single structured format
   - Id: report-unification
   - Epic: Metrics & observability
-  - Status: Ready
+  - Status: Done
   - Depends on: commit-attribution
   - Files: src/commands/release.js, _NEXUS_REPORT.md
   - Affinity: cli, metrics, reporting
