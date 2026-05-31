@@ -78,6 +78,12 @@ function serveDashboard(port) {
       return;
     }
 
+    if (url.pathname === '/style.css') {
+      res.writeHead(200, { 'Content-Type': 'text/css' });
+      res.end(readFileSync(new URL('../../nexus-dashboard/style.css', import.meta.url)));
+      return;
+    }
+
     if (url.pathname === '/events') {
       res.writeHead(200, {
         'Content-Type': 'text/event-stream',
