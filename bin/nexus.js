@@ -72,7 +72,7 @@ Commands:
   start [--agent @handle]           Orient an agent entering this repo
   dashboard --serve [--port <port>]  Serve live local Nexus dashboard
   metrics [--json]                   Summarize commits, releases, and queue cost
-  ledger [--json]                    Show completed task ledger
+  ledger [--json|backfill]           Show or backfill completed task ledger
   chmod [--list] [--init]            Show or set promptCHMOD permissions
   db <backup|list|restore|schedule>  Database backup and recovery
   drill <list|show|run|report>       Inspect or run protocol drills
@@ -90,6 +90,7 @@ Examples:
   nexus metrics --json
   nexus ledger
   nexus ledger --json
+  nexus ledger backfill
   nexus drill list
   nexus drill show wrong-repo-push
   nexus drill run wrong-repo-push
