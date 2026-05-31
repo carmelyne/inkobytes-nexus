@@ -16,6 +16,7 @@ const COMMANDS = {
   drill: () => import('../src/commands/drill.js'),
   soul: () => import('../src/commands/soul.js'),
   chmod: () => import('../src/commands/chmod.js'),
+  db: () => import('../src/commands/db.js'),
   help: () => import('../src/commands/help.js'),
 };
 
@@ -67,6 +68,7 @@ Commands:
   dashboard --serve [--port <port>]  Serve live local Nexus dashboard
   metrics [--json]                   Summarize commits, releases, and queue cost
   chmod [--list] [--init]            Show or set promptCHMOD permissions
+  db <backup|list|restore|schedule>  Database backup and recovery
   drill <list|show|run|report>       Inspect or run protocol drills
   soul [--file <path>] [--status | --remove]
                                     Manage local soul overlay in agent files
