@@ -119,3 +119,43 @@ body {
   grid-template-columns: repeat(12, 1fr);
   gap: var(--gap-lg);
 }
+
+/* Cards */
+section {
+  grid-column: span 6;
+  background: var(--bg-card);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: var(--r-card);
+  padding: var(--padding-card);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+section.wide {
+  grid-column: span 12;
+}
+
+h2 {
+  margin: 0;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Status Badge */
+.status-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: var(--r-card);
+  background: var(--bg-accent);
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 500;
+}
