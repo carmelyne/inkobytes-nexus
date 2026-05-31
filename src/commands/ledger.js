@@ -36,7 +36,8 @@ export function appendCompletedLedgerEntries({ target, agent, sha, commit }) {
   const tasks = parseQueueTasks(queueText)
     .filter((task) => task.checked)
     .filter((task) => task.id && !existingIds.has(task.id))
-    .filter((task) => task.files.includes(target));
+    .filter((task) => task.files.includes(target))
+    .filter((task) => commitReferencesTask(commit, task.id));
 
   if (!tasks.length) return 0;
   ensureLedgerFile(config.ledger);
@@ -159,6 +160,11 @@ function readField(block, label) {
 function splitCsv(value) {
   if (!value) return [];
   return value.split(',').map((item) => item.trim()).filter(Boolean);
+}
+
+function commitReferencesTask(commit, taskId) {
+  const normalizedCommit = String(commit || '').toLowerCase();
+  return normalizedCommit.includes(taskId.toLowerCase());
 }
 
 function countBy(items, key) {
