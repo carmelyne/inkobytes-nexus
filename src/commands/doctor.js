@@ -2,7 +2,7 @@
  * nexus doctor - inspect and repair agent protocol scaffolds in existing repos
  */
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { cwd } from 'process';
 import { spawnSync } from 'child_process';
@@ -49,7 +49,7 @@ const LOCAL_DECISIONS_TEMPLATE = `# Decisions
 Local agent work decisions live here. This file is gitignored by Nexus.
 `;
 
-const LOCAL_GITIGNORE_LINES = ['DECISIONS.md', 'docs-priv/'];
+const LOCAL_GITIGNORE_LINES = ['DECISIONS.md', 'docs-priv/', '.nexus/presence/'];
 
 const MEMORY_INDEX_TEMPLATE = `# Memory Index
 
@@ -499,6 +499,25 @@ export default function doctor(args) {
           fix: 'If this is a local/unverified model, set NEXUS_AGENT=@handle before claiming. If unexpected, inspect the lock.',
         });
       }
+    }
+  }
+
+  // Orphan presence — agent checked in but crashed without checking out
+  const presenceDir = join(root, '.nexus', 'presence');
+  if (existsSync(presenceDir)) {
+    const activeLockAgents = new Set(freshLocks.map(l => l.agent.replace(/^@/, '').toLowerCase()));
+    const now = Math.floor(Date.now() / 1000);
+    for (const file of readdirSync(presenceDir)) {
+      try {
+        const ts = parseInt(readFileSync(join(presenceDir, file), 'utf-8').trim(), 10);
+        const age = now - ts;
+        if (age >= config.staleThreshold && !activeLockAgents.has(file.toLowerCase())) {
+          sections.Locks.push({
+            issue: `Orphan presence for @${file} (${age}s old, no active lock) — agent likely crashed without checking out`,
+            fix: `Run \`nexus checkout @${file}\` to clear it.`,
+          });
+        }
+      } catch { /* skip unreadable */ }
     }
   }
 
