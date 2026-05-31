@@ -193,10 +193,10 @@
   - Auto-flow: no
   - Notes: The blocker for local models (Ollama, llama.cpp, lm-studio) in agent CLIs is not capability — it's tool/function call support. Known failure modes: inconsistent tool call JSON schema, no MCP protocol support, broken structured output, tool result format mismatches that crash the agent loop. Research and document: (1) which local models currently support tool calling reliably enough for Nexus commands (claim/release are just shell — the issue is the agent loop in Claude Code / Codex CLI itself), (2) what the actual failure surface looks like, (3) whether a Nexus-specific compatibility shim or reduced-tool mode could help. Output: compatibility matrix + recommended local models for swarm use. This is an open problem — document what we know, what we don't, and where the gap is.
 
-- [ ] TASK/@claude: Add agent identity verification via CLAUDECODE env var
+- [x] TASK/@claude: Add agent identity verification via CLAUDECODE env var
   - Id: agent-identity
   - Epic: Security & trust
-  - Status: Ready
+  - Status: Done
   - Depends on: none
   - Files: src/commands/claim.js, src/lib/lockManager.js, src/commands/dashboard.js, nexus-dashboard/index.html
   - Affinity: cli, security, protocol
