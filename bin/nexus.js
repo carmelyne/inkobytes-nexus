@@ -5,6 +5,8 @@ import { argv, exit } from 'process';
 const COMMANDS = {
   init: () => import('../src/commands/init.js'),
   doctor: () => import('../src/commands/doctor.js'),
+  checkin: () => import('../src/commands/checkin.js'),
+  checkout: () => import('../src/commands/checkout.js'),
   claim: () => import('../src/commands/claim.js'),
   release: () => import('../src/commands/release.js'),
   status: () => import('../src/commands/status.js'),
@@ -59,6 +61,8 @@ Usage: nexus <command> [options]
 Commands:
   init                              Scaffold Nexus files into current repo
   doctor [--fix] [--json]           Check or repair agent protocol files
+  checkin <agent>                   Signal agent presence (heartbeat)
+  checkout [--all] <agent>          Signal session end or cleanup
   claim <path> <agent> "<intent>"   Lock a file or directory
   release <path> "<commit msg>"     Unlock, auto-commit, and log
   status                            Show current blackboard state
