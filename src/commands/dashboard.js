@@ -20,7 +20,10 @@ export default function dashboard(args) {
     console.log(JSON.stringify(buildSnapshot(), null, 2));
     return;
   }
-...
+
+  serveDashboard(resolveDashboardPort(args));
+}
+
 export function buildSnapshot() {
   const config = getConfig();
   const locks = listLocks().map(lock => ({
@@ -64,7 +67,6 @@ export function buildSnapshot() {
     releases: parseReleaseEntries(reportText).slice(-6),
   };
 }
-...
 
 function serveDashboard(port) {
   const clients = new Set();
