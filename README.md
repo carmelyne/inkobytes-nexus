@@ -151,6 +151,17 @@ nexus dashboard --serve --port 13787
 
 The dashboard prints both `127.0.0.1` and local-network URLs when available, then shows repo health, active locks, queue items, recent standup lines, recent release notes, and dirty git files. It uses local files as the source of truth and updates the page through server-sent events. The default port is `13787`; if that port is already in use, Nexus tries `13788`, `13789`, and so on. Passing `--port` uses that exact port.
 
+### `nexus ledger [--json]`
+
+Show completed task entries from `_NEXUS_LEDGER.md`.
+
+```bash
+nexus ledger
+nexus ledger --json
+```
+
+The ledger is task-shaped dashboard data. When `nexus release` sees that a released path belongs to a checked queue task and the release message names that task id, it appends one structured entry with task id, title, agent, epic, cost, files, commit SHA, and commit message. The report remains the release receipt log; the ledger is the completed-task source for dashboard history and reporting.
+
 ### `nexus drill <list|show|run|report> [id]`
 
 Inspect and run protocol drills for known shared-repo failure modes.
@@ -213,18 +224,7 @@ nexus release src/lib/components/login/ "feat: login form"
 Nexus stages only the released path before committing, which helps avoid stowaway changes from other agents.
 If Git's index is temporarily locked by another release, Nexus waits briefly and retries before failing with a clearer message.
 
-Each release appends a repo-local backup record to `_NEXUS_REPORT.md`:
-
-```md
-Done claim:
-- Changed:
-- Validated:
-- Risk:
-
-Adversarial result:
-- Pass, or:
-- Finding:
-```
+Each release appends a repo-local receipt to `_NEXUS_REPORT.md`. If the released path is listed on a completed queue task and the release message names that task id, Nexus also appends one deduplicated completed-task entry to `_NEXUS_LEDGER.md`.
 
 ### `nexus next <agent>`
 
