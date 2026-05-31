@@ -9,7 +9,6 @@ import { spawnSync } from 'child_process';
 import { listLocks } from '../lib/lockManager.js';
 import { AGENT_SCOPE_ENTRIES, AGENT_SCOPES, normalizeAgentHandle } from '../lib/agentScopes.js';
 import { loadPermissions, getChmodPath } from '../lib/permissions.js';
-import { existsSync } from 'fs';
 
 function git(args) {
   const result = spawnSync('git', args, { cwd: cwd(), encoding: 'utf-8', stdio: 'pipe' });
