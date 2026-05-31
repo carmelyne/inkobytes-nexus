@@ -82,7 +82,8 @@ export function stageAndCommit(target, message, maxRetries = 5, retryMs = 1000) 
   while (attempt < maxRetries) {
     try {
       gitWithIndexLockRetry(['commit', '-m', `[${attribution}] ${message}`, '--', safeTarget], maxRetries, retryMs);
-      return { success: true };
+      const sha = git(['rev-parse', 'HEAD']).trim();
+      return { success: true, sha };
     } catch (err) {
       attempt++;
       if (attempt >= maxRetries) {
