@@ -41,6 +41,8 @@ export function buildSnapshot() {
     subagents: lock.subagents || 0,
     model: lock.model || '',
     thinking: lock.thinking || '',
+    verified: lock.verified ?? true,
+    trustSource: lock.trustSource || 'unverified',
   }));
 
   const queueText = readText(config.queue);
