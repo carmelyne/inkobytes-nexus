@@ -78,6 +78,8 @@ If a claim appears stale, do not edit through it. Run `nexus status` or `nexus d
    nexus claim <path> @Agent "intent"
    ```
 
+   Add `--model <name>` and `--thinking <low|medium|high>` when the operator knows the real model. These values are operator declarations, not agent self-report.
+
 3. Treat `nexus claim` as the atomic lock-and-read boundary and claim output as the current file state.
 4. Do the scoped work only inside the claimed surface.
 5. Release through Nexus:
