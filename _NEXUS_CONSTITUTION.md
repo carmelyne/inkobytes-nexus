@@ -88,6 +88,8 @@ If a claim appears stale, do not edit through it. Run `nexus status` or `nexus d
    nexus release <path> "short commit message"
    ```
 
+   When releasing `_NEXUS_REPORT.md`, Nexus does not append a second receipt for that release. This keeps the audit log from dirtying itself forever.
+
 6. Add a short completion note to standup if useful.
 7. Run `nexus next @Agent` or stand by.
 
