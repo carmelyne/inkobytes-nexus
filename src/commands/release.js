@@ -9,6 +9,7 @@ import { listLocks, readGitHead, releaseLock } from '../lib/lockManager.js';
 import { stageAndCommit } from '../lib/git.js';
 import { getConfig } from '../lib/config.js';
 import { normalizeTarget } from '../lib/pathSafety.js';
+import { appendCompletedLedgerEntries } from './ledger.js';
 
 export default function release(args) {
   let target = args[0];
@@ -75,6 +76,16 @@ export default function release(args) {
   try {
     appendFileSync(config.report, reportLine, 'utf-8');
   } catch { /* report file might not exist yet */ }
+
+  try {
+    const count = appendCompletedLedgerEntries({
+      target,
+      agent: lock?.agent || 'unknown',
+      sha: gitResult.sha || 'unknown',
+      commit: commitMsg,
+    });
+    if (count) console.log(`[LEDGER] Added ${count} completed task entr${count === 1 ? 'y' : 'ies'}.`);
+  } catch { /* ledger is reporting only; release should still complete */ }
 
   console.log('[LOCK RELEASED & COMMITTED]');
 }
