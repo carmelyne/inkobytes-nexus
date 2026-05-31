@@ -54,11 +54,59 @@ test('release appends structured report entry', () => {
     assert.match(report, /## \[\d\d:\d\d:\d\d\] file\.txt/);
     assert.match(report, /- Agent: @codex/);
     assert.match(report, /- Target: file\.txt/);
+    assert.match(report, /- Claim HEAD: [0-9a-f]{40}/);
+    assert.match(report, /- Release HEAD: [0-9a-f]{40}/);
+    assert.match(report, /- Drift: no/);
     assert.match(report, /- SHA: [0-9a-f]{40}/);
     assert.match(report, /- Commit: test release report/);
     assert.doesNotMatch(report, /Done claim:/);
     assert.doesNotMatch(report, /Adversarial result:/);
     const log = spawnSync('git', ['log', '-1', '--pretty=%s'], { cwd: root, encoding: 'utf-8' }).stdout.trim();
     assert.equal(log, '[@codex] test release report');
+  });
+});
+
+test('release warns and reports when HEAD changed since claim', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, 'file.txt'), 'hello\n', 'utf-8');
+    spawnSync('git', ['add', 'file.txt'], { cwd: root, stdio: 'pipe' });
+    spawnSync('git', ['commit', '-m', 'init'], { cwd: root, stdio: 'pipe' });
+    const claimHead = spawnSync('git', ['rev-parse', 'HEAD'], {
+      cwd: root,
+      encoding: 'utf-8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).stdout.trim();
+
+    acquireLock('file.txt', '@codex', 'test release drift');
+
+    writeFileSync(join(root, 'other.txt'), 'interleaved\n', 'utf-8');
+    spawnSync('git', ['add', 'other.txt'], { cwd: root, stdio: 'pipe' });
+    spawnSync('git', ['commit', '-m', 'interleaved commit'], { cwd: root, stdio: 'pipe' });
+    const releaseHead = spawnSync('git', ['rev-parse', 'HEAD'], {
+      cwd: root,
+      encoding: 'utf-8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).stdout.trim();
+    writeFileSync(join(root, 'file.txt'), 'hello after drift\n', 'utf-8');
+
+    const warnings = [];
+    const originalWarn = console.warn;
+    console.warn = (message) => warnings.push(message);
+    try {
+      release(['file.txt', 'test release drift']);
+    } finally {
+      console.warn = originalWarn;
+    }
+
+    assert.equal(warnings.length, 1);
+    assert.match(warnings[0], /HEAD changed since claim for file\.txt/);
+    assert.match(warnings[0], new RegExp(claimHead.slice(0, 7)));
+    assert.match(warnings[0], new RegExp(releaseHead.slice(0, 7)));
+
+    const report = readFileSync(join(root, '_NEXUS_REPORT.md'), 'utf-8');
+    assert.match(report, new RegExp(`- Claim HEAD: ${claimHead}`));
+    assert.match(report, new RegExp(`- Release HEAD: ${releaseHead}`));
+    assert.match(report, /- Drift: yes/);
+    assert.match(report, /- SHA: [0-9a-f]{40}/);
   });
 });
