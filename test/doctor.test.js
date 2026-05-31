@@ -364,6 +364,26 @@ test('doctor reports tracked private agent state without deleting local files', 
   });
 });
 
+test('doctor reports untracked generated-looking artifacts without deleting them', () => {
+  inTempRepo((root) => {
+    spawnSync('git', ['init'], { cwd: root, stdio: 'pipe' });
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    mkdirSync(join(root, 'nexus-dashboard copy'), { recursive: true });
+    mkdirSync(join(root, 'screenshots'), { recursive: true });
+    writeFileSync(join(root, 'nexus-dashboard copy', 'index.html'), '<!doctype html>\n', 'utf-8');
+    writeFileSync(join(root, 'screenshots', 'home.png'), 'not really a png\n', 'utf-8');
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /Generated Artifacts/);
+    assert.match(output, /Untracked generated-looking artifact needs owner decision: nexus-dashboard copy/);
+    assert.match(output, /Untracked generated-looking artifact needs owner decision: screenshots/);
+    assert.match(output, /Nexus will not delete it automatically/);
+  });
+});
+
 test('doctor reports active locks missing model metadata', () => {
   inTempRepo((root) => {
     writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
