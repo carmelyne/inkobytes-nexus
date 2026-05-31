@@ -478,6 +478,13 @@ export default function doctor(args) {
         fix: 'No action if the agent is still working. Use `nexus status` to inspect.',
         ok: true,
       });
+      if (!lock.model) {
+        sections.Locks.push({
+          issue: `Active lock on ${lock.target} has no --model metadata`,
+          fix: 'Use `nexus claim ... --model <name>` for future claims; only the human operator can declare the real model.',
+          ok: true,
+        });
+      }
     }
   }
 
