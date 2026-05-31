@@ -15,6 +15,8 @@ import { readLedgerEntries } from './ledger.js';
 const DEFAULT_PORT = 13787;
 const MAX_PORT_SEARCH = 30;
 const DASHBOARD_HTML_URL = new URL('../../nexus-dashboard/index.html', import.meta.url);
+const DASHBOARD_DOCS_URL = new URL('../../nexus-dashboard/docs/index.html', import.meta.url);
+const DASHBOARD_LOGO_URL = new URL('../../nexus-dashboard/logo-nexus.svg', import.meta.url);
 
 export default function dashboard(args) {
   if (args.includes('--snapshot')) {
@@ -66,7 +68,8 @@ export function buildSnapshot() {
     proposed: parseProposed(queueText),
     ledger: readLedgerEntries().reverse(),
     standup: parseStandupEntries(standupText).slice(-8),
-    releases: parseReleaseEntries(reportText).slice(-6),
+    releases: parseReleaseEntries(reportText).slice(-16),
+    report: reportText,
   };
 }
 
@@ -83,6 +86,24 @@ function serveDashboard(port) {
     if (url.pathname === '/style.css') {
       res.writeHead(200, { 'Content-Type': 'text/css' });
       res.end(readFileSync(new URL('../../nexus-dashboard/style.css', import.meta.url)));
+      return;
+    }
+
+    if (url.pathname === '/logo-nexus.svg') {
+      res.writeHead(200, { 'Content-Type': 'image/svg+xml' });
+      res.end(readFileSync(DASHBOARD_LOGO_URL));
+      return;
+    }
+
+    if (url.pathname === '/docs' || url.pathname === '/docs/') {
+      res.writeHead(302, { Location: '/docs/index.html' });
+      res.end();
+      return;
+    }
+
+    if (url.pathname === '/docs/index.html') {
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end(readFileSync(DASHBOARD_DOCS_URL, 'utf-8'));
       return;
     }
 
