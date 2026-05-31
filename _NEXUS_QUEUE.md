@@ -141,10 +141,10 @@
   - Auto-flow: no
   - Notes: Make `nexus clean --stale` safer for timed-out agents. Prefer listing stale locks with recovery context first; require explicit target or `--force` for bulk cleanup; never remove locks silently. Recoverability principle: cleanup should preserve human control when agents may resume after a reset.
 
-- [ ] TASK/Codex: Add identity cleanup for legacy Agent/unknown metrics
+- [x] TASK/Codex: Add identity cleanup for legacy Agent/unknown metrics
   - Id: metrics-identity-cleanup
   - Epic: Metrics & observability
-  - Status: Ready
+  - Status: Done
   - Depends on: nexus-metrics
   - Files: src/commands/metrics.js, test/metrics.test.js
   - Affinity: cli, metrics, reporting
