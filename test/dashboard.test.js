@@ -29,6 +29,8 @@ test('dashboard snapshot summarizes Nexus repo state', () => {
   inTempRepo((root) => {
     mkdirSync(join(root, '.nexus', 'locks', 'src~2Fapp.js.lock'), { recursive: true });
     writeFileSync(join(root, '.nexus', 'locks', 'src~2Fapp.js.lock', 'ts'), String(Math.floor(Date.now() / 1000)), 'utf-8');
+    writeFileSync(join(root, '.nexus', 'locks', 'src~2Fapp.js.lock', 'model'), 'gpt-5-codex', 'utf-8');
+    writeFileSync(join(root, '.nexus', 'locks', 'src~2Fapp.js.lock', 'thinking'), 'medium', 'utf-8');
     writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
     writeFileSync(join(root, '_NEXUS_QUEUE.md'), [
       '# Queue',
@@ -65,6 +67,8 @@ test('dashboard snapshot summarizes Nexus repo state', () => {
     assert.equal(snapshot.queue[0].id, 'dashboard-v1');
     assert.equal(snapshot.queue[0].autoFlow, 'yes');
     assert.equal(snapshot.locks[0].target, 'src/app.js');
+    assert.equal(snapshot.locks[0].model, 'gpt-5-codex');
+    assert.equal(snapshot.locks[0].thinking, 'medium');
     assert.deepEqual(snapshot.standup, [
       { type: 'Task', title: 'Build dashboard', meta: '@codex · Ready · src/commands/dashboard.js' },
       { type: '@codex', title: 'Dashboard v1 started', meta: '' },
