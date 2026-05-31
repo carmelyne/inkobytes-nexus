@@ -58,6 +58,18 @@ function gitWithIndexLockRetry(args, maxRetries, retryMs) {
  */
 export function stageAndCommit(target, message, maxRetries = 5, retryMs = 1000) {
   const safeTarget = normalizeTarget(target);
+  let agent = '';
+
+  if (typeof maxRetries === 'string') {
+    agent = maxRetries.trim();
+    maxRetries = 5;
+    retryMs = 1000;
+  } else if (typeof retryMs === 'string') {
+    agent = retryMs.trim();
+    retryMs = 1000;
+  }
+
+  const attribution = agent ? agent : 'Agent';
 
   // Stage the target
   try {
@@ -69,7 +81,7 @@ export function stageAndCommit(target, message, maxRetries = 5, retryMs = 1000) 
   let attempt = 0;
   while (attempt < maxRetries) {
     try {
-      gitWithIndexLockRetry(['commit', '-m', `[Agent] ${message}`, '--', safeTarget], maxRetries, retryMs);
+      gitWithIndexLockRetry(['commit', '-m', `[${attribution}] ${message}`, '--', safeTarget], maxRetries, retryMs);
       return { success: true };
     } catch (err) {
       attempt++;
