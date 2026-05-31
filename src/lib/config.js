@@ -22,6 +22,7 @@ export function getConfig(fromDir) {
     blackboard: join(root, '_NEXUS.md'),
     standup: join(root, '_NEXUS_STANDUP.md'),
     report: join(root, '_NEXUS_REPORT.md'),
+    ledger: join(root, '_NEXUS_LEDGER.md'),
     queue: join(root, '_NEXUS_QUEUE.md'),
     staleThreshold: 600, // 10 minutes in seconds
     maxDumpFiles: 20,
