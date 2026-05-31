@@ -41,10 +41,11 @@ function readGitCommits(root) {
     const [sha, date, ...subjectParts] = line.split('\t');
     const subject = subjectParts.join('\t');
     const match = subject.match(/^\[([^\]]+)\]\s+(.+)$/);
+    const rawAgent = match ? match[1] : '';
     return {
       sha,
       date,
-      agent: match ? match[1] : 'unknown',
+      agent: normalizeAgentBucket(rawAgent),
       subject: match ? match[2] : subject,
     };
   });
@@ -60,7 +61,7 @@ function parseReport(content) {
     releases.push({
       time: header[1],
       target: readField(block, 'Target') || header[2],
-      agent: readField(block, 'Agent') || 'unknown',
+      agent: normalizeAgentBucket(readField(block, 'Agent')),
       sha: readField(block, 'SHA') || '',
       commit: readField(block, 'Commit') || '',
     });
@@ -75,6 +76,10 @@ function readField(block, label) {
 
 function buildSummary(gitCommits, releases, queueText) {
   return {
+    identityBuckets: {
+      'legacy-agent': 'Older Nexus releases used the generic [Agent] commit or report label before explicit handles shipped.',
+      'unknown-agent': 'No parseable agent label was found in the commit subject or report receipt.',
+    },
     commitsByAgent: countBy(gitCommits, 'agent'),
     releasesByAgent: countBy(releases, 'agent'),
     topReleaseTargets: topCounts(countBy(releases, 'target'), 8),
@@ -85,6 +90,14 @@ function buildSummary(gitCommits, releases, queueText) {
       releases: releases.length,
     },
   };
+}
+
+function normalizeAgentBucket(agent) {
+  const value = String(agent || '').trim();
+  if (!value) return 'unknown-agent';
+  if (value.toLowerCase() === 'unknown') return 'unknown-agent';
+  if (value.toLowerCase() === 'agent') return 'legacy-agent';
+  return value;
 }
 
 function countBy(items, keyOrFn) {
@@ -130,9 +143,19 @@ function printSummary(summary) {
   console.log(`Totals: ${summary.totals.commits} commits, ${summary.totals.releases} release receipt(s)`);
   printCounts('Commits by agent', summary.commitsByAgent);
   printCounts('Releases by agent', summary.releasesByAgent);
+  printIdentityNotes(summary);
   printTopTargets(summary.topReleaseTargets);
   printCounts('Weekly velocity', summary.weeklyVelocity);
   printCounts('Queue cost distribution', summary.queueCostDistribution);
+}
+
+function printIdentityNotes(summary) {
+  const used = Object.keys(summary.identityBuckets)
+    .filter((bucket) => summary.commitsByAgent[bucket] || summary.releasesByAgent[bucket]);
+  if (!used.length) return;
+
+  console.log('\nIdentity bucket notes');
+  for (const bucket of used) console.log(`  ${bucket}: ${summary.identityBuckets[bucket]}`);
 }
 
 function printCounts(title, counts) {
