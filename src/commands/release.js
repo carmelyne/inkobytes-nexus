@@ -5,7 +5,7 @@
 
 import { appendFileSync } from 'fs';
 import { removeEntry } from '../lib/blackboard.js';
-import { releaseLock } from '../lib/lockManager.js';
+import { listLocks, releaseLock } from '../lib/lockManager.js';
 import { stageAndCommit } from '../lib/git.js';
 import { getConfig } from '../lib/config.js';
 import { normalizeTarget } from '../lib/pathSafety.js';
@@ -26,9 +26,10 @@ export default function release(args) {
   }
 
   const commitMsg = args[1] || `chore: agent updated ${target}`;
+  const lock = listLocks().find((entry) => entry.target === target);
 
   // Stage and commit first
-  const gitResult = stageAndCommit(target, commitMsg);
+  const gitResult = stageAndCommit(target, commitMsg, lock?.agent || '');
   if (!gitResult.success && !gitResult.message?.includes('clean')) {
     console.error(`[ERROR] ${gitResult.message}`);
     process.exit(1);
