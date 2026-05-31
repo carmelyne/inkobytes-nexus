@@ -9,7 +9,7 @@ import { spawnSync } from 'child_process';
 import { listLocks } from '../lib/lockManager.js';
 import { getConfig } from '../lib/config.js';
 import { AGENT_SCOPE_LIST } from '../lib/agentScopes.js';
-import { loadPermissions, getChmodPath } from '../lib/permissions.js';
+import { DEFAULT_MATRIX, loadPermissions, getChmodPath } from '../lib/permissions.js';
 
 const MONTH_NAMES = [
   'January',
@@ -499,10 +499,19 @@ export default function doctor(args) {
   // promptCHMOD hygiene — check matrix exists and covers core protocol files
   const CORE_PROTOCOL_FILES = ['_NEXUS_CONSTITUTION.md', '_NEXUS_QUEUE.md', '_NEXUS_STANDUP.md', '_NEXUS_REPORT.md'];
   if (!existsSync(getChmodPath())) {
-    sections.promptCHMOD.push({
-      issue: '_NEXUS_CHMOD.md is missing — prompt injection surface is undeclared',
-      fix: 'Run `nexus chmod --init` to create the default permission matrix.',
-    });
+    if (fix) {
+      writeFileSync(getChmodPath(), DEFAULT_MATRIX, 'utf-8');
+      changes.push('created _NEXUS_CHMOD.md');
+      sections.promptCHMOD.push({
+        issue: 'Permission matrix present and core protocol files covered',
+        ok: true,
+      });
+    } else {
+      sections.promptCHMOD.push({
+        issue: '_NEXUS_CHMOD.md is missing — prompt injection surface is undeclared',
+        fix: 'Run `nexus chmod --init` to create the default permission matrix.',
+      });
+    }
   } else {
     const perms = loadPermissions();
     const covered = new Set(perms.map(e => e.path));
