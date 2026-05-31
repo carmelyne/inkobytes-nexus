@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Nexus CLI Docs</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div class="layout">
+      <nav class="sidebar">
+        <div class="brand">
+          <div class="brand-icon">
+            <img src="/logo-nexus.svg" alt="">
+          </div>
+          <div class="brand-wordmark">
+            <h1>Nexus</h1>
+          </div>
+        </div>
+        <nav class="nav-links">
+          <a href="/" class="nav-link"><span data-icon="layout-dashboard"></span>Dashboard</a>
+          <a href="/#active" class="nav-link"><span data-icon="lock"></span>Claims &amp; Locks</a>
+          <a href="/#metrics" class="nav-link"><span data-icon="chart-line"></span>Metrics</a>
+          <a href="/#queue" class="nav-link"><span data-icon="list-checks"></span>Queue</a>
+          <a href="/#standup-section" class="nav-link"><span data-icon="messages-square"></span>Standup</a>
+          <a href="/#git-status" class="nav-link"><span data-icon="git-branch"></span>Git Status</a>
+          <a href="/#recent-releases" class="nav-link"><span data-icon="ship"></span>Recent Releases</a>
+          <a href="/#nexus-report" class="nav-link"><span data-icon="file-text"></span>Nexus Report</a>
+          <div class="nav-divider"></div>
+          <a href="/docs/index.html" class="nav-link active"><span data-icon="file-text"></span>CLI Docs</a>
+        </nav>
+      </nav>
+
+      <main class="content docs-content">
+        <header>
+          <div class="brand">
+            <div class="brand-wordmark">
+              <h1>Nexus CLI Docs</h1>
+              <div class="brand-repo muted">Commands for local-first multi-agent repo coordination</div>
+            </div>
+          </div>
+          <div class="header-meta">
+            <a class="tab-button" href="/">Dashboard</a>
+          </div>
+        </header>
+
+        <div class="docs-layout">
+          <section class="docs-main">
+            <h2><span data-icon="file-text"></span>Commands</h2>
+            <div class="command-list">
+              <article class="command-card" id="checkin">
+                <h3><code>nexus checkin &lt;agent&gt;</code></h3>
+                <p>Writes an agent heartbeat so the dashboard can show online, idle, or offline presence.</p>
+              </article>
+              <article class="command-card" id="checkout">
+                <h3><code>nexus checkout [--all] &lt;agent&gt;</code></h3>
+                <p>Marks an agent session as ended, or clears all presence records during emergency cleanup.</p>
+              </article>
+              <article class="command-card" id="chmod">
+                <h3><code>nexus chmod [--list] [--init]</code></h3>
+                <p>Shows or initializes promptCHMOD permissions for agent-safe file access conventions.</p>
+              </article>
+              <article class="command-card" id="claim">
+                <h3><code>nexus claim &lt;path&gt; &lt;agent&gt; "&lt;intent&gt;"</code></h3>
+                <p>Locks a file or directory before edits so other agents can see ownership and intent. Also accepts <code>--agent &lt;agent&gt;</code> and <code>--intent "&lt;intent&gt;"</code>. Warns when agent, intent, or model metadata is missing.</p>
+              </article>
+              <article class="command-card" id="clean">
+                <h3><code>nexus clean [--stale | &lt;path&gt;]</code></h3>
+                <p>Prunes locks surgically, by stale age, or by explicit target when cleanup is needed.</p>
+              </article>
+              <article class="command-card" id="dashboard">
+                <h3><code>nexus dashboard --serve [--port &lt;port&gt;]</code></h3>
+                <p>Serves the local dashboard with claims, queue state, metrics, ledger history, and report views.</p>
+              </article>
+              <article class="command-card" id="db">
+                <h3><code>nexus db &lt;backup|list|restore|schedule&gt;</code></h3>
+                <p>Runs database backup and recovery helpers for repo-local protection workflows.</p>
+              </article>
+              <article class="command-card" id="doctor">
+                <h3><code>nexus doctor [--fix] [--json]</code></h3>
+                <p>Checks protocol files, private-path safety, and repo health; can repair known protocol drift.</p>
+              </article>
+              <article class="command-card" id="drill">
+                <h3><code>nexus drill &lt;list|show|run|report&gt;</code></h3>
+                <p>Inspects or runs protocol drills and summarizes the latest drill results.</p>
+              </article>
+              <article class="command-card" id="help">
+                <h3><code>nexus help</code></h3>
+                <p>Prints the CLI command list, examples, and usage syntax.</p>
+              </article>
+              <article class="command-card" id="init">
+                <h3><code>nexus init</code></h3>
+                <p>Scaffolds Nexus coordination files into the current repository.</p>
+              </article>
+              <article class="command-card" id="ledger">
+                <h3><code>nexus ledger [--json|backfill]</code></h3>
+                <p>Shows or backfills the completed-task ledger that powers dashboard history and charts.</p>
+              </article>
+              <article class="command-card" id="metrics">
+                <h3><code>nexus metrics [--json]</code></h3>
+                <p>Summarizes commits, release activity, queue cost, and agent attribution.</p>
+              </article>
+              <article class="command-card" id="next">
+                <h3><code>nexus next &lt;agent&gt;</code></h3>
+                <p>Suggests the next safe ready task for an agent from the queue.</p>
+              </article>
+              <article class="command-card" id="release">
+                <h3><code>nexus release &lt;path&gt; "&lt;commit msg&gt;"</code></h3>
+                <p>Releases a claim, stages and commits the target, and appends a Nexus report receipt.</p>
+              </article>
+              <article class="command-card" id="soul">
+                <h3><code>nexus soul [--file &lt;path&gt;] [--status | --remove]</code></h3>
+                <p>Manages local soul overlays in agent files without making them part of public docs.</p>
+              </article>
+              <article class="command-card" id="start">
+                <h3><code>nexus start [--agent @handle]</code></h3>
+                <p>Orients an entering agent with repo facts, scoped memory paths, locks, and current status.</p>
+              </article>
+              <article class="command-card" id="status">
+                <h3><code>nexus status</code></h3>
+                <p>Shows the current Nexus blackboard state, active locks, and coordination context.</p>
+              </article>
+            </div>
+          </section>
+
+          <aside class="docs-toc" aria-label="Command table of contents">
+            <h2><span data-icon="list-checks"></span>Commands</h2>
+            <nav>
+              <a href="#checkin">checkin</a>
+              <a href="#checkout">checkout</a>
+              <a href="#chmod">chmod</a>
+              <a href="#claim">claim</a>
+              <a href="#clean">clean</a>
+              <a href="#dashboard">dashboard</a>
+              <a href="#db">db</a>
+              <a href="#doctor">doctor</a>
+              <a href="#drill">drill</a>
+              <a href="#help">help</a>
+              <a href="#init">init</a>
+              <a href="#ledger">ledger</a>
+              <a href="#metrics">metrics</a>
+              <a href="#next">next</a>
+              <a href="#release">release</a>
+              <a href="#soul">soul</a>
+              <a href="#start">start</a>
+              <a href="#status">status</a>
+            </nav>
+          </aside>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      function renderIcons() {
+        const icons = {
+          activity: '<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>',
+          'bar-chart-2': '<line x1="18" x2="18" y1="20" y2="10"></line><line x1="12" x2="12" y1="20" y2="4"></line><line x1="6" x2="6" y1="20" y2="14"></line>',
+          'chart-line': '<path d="M3 3v16a2 2 0 0 0 2 2h16"></path><path d="m19 9-5 5-4-4-3 3"></path>',
+          'file-text': '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path>',
+          'git-branch': '<line x1="6" x2="6" y1="3" y2="15"></line><circle cx="18" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M18 9a9 9 0 0 1-9 9"></path>',
+          'layout-dashboard': '<rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect>',
+          'list-checks': '<path d="m3 17 2 2 4-4"></path><path d="m3 7 2 2 4-4"></path><path d="M13 6h8"></path><path d="M13 12h8"></path><path d="M13 18h8"></path>',
+          lock: '<rect width="18" height="11" x="3" y="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>',
+          'messages-square': '<path d="M14 9a2 2 0 0 1-2 2H6l-4 4V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"></path><path d="M18 9h2a2 2 0 0 1 2 2v10l-4-4h-6a2 2 0 0 1-2-2v-1"></path>',
+          ship: '<path d="M12 10.189V14"></path><path d="M12 2v3"></path><path d="M19 13V7a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v6"></path><path d="M19.38 20A11.6 11.6 0 0 0 21 14l-8.188-3.639a2 2 0 0 0-1.624 0L3 14a11.6 11.6 0 0 0 2.81 7.76"></path><path d="M2 21c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1s1.2 1 2.5 1c2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"></path>',
+        };
+        document.querySelectorAll('[data-icon]').forEach((node) => {
+          const name = node.dataset.icon;
+          node.innerHTML = '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">' + (icons[name] || '') + '</svg>';
+        });
+      }
+      renderIcons();
+    </script>
+  </body>
+</html>
