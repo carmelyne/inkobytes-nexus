@@ -4,7 +4,7 @@ import { mkdtempSync, readFileSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { chdir, cwd } from 'process';
-import ledger, { appendCompletedLedgerEntries, readLedgerEntries } from '../src/commands/ledger.js';
+import ledger, { appendCompletedLedgerEntries, backfillLedger, readLedgerEntries } from '../src/commands/ledger.js';
 import { resetConfig } from '../src/lib/config.js';
 
 function inTempRepo(fn) {
@@ -100,5 +100,34 @@ test('ledger --json emits entries and totals', () => {
     assert.equal(payload.entries[0].id, 'nexus-ledger');
     assert.equal(payload.totals.completedTasks, 1);
     assert.equal(payload.totals.byAgent['@codex'], 1);
+  });
+});
+
+test('backfillLedger records checked queue tasks with backfill source', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), [
+      '- [x] TASK/Codex: Completed one',
+      '  - Id: completed-one',
+      '  - Epic: Dashboard observability',
+      '  - Files: a.js',
+      '  - Cost: small',
+      '- [ ] TASK/Gemini: Still open',
+      '  - Id: still-open',
+      '  - Epic: Dashboard observability',
+      '  - Files: b.js',
+      '  - Cost: medium',
+    ].join('\n'), 'utf-8');
+
+    const count = backfillLedger();
+    const secondCount = backfillLedger();
+    const entries = readLedgerEntries();
+
+    assert.equal(count, 1);
+    assert.equal(secondCount, 0);
+    assert.equal(entries.length, 1);
+    assert.equal(entries[0].id, 'completed-one');
+    assert.equal(entries[0].agent, '@codex');
+    assert.equal(entries[0].source, 'backfill');
+    assert.equal(entries[0].sha, 'unknown');
   });
 });
