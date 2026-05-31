@@ -65,6 +65,7 @@ Commands:
   checkin <agent>                   Signal agent presence (heartbeat)
   checkout [--all] <agent>          Signal session end or cleanup
   claim <path> <agent> "<intent>"   Lock a file or directory
+                                    Also accepts --agent and --intent
   release <path> "<commit msg>"     Unlock, auto-commit, and log
   status                            Show current blackboard state
   clean [--stale | <path>]          Prune locks (surgical, stale, or nuke)
