@@ -72,6 +72,50 @@
   - Auto-flow: no
   - Notes: Add `nexus recover <sha|target>` as a read-only helper that prints the release receipt, git show summary, files changed, and suggested rollback/reapply commands without executing destructive actions. This is the core advantage of 3 SOTA on one branch: when things go wrong, recovery should be fast, local, and evidence-backed.
 
+- [ ] TASK/Codex: Add stale-lock recovery safety metadata
+  - Id: stale-lock-recovery-safety
+  - Epic: Same-branch recoverability
+  - Status: Ready
+  - Depends on: release-head-drift, agent-presence
+  - Files: src/lib/lockManager.js, src/commands/status.js, src/commands/doctor.js, test/lockManager.test.js, test/status.test.js, test/doctor.test.js
+  - Affinity: cli, locks, recoverability
+  - Cost: medium
+  - Auto-flow: no
+  - Notes: When a lock appears stale, show enough context to decide safely: agent, age, claim-time HEAD, current HEAD, model/thinking if present, and last heartbeat if presence exists. Do not auto-encourage cleanup when the agent may simply be timed out or reset. Recoverability principle: stale-lock cleanup must be an informed recovery action, not a reflex.
+
+- [ ] TASK/Codex: Add generated artifact ownership checks
+  - Id: generated-artifact-ownership
+  - Epic: Same-branch recoverability
+  - Status: Ready
+  - Depends on: none
+  - Files: src/commands/doctor.js, src/commands/status.js, test/doctor.test.js, test/status.test.js
+  - Affinity: cli, artifacts, recoverability
+  - Cost: medium
+  - Auto-flow: no
+  - Notes: Surface untracked generated-looking paths such as dashboard copies, screenshots, reports, ledgers, docs exports, build outputs, and temp artifacts. Do not delete them; label them as "needs owner/keep/delete decision" and suggest claiming or ignoring intentionally. Recoverability principle: generated artifacts should not become invisible clutter or accidental release payload.
+
+- [ ] TASK/Codex: Add verification freshness warning
+  - Id: verification-freshness
+  - Epic: Same-branch recoverability
+  - Status: Ready
+  - Depends on: release-head-drift
+  - Files: src/commands/release.js, src/lib/lockManager.js, test/release.test.js, test/lockManager.test.js
+  - Affinity: cli, testing, recoverability
+  - Cost: medium
+  - Auto-flow: no
+  - Notes: Record claim-time HEAD and optionally last verification command/time in lock metadata. On release, warn when HEAD moved after verification or when no verification note is present for a task that touched hot files. Do not block release. Recoverability principle: agents should know whether their tests/dev-server checks were against the state being committed.
+
+- [ ] TASK/Codex: Add clean-stale guardrails
+  - Id: clean-stale-guardrails
+  - Epic: Same-branch recoverability
+  - Status: Ready
+  - Depends on: stale-lock-recovery-safety
+  - Files: src/commands/clean.js, src/lib/lockManager.js, test/clean.test.js
+  - Affinity: cli, locks, safety
+  - Cost: medium
+  - Auto-flow: no
+  - Notes: Make `nexus clean --stale` safer for timed-out agents. Prefer listing stale locks with recovery context first; require explicit target or `--force` for bulk cleanup; never remove locks silently. Recoverability principle: cleanup should preserve human control when agents may resume after a reset.
+
 - [ ] TASK/Codex: Add identity cleanup for legacy Agent/unknown metrics
   - Id: metrics-identity-cleanup
   - Epic: Metrics & observability
