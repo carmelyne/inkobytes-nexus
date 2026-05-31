@@ -7,6 +7,12 @@ import { appendFileSync, existsSync, readFileSync, writeFileSync } from 'fs';
 import { getConfig } from '../lib/config.js';
 
 export default function ledger(args) {
+  if (args[0] === 'backfill') {
+    const count = backfillLedger();
+    console.log(`Backfilled ${count} completed task entr${count === 1 ? 'y' : 'ies'} into _NEXUS_LEDGER.md.`);
+    return;
+  }
+
   const entries = readLedgerEntries();
 
   if (args.includes('--json')) {
@@ -74,11 +80,37 @@ export function readLedgerEntries() {
       completedAt: readField(block, 'Completed At'),
       sha: readField(block, 'SHA'),
       commit: readField(block, 'Commit'),
+      source: readField(block, 'Source') || 'release',
       files: splitCsv(readField(block, 'Files')),
     });
   }
 
   return entries;
+}
+
+export function backfillLedger() {
+  const config = getConfig();
+  const existingIds = new Set(readLedgerEntries().map((entry) => entry.id));
+  const tasks = parseQueueTasks(readText(config.queue))
+    .filter((task) => task.checked)
+    .filter((task) => task.id && !existingIds.has(task.id));
+
+  if (!tasks.length) return 0;
+  ensureLedgerFile(config.ledger);
+
+  const completedAt = new Date().toISOString();
+  for (const task of tasks) {
+    appendFileSync(config.ledger, renderEntry({
+      ...task,
+      agent: normalizeAgentForLedger(task.agent),
+      sha: 'unknown',
+      commit: `backfill: ${task.id}`,
+      completedAt,
+      source: 'backfill',
+    }), 'utf-8');
+  }
+
+  return tasks.length;
 }
 
 function buildTotals(entries) {
@@ -144,6 +176,7 @@ function renderEntry(entry) {
 - Files: ${entry.files.join(', ')}
 - SHA: ${entry.sha || 'unknown'}
 - Commit: ${entry.commit || ''}
+- Source: ${entry.source || 'release'}
 
 `;
 }
@@ -174,4 +207,9 @@ function countBy(items, key) {
     counts[value] = (counts[value] || 0) + 1;
   }
   return counts;
+}
+
+function normalizeAgentForLedger(agent) {
+  const value = String(agent || '').trim();
+  return value.startsWith('@') ? value : `@${value.toLowerCase()}`;
 }
