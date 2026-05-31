@@ -58,6 +58,7 @@ export function buildSnapshot() {
     health: getHealth(config),
     locks,
     queue: parseQueue(queueText),
+    proposed: parseProposed(queueText),
     standup: parseStandupEntries(standupText).slice(-8),
     releases: parseReleaseEntries(reportText).slice(-6),
   };
@@ -185,7 +186,18 @@ function getHealth(config) {
   return { ok: issues.length === 0, issues };
 }
 
-function parseQueue(content) {
+function extractSection(content, heading) {
+  const lines = content.split('\n');
+  let inSection = false;
+  const result = [];
+  for (const line of lines) {
+    if (line.startsWith('## ')) { inSection = line.trim() === heading; continue; }
+    if (inSection) result.push(line);
+  }
+  return result.join('\n');
+}
+
+function parseTasks(content) {
   const tasks = [];
   const lines = content.split('\n');
   let current = null;
@@ -198,18 +210,12 @@ function parseQueue(content) {
         checked: task[1] === 'x',
         agent: task[2].trim(),
         title: task[3].trim(),
-        id: '',
-        epic: '',
-        status: '',
-        depends: '',
-        files: '',
-        cost: '',
-        autoFlow: '',
-        notes: '',
+        id: '', epic: '', status: '', depends: '',
+        files: '', cost: '', autoFlow: '', notes: '',
+        review: '', approvedBy: '',
       };
       continue;
     }
-
     if (!current) continue;
     const field = line.trim().match(/^- ([^:]+):\s*(.+)$/);
     if (!field) continue;
@@ -222,10 +228,19 @@ function parseQueue(content) {
     if (key === 'cost') current.cost = field[2];
     if (key === 'auto-flow') current.autoFlow = field[2];
     if (key === 'notes') current.notes = field[2];
+    if (key === 'review') current.review = field[2];
+    if (key === 'approved by') current.approvedBy = field[2];
   }
-
   if (current) tasks.push(current);
   return tasks;
+}
+
+function parseQueue(content) {
+  return parseTasks(extractSection(content, '## Ready Queue'));
+}
+
+function parseProposed(content) {
+  return parseTasks(extractSection(content, '## Proposed Queue'));
 }
 
 function parseStandupEntries(content) {
