@@ -37,6 +37,32 @@ test('stageAndCommit succeeds on a real git repo with a new file', () => {
   });
 });
 
+test('stageAndCommit uses explicit agent attribution when provided', () => {
+  inTempRepo((root) => {
+    initGitRepo(root);
+    writeFileSync(join(root, 'agent-output.md'), 'hello world\n', 'utf-8');
+
+    const result = stageAndCommit('agent-output.md', 'add agent-output.md', '@codex');
+
+    assert.equal(result.success, true);
+    const log = spawnSync('git', ['log', '-1', '--pretty=%s'], { cwd: root, encoding: 'utf-8' }).stdout.trim();
+    assert.equal(log, '[@codex] add agent-output.md');
+  });
+});
+
+test('stageAndCommit keeps generic attribution when no agent is provided', () => {
+  inTempRepo((root) => {
+    initGitRepo(root);
+    writeFileSync(join(root, 'agent-output.md'), 'hello world\n', 'utf-8');
+
+    const result = stageAndCommit('agent-output.md', 'add agent-output.md');
+
+    assert.equal(result.success, true);
+    const log = spawnSync('git', ['log', '-1', '--pretty=%s'], { cwd: root, encoding: 'utf-8' }).stdout.trim();
+    assert.equal(log, '[Agent] add agent-output.md');
+  });
+});
+
 test('stageAndCommit returns success with nothing-to-commit when file is unchanged', () => {
   inTempRepo((root) => {
     initGitRepo(root);
