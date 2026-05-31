@@ -6,6 +6,7 @@ import { existsSync, mkdirSync, writeFileSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { cwd } from 'process';
 import { AGENT_SCOPE_ENTRIES } from '../lib/agentScopes.js';
+import { DEFAULT_MATRIX } from '../lib/permissions.js';
 
 const TEMPLATES = {
   '_NEXUS.md': '',
@@ -110,6 +111,8 @@ Adversarial result:
   - Cost: small
   - Auto-flow: yes
 `,
+
+  '_NEXUS_CHMOD.md': DEFAULT_MATRIX,
 
   '_NEXUS_CONSTITUTION.md': `# Nexus Swarm: Core Operating Protocol
 
