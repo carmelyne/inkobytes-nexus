@@ -297,3 +297,16 @@
 - Commit: backfill: dashboard-chart-agent
 - Source: backfill
 
+## dashboard-docs-release-cleanup
+
+- Id: dashboard-docs-release-cleanup
+- Title: Release dashboard docs and reset recovery cleanup
+- Agent: @codex
+- Epic: Open-source CLI release
+- Cost: medium
+- Completed At: 2026-05-31T23:41:49.603Z
+- Files: README.md, _NEXUS.md, _NEXUS_QUEUE.md, _NEXUS_REPORT.md, _NEXUS_LEDGER.md, bin/nexus.js, nexus-dashboard/docs/index.html, nexus-dashboard/index.html, nexus-dashboard/style.css, src/commands/claim.js, src/commands/dashboard.js, src/commands/init.js, test/claim.test.js
+- SHA: 89698d027607022a42215f88f05d5d93dd6b153b
+- Commit: dashboard-docs-release-cleanup: document claim flags
+- Source: release
+
