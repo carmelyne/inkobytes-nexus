@@ -1682,3 +1682,373 @@ Structured release receipts.
 - SHA: 275b226c9927579593c133a8d0865c6595033db4
 - Commit: test report receipt sha
 
+## [21:10:41] nexus-dashboard/style.css
+
+- Agent: @gemini
+- Target: nexus-dashboard/style.css
+- Claim HEAD: 2d9aaa21f4a9902d6688a025fdaf3860a897b5c7
+- Release HEAD: 2d9aaa21f4a9902d6688a025fdaf3860a897b5c7
+- Drift: no
+- SHA: ceb8f859a34ea5821e3c1c30310ec15a93eef25f
+- Commit: feat: complete dashboard styling tokens
+
+## [21:10:45] nexus-dashboard/index.html
+
+- Agent: @gemini
+- Target: nexus-dashboard/index.html
+- Claim HEAD: 2d9aaa21f4a9902d6688a025fdaf3860a897b5c7
+- Release HEAD: ceb8f859a34ea5821e3c1c30310ec15a93eef25f
+- Drift: yes
+- SHA: unknown
+- Commit: feat: complete dashboard styling tokens
+
+## [22:05:07] nexus-dashboard/style.css
+
+- Agent: @gemini
+- Target: nexus-dashboard/style.css
+- Claim HEAD: ceb8f859a34ea5821e3c1c30310ec15a93eef25f
+- Release HEAD: ceb8f859a34ea5821e3c1c30310ec15a93eef25f
+- Drift: no
+- SHA: afb47b5deee370fc4f17e85af344fb727a451dc8
+- Commit: feat: complete missing CSS rules
+
+## [23:02:56] src/commands/ledger.js
+
+- Agent: @codex
+- Target: src/commands/ledger.js
+- Claim HEAD: afb47b5deee370fc4f17e85af344fb727a451dc8
+- Release HEAD: afb47b5deee370fc4f17e85af344fb727a451dc8
+- Drift: no
+- SHA: e9323ab2000f49a3986d4663d867b74884c88950
+- Commit: feat: add completed task ledger command
+
+## [23:03:03] src/commands/release.js
+
+- Agent: @codex
+- Target: src/commands/release.js
+- Claim HEAD: afb47b5deee370fc4f17e85af344fb727a451dc8
+- Release HEAD: e9323ab2000f49a3986d4663d867b74884c88950
+- Drift: yes
+- SHA: 1fe16edff81ec8ed418744c2ccee8af4b4239cbc
+- Commit: feat: append completed tasks to ledger on release
+
+## [23:04:20] src/commands/ledger.js
+
+- Agent: @codex
+- Target: src/commands/ledger.js
+- Claim HEAD: 1fe16edff81ec8ed418744c2ccee8af4b4239cbc
+- Release HEAD: 1fe16edff81ec8ed418744c2ccee8af4b4239cbc
+- Drift: no
+- SHA: d1bab94c418bbb3ffa7052fb3b82a8c4bc927c97
+- Commit: nexus-ledger: tighten ledger task matching
+
+## [23:04:33] src/commands/release.js
+
+- Agent: @codex
+- Target: src/commands/release.js
+- Claim HEAD: 1fe16edff81ec8ed418744c2ccee8af4b4239cbc
+- Release HEAD: d1bab94c418bbb3ffa7052fb3b82a8c4bc927c97
+- Drift: yes
+- SHA: unknown
+- Commit: nexus-ledger: require task id for ledger append
+
+## [23:04:45] src/commands/dashboard.js
+
+- Agent: @codex
+- Target: src/commands/dashboard.js
+- Claim HEAD: afb47b5deee370fc4f17e85af344fb727a451dc8
+- Release HEAD: d1bab94c418bbb3ffa7052fb3b82a8c4bc927c97
+- Drift: yes
+- SHA: 9632d299183bbfb547059cf873ee2067a1859912
+- Commit: nexus-ledger: expose ledger in dashboard snapshot
+
+## [23:04:48] src/lib/config.js
+
+- Agent: @codex
+- Target: src/lib/config.js
+- Claim HEAD: afb47b5deee370fc4f17e85af344fb727a451dc8
+- Release HEAD: 9632d299183bbfb547059cf873ee2067a1859912
+- Drift: yes
+- SHA: 307006ca4d5badb1947535a883af1f5b43d2831f
+- Commit: nexus-ledger: add ledger config path
+
+## [23:04:52] bin/nexus.js
+
+- Agent: @codex
+- Target: bin/nexus.js
+- Claim HEAD: afb47b5deee370fc4f17e85af344fb727a451dc8
+- Release HEAD: 307006ca4d5badb1947535a883af1f5b43d2831f
+- Drift: yes
+- SHA: 6667b6aacfaf7dc4cedae3f6ec33a85646f563e7
+- Commit: nexus-ledger: wire ledger CLI command
+
+## [23:04:55] README.md
+
+- Agent: @codex
+- Target: README.md
+- Claim HEAD: afb47b5deee370fc4f17e85af344fb727a451dc8
+- Release HEAD: 6667b6aacfaf7dc4cedae3f6ec33a85646f563e7
+- Drift: yes
+- SHA: 503274f97b25dd1cc9b2e1d74d12463e705dc2b5
+- Commit: nexus-ledger: document ledger command
+
+## [23:04:59] test/ledger.test.js
+
+- Agent: @codex
+- Target: test/ledger.test.js
+- Claim HEAD: afb47b5deee370fc4f17e85af344fb727a451dc8
+- Release HEAD: 503274f97b25dd1cc9b2e1d74d12463e705dc2b5
+- Drift: yes
+- SHA: 89a868ec13d21d1f0919a565eaf4fabe0af725c0
+- Commit: nexus-ledger: test ledger command
+
+## [23:05:02] test/release.test.js
+
+- Agent: @codex
+- Target: test/release.test.js
+- Claim HEAD: afb47b5deee370fc4f17e85af344fb727a451dc8
+- Release HEAD: 89a868ec13d21d1f0919a565eaf4fabe0af725c0
+- Drift: yes
+- SHA: 07c3d2bf1d566e3ba533176db17a412c7b692a60
+- Commit: nexus-ledger: test release ledger append
+
+## [23:05:06] test/dashboard.test.js
+
+- Agent: @codex
+- Target: test/dashboard.test.js
+- Claim HEAD: afb47b5deee370fc4f17e85af344fb727a451dc8
+- Release HEAD: 07c3d2bf1d566e3ba533176db17a412c7b692a60
+- Drift: yes
+- SHA: 734da9263e59d931bed0da80238127191ea3fc63
+- Commit: nexus-ledger: test dashboard ledger snapshot
+
+## [23:05:13] _NEXUS_QUEUE.md
+
+- Agent: @codex
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: afb47b5deee370fc4f17e85af344fb727a451dc8
+- Release HEAD: 734da9263e59d931bed0da80238127191ea3fc63
+- Drift: yes
+- SHA: a61188b2cdeba213eabb364ed3ac955cd4a313cc
+- Commit: nexus-ledger: mark ledger task done
+
+## [23:05:18] _NEXUS_LEDGER.md
+
+- Agent: @codex
+- Target: _NEXUS_LEDGER.md
+- Claim HEAD: afb47b5deee370fc4f17e85af344fb727a451dc8
+- Release HEAD: a61188b2cdeba213eabb364ed3ac955cd4a313cc
+- Drift: yes
+- SHA: db5f1b9825f79049934997ed146f6ad501a85f7d
+- Commit: nexus-ledger: record completed ledger task
+
+## [23:11:50] nexus-dashboard/index.html
+
+- Agent: @codex
+- Target: nexus-dashboard/index.html
+- Claim HEAD: db5f1b9825f79049934997ed146f6ad501a85f7d
+- Release HEAD: db5f1b9825f79049934997ed146f6ad501a85f7d
+- Drift: no
+- SHA: bcd31ed4fab398b342aadfff98a46bb9800ba277
+- Commit: dashboard: commit existing visual and ledger UI updates
+
+## [00:55:38] _NEXUS_QUEUE.md
+
+- Agent: @gemini
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: bcd31ed4fab398b342aadfff98a46bb9800ba277
+- Release HEAD: bcd31ed4fab398b342aadfff98a46bb9800ba277
+- Drift: no
+- SHA: 8741ccadb7646f9fa037e55b8f7f901619ccab94
+- Commit: feat: mark dashboard aesthetic task done
+
+## [01:02:16] src/commands/ledger.js
+
+- Agent: @codex
+- Target: src/commands/ledger.js
+- Claim HEAD: 8741ccadb7646f9fa037e55b8f7f901619ccab94
+- Release HEAD: 8741ccadb7646f9fa037e55b8f7f901619ccab94
+- Drift: no
+- SHA: 782322c5b28106f85c829a137dac42e4eb360750
+- Commit: nexus-ledger: add backfill command
+
+## [01:02:22] test/ledger.test.js
+
+- Agent: @codex
+- Target: test/ledger.test.js
+- Claim HEAD: 8741ccadb7646f9fa037e55b8f7f901619ccab94
+- Release HEAD: 782322c5b28106f85c829a137dac42e4eb360750
+- Drift: yes
+- SHA: 2983aa8fc1d5aa72fe45a6c8536ca087ba7b8d4b
+- Commit: nexus-ledger: test backfill command
+
+## [01:02:27] bin/nexus.js
+
+- Agent: @codex
+- Target: bin/nexus.js
+- Claim HEAD: 8741ccadb7646f9fa037e55b8f7f901619ccab94
+- Release HEAD: 2983aa8fc1d5aa72fe45a6c8536ca087ba7b8d4b
+- Drift: yes
+- SHA: b7f7d7f3250f9213e4a271133bad530d968fecba
+- Commit: nexus-ledger: document backfill command
+
+## [01:02:31] src/commands/dashboard.js
+
+- Agent: @codex
+- Target: src/commands/dashboard.js
+- Claim HEAD: 8741ccadb7646f9fa037e55b8f7f901619ccab94
+- Release HEAD: b7f7d7f3250f9213e4a271133bad530d968fecba
+- Drift: yes
+- SHA: 65ea9b4aaec6ebf20f3edc1001b58d5f77c09cc6
+- Commit: nexus-ledger: send full ledger to dashboard
+
+## [01:02:36] nexus-dashboard/index.html
+
+- Agent: @codex
+- Target: nexus-dashboard/index.html
+- Claim HEAD: bcd31ed4fab398b342aadfff98a46bb9800ba277
+- Release HEAD: 65ea9b4aaec6ebf20f3edc1001b58d5f77c09cc6
+- Drift: yes
+- SHA: 040f9d3e2b2dc3454385a642c1aed0db63ede36c
+- Commit: nexus-ledger: power charts from ledger totals
+
+## [01:02:40] nexus-dashboard/style.css
+
+- Agent: @codex
+- Target: nexus-dashboard/style.css
+- Claim HEAD: bcd31ed4fab398b342aadfff98a46bb9800ba277
+- Release HEAD: 040f9d3e2b2dc3454385a642c1aed0db63ede36c
+- Drift: yes
+- SHA: 2216e797d7556526984edcf813af01f5f3f311b2
+- Commit: nexus-ledger: style ledger dashboard rows
+
+## [01:02:44] _NEXUS_LEDGER.md
+
+- Agent: @codex
+- Target: _NEXUS_LEDGER.md
+- Claim HEAD: 8741ccadb7646f9fa037e55b8f7f901619ccab94
+- Release HEAD: 2216e797d7556526984edcf813af01f5f3f311b2
+- Drift: yes
+- SHA: aa5392ecc76bb39cb3a81c09529de2683bb778b1
+- Commit: nexus-ledger: backfill completed task history
+
+## [01:05:13] nexus-dashboard/index.html
+
+- Agent: @codex
+- Target: nexus-dashboard/index.html
+- Claim HEAD: aa5392ecc76bb39cb3a81c09529de2683bb778b1
+- Release HEAD: aa5392ecc76bb39cb3a81c09529de2683bb778b1
+- Drift: no
+- SHA: cfbebfd9fb3f2226b35d15b2f951361973e0c7fe
+- Commit: dashboard: hide completed tasks from queue
+
+## [07:41:49] README.md
+
+- Agent: @codex
+- Target: README.md
+- Claim HEAD: cfbebfd9fb3f2226b35d15b2f951361973e0c7fe
+- Release HEAD: cfbebfd9fb3f2226b35d15b2f951361973e0c7fe
+- Drift: no
+- SHA: 89698d027607022a42215f88f05d5d93dd6b153b
+- Commit: dashboard-docs-release-cleanup: document claim flags
+
+## [07:42:00] bin/nexus.js
+
+- Agent: @codex
+- Target: bin/nexus.js
+- Claim HEAD: cfbebfd9fb3f2226b35d15b2f951361973e0c7fe
+- Release HEAD: 89698d027607022a42215f88f05d5d93dd6b153b
+- Drift: yes
+- SHA: 2a57d2d915c728f5df582c282172952c8e0cdf10
+- Commit: dashboard-docs-release-cleanup: update help text
+
+## [07:42:03] src/commands/claim.js
+
+- Agent: @codex
+- Target: src/commands/claim.js
+- Claim HEAD: cfbebfd9fb3f2226b35d15b2f951361973e0c7fe
+- Release HEAD: 2a57d2d915c728f5df582c282172952c8e0cdf10
+- Drift: yes
+- SHA: c1ec5d4c4faccf48253db08eea9f985d1090461d
+- Commit: dashboard-docs-release-cleanup: support claim flags
+
+## [07:42:07] test/claim.test.js
+
+- Agent: @codex
+- Target: test/claim.test.js
+- Claim HEAD: cfbebfd9fb3f2226b35d15b2f951361973e0c7fe
+- Release HEAD: c1ec5d4c4faccf48253db08eea9f985d1090461d
+- Drift: yes
+- SHA: 837883446529404b95a109b984c8fb327c54b0d4
+- Commit: dashboard-docs-release-cleanup: test claim flags
+
+## [07:42:10] src/commands/dashboard.js
+
+- Agent: @codex
+- Target: src/commands/dashboard.js
+- Claim HEAD: cfbebfd9fb3f2226b35d15b2f951361973e0c7fe
+- Release HEAD: 837883446529404b95a109b984c8fb327c54b0d4
+- Drift: yes
+- SHA: 8a627d0c77bb48dfb3320d08aadd214871fd4f20
+- Commit: dashboard-docs-release-cleanup: serve dashboard docs
+
+## [07:42:14] nexus-dashboard/docs/index.html
+
+- Agent: @codex
+- Target: nexus-dashboard/docs/index.html
+- Claim HEAD: cfbebfd9fb3f2226b35d15b2f951361973e0c7fe
+- Release HEAD: 8a627d0c77bb48dfb3320d08aadd214871fd4f20
+- Drift: yes
+- SHA: f5198305d4e67d92c14cdc813cd5cc8ef38750e1
+- Commit: dashboard-docs-release-cleanup: add cli docs page
+
+## [07:42:18] nexus-dashboard/index.html
+
+- Agent: @codex
+- Target: nexus-dashboard/index.html
+- Claim HEAD: cfbebfd9fb3f2226b35d15b2f951361973e0c7fe
+- Release HEAD: f5198305d4e67d92c14cdc813cd5cc8ef38750e1
+- Drift: yes
+- SHA: df410b8107dc29af0663ae53af7546e30d4dc39d
+- Commit: dashboard-docs-release-cleanup: wire dashboard sections
+
+## [07:42:22] nexus-dashboard/style.css
+
+- Agent: @codex
+- Target: nexus-dashboard/style.css
+- Claim HEAD: cfbebfd9fb3f2226b35d15b2f951361973e0c7fe
+- Release HEAD: df410b8107dc29af0663ae53af7546e30d4dc39d
+- Drift: yes
+- SHA: cba716bf0db78d9d1afab7b64d6fac9bf35d08ba
+- Commit: dashboard-docs-release-cleanup: style docs and report views
+
+## [07:42:26] src/commands/init.js
+
+- Agent: @codex
+- Target: src/commands/init.js
+- Claim HEAD: cfbebfd9fb3f2226b35d15b2f951361973e0c7fe
+- Release HEAD: cba716bf0db78d9d1afab7b64d6fac9bf35d08ba
+- Drift: yes
+- SHA: 1da49b805c9138bbae062db217ba7c8fd569524a
+- Commit: dashboard-docs-release-cleanup: sync init scaffold
+
+## [07:42:30] _NEXUS_QUEUE.md
+
+- Agent: @codex
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: cfbebfd9fb3f2226b35d15b2f951361973e0c7fe
+- Release HEAD: 1da49b805c9138bbae062db217ba7c8fd569524a
+- Drift: yes
+- SHA: e444424421a74cfe2d165f1b649bf746f7ff948b
+- Commit: dashboard-docs-release-cleanup: queue release metrics
+
+## [07:42:34] _NEXUS_LEDGER.md
+
+- Agent: @codex
+- Target: _NEXUS_LEDGER.md
+- Claim HEAD: 89698d027607022a42215f88f05d5d93dd6b153b
+- Release HEAD: e444424421a74cfe2d165f1b649bf746f7ff948b
+- Drift: yes
+- SHA: 80b45d1d735f49d44385dcd8f1086c1b06901dec
+- Commit: dashboard-docs-release-cleanup: record completed task
+
