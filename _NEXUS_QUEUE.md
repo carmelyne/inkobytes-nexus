@@ -36,10 +36,10 @@
   - Approved by: human
   - Notes: Store claim-time HEAD SHA in lock metadata. On `nexus release`, compare current HEAD to claim HEAD. If HEAD changed, do not block; warn clearly before committing so same-branch interleaving is visible. Recoverability principle: every release should explain whether it was based on the same branch tip it claimed from.
 
-- [ ] TASK/Codex: Add report self-noise handling for _NEXUS_REPORT.md releases
+- [x] TASK/Codex: Add report self-noise handling for _NEXUS_REPORT.md releases
   - Id: report-self-noise
   - Epic: Same-branch recoverability
-  - Status: Ready
+  - Status: Done
   - Depends on: report-unification
   - Files: src/commands/release.js, test/release.test.js, _NEXUS_CONSTITUTION.md
   - Affinity: cli, reporting, recoverability
