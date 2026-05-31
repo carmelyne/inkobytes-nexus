@@ -110,3 +110,20 @@ test('release warns and reports when HEAD changed since claim', () => {
     assert.match(report, /- SHA: [0-9a-f]{40}/);
   });
 });
+
+test('release skips report append when releasing _NEXUS_REPORT.md', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_REPORT.md'), '# Report\n\nExisting receipt\n', 'utf-8');
+    spawnSync('git', ['add', '_NEXUS_REPORT.md'], { cwd: root, stdio: 'pipe' });
+    spawnSync('git', ['commit', '-m', 'init report'], { cwd: root, stdio: 'pipe' });
+    writeFileSync(join(root, '_NEXUS_REPORT.md'), '# Report\n\nExisting receipt\n\nManual cleanup\n', 'utf-8');
+    acquireLock('_NEXUS_REPORT.md', '@codex', 'test report self-noise');
+
+    release(['_NEXUS_REPORT.md', 'test report self-noise']);
+
+    const report = readFileSync(join(root, '_NEXUS_REPORT.md'), 'utf-8');
+    assert.equal(report, '# Report\n\nExisting receipt\n\nManual cleanup\n');
+    const log = spawnSync('git', ['log', '-1', '--pretty=%s'], { cwd: root, encoding: 'utf-8' }).stdout.trim();
+    assert.equal(log, '[@codex] test report self-noise');
+  });
+});
