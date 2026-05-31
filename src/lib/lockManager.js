@@ -76,10 +76,16 @@ function isStale(lockPath) {
  * Break a stale lock
  */
 function breakLock(lockPath) {
-  for (const f of ['ts', 'agent', 'intent', 'subagents', 'model', 'thinking']) {
+  for (const f of ['ts', 'agent', 'intent', 'subagents', 'model', 'thinking', 'verified', 'trust-source']) {
     try { unlinkSync(join(lockPath, f)); } catch { /* ok */ }
   }
   try { rmdirSync(lockPath); } catch { /* ok */ }
+}
+
+function detectTrust() {
+  if (process.env.CLAUDECODE === '1') return { verified: true, trustSource: 'harness' };
+  if (process.env.NEXUS_AGENT)        return { verified: true, trustSource: 'operator' };
+  return { verified: false, trustSource: 'unverified' };
 }
 
 /**
@@ -138,6 +144,9 @@ export function acquireLock(target, agentName, intent, subagents = 0, metadata =
       if (subagents > 0) writeFileSync(join(lockPath, 'subagents'), String(subagents), 'utf-8');
       if (metadata.model) writeFileSync(join(lockPath, 'model'), metadata.model, 'utf-8');
       if (metadata.thinking) writeFileSync(join(lockPath, 'thinking'), metadata.thinking, 'utf-8');
+      const { verified, trustSource } = detectTrust();
+      writeFileSync(join(lockPath, 'verified'), verified ? 'true' : 'false', 'utf-8');
+      writeFileSync(join(lockPath, 'trust-source'), trustSource, 'utf-8');
 
       return {
         success: true,
@@ -170,7 +179,7 @@ export function releaseLock(target) {
     return { success: false, message: `No lock found for: ${normalizedTarget}` };
   }
 
-  for (const f of ['ts', 'agent', 'intent', 'subagents', 'model', 'thinking']) {
+  for (const f of ['ts', 'agent', 'intent', 'subagents', 'model', 'thinking', 'verified', 'trust-source']) {
     try { unlinkSync(join(lockPath, f)); } catch { /* ok */ }
   }
   try {
@@ -222,6 +231,8 @@ export function listLocks() {
       subagents: subagentsRaw ? parseInt(subagentsRaw, 10) : 0,
       model: readMeta('model'),
       thinking: readMeta('thinking'),
+      verified: readMeta('verified') === 'true',
+      trustSource: readMeta('trust-source') || 'unverified',
     });
   }
 
