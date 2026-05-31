@@ -80,3 +80,34 @@ test('claim stores operator-declared model and thinking metadata', () => {
     assert.equal(locks[0].thinking, 'medium');
   });
 });
+
+test('claim accepts agent and intent flags', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, 'file.txt'), 'hello\n', 'utf-8');
+
+    capture(() => claim(['file.txt', '--agent', '@codex', '--intent', 'flag claim']));
+
+    const locks = listLocks();
+    assert.equal(locks.length, 1);
+    assert.equal(locks[0].agent, '@codex');
+    assert.equal(locks[0].intent, 'flag claim');
+  });
+});
+
+test('claim warns when agent intent or model metadata are missing', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, 'file.txt'), 'hello\n', 'utf-8');
+
+    const output = capture(() => claim(['file.txt']));
+
+    assert.match(output, /Claim has no agent handle/);
+    assert.match(output, /Claim has no intent/);
+    assert.match(output, /Claim has no model metadata/);
+  });
+});
