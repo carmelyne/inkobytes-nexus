@@ -3,6 +3,7 @@
  * with hierarchy enforcement and stale detection.
  */
 
+import { spawnSync } from 'child_process';
 import { mkdirSync, rmdirSync, existsSync, readFileSync, writeFileSync, readdirSync, statSync, unlinkSync } from 'fs';
 import { join, dirname } from 'path';
 import { getConfig } from './config.js';
@@ -75,8 +76,30 @@ function isStale(lockPath) {
 /**
  * Break a stale lock
  */
+const LOCK_METADATA_FILES = [
+  'ts',
+  'agent',
+  'intent',
+  'subagents',
+  'model',
+  'thinking',
+  'verified',
+  'trust-source',
+  'claim-head',
+];
+
+export function readGitHead(root) {
+  const result = spawnSync('git', ['rev-parse', 'HEAD'], {
+    cwd: root,
+    encoding: 'utf-8',
+    stdio: ['ignore', 'pipe', 'ignore'],
+  });
+  const head = result.stdout?.trim();
+  return result.status === 0 && head ? head : 'unknown';
+}
+
 function breakLock(lockPath) {
-  for (const f of ['ts', 'agent', 'intent', 'subagents', 'model', 'thinking', 'verified', 'trust-source']) {
+  for (const f of LOCK_METADATA_FILES) {
     try { unlinkSync(join(lockPath, f)); } catch { /* ok */ }
   }
   try { rmdirSync(lockPath); } catch { /* ok */ }
@@ -147,6 +170,7 @@ export function acquireLock(target, agentName, intent, subagents = 0, metadata =
       const { verified, trustSource } = detectTrust();
       writeFileSync(join(lockPath, 'verified'), verified ? 'true' : 'false', 'utf-8');
       writeFileSync(join(lockPath, 'trust-source'), trustSource, 'utf-8');
+      writeFileSync(join(lockPath, 'claim-head'), readGitHead(config.root), 'utf-8');
 
       return {
         success: true,
@@ -179,7 +203,7 @@ export function releaseLock(target) {
     return { success: false, message: `No lock found for: ${normalizedTarget}` };
   }
 
-  for (const f of ['ts', 'agent', 'intent', 'subagents', 'model', 'thinking', 'verified', 'trust-source']) {
+  for (const f of LOCK_METADATA_FILES) {
     try { unlinkSync(join(lockPath, f)); } catch { /* ok */ }
   }
   try {
@@ -233,6 +257,7 @@ export function listLocks() {
       thinking: readMeta('thinking'),
       verified: readMeta('verified') === 'true',
       trustSource: readMeta('trust-source') || 'unverified',
+      claimHead: readMeta('claim-head') || 'unknown',
     });
   }
 
