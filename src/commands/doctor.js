@@ -605,7 +605,7 @@ export default function doctor(args) {
     for (const entry of entries) {
       const prefix = entry.ok ? '-' : '!';
       console.log(`  ${prefix} ${entry.issue}`);
-      console.log(`    Fix: ${entry.fix}`);
+      if (entry.fix) console.log(`    Fix: ${entry.fix}`);
       if (!entry.ok) problemCount++;
     }
     console.log('');
