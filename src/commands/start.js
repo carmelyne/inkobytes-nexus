@@ -8,6 +8,8 @@ import { cwd, env } from 'process';
 import { spawnSync } from 'child_process';
 import { listLocks } from '../lib/lockManager.js';
 import { AGENT_SCOPE_ENTRIES, AGENT_SCOPES, normalizeAgentHandle } from '../lib/agentScopes.js';
+import { loadPermissions, getChmodPath } from '../lib/permissions.js';
+import { existsSync } from 'fs';
 
 function git(args) {
   const result = spawnSync('git', args, { cwd: cwd(), encoding: 'utf-8', stdio: 'pipe' });
@@ -97,6 +99,16 @@ export default function start(args = []) {
       console.log(`  - ${handle}: ${item.dir}/CONTINUITY.md, ${item.dir}/memories/INDEX.md`);
     }
     console.log('  Pick your model scope; do not read another model memory unless the user asks.');
+  }
+
+  // promptCHMOD — surface reference-only files so agents know what not to execute
+  if (existsSync(getChmodPath())) {
+    const perms = loadPermissions();
+    const xOff = perms.filter(e => e.perms[2] !== 'x' && (e.agent === 'all' || e.agent === agent));
+    const xOn  = perms.filter(e => e.perms[2] === 'x' && (e.agent === 'all' || e.agent === agent));
+    console.log('\npromptCHMOD:');
+    if (xOff.length) console.log(`  Reference only (do not execute): ${xOff.map(e => e.path).join(', ')}`);
+    if (xOn.length)  console.log(`  Authoritative (execute as instructions): ${xOn.map(e => e.path).join(', ')}`);
   }
 
   console.log('\nNext:');
