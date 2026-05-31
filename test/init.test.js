@@ -44,12 +44,15 @@ test('init creates managed agent guides that doctor accepts', () => {
     const codexGuide = readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8');
     const agyGuide = readFileSync(join(root, '.agy', 'AGENTS.md'), 'utf-8');
     const constitution = readFileSync(join(root, '_NEXUS_CONSTITUTION.md'), 'utf-8');
+    const queue = readFileSync(join(root, '_NEXUS_QUEUE.md'), 'utf-8');
     const gitignore = readFileSync(join(root, '.gitignore'), 'utf-8');
 
     assert.match(output, /All checked Nexus categories are ready/);
     assert.match(readFileSync(join(root, 'DECISIONS.md'), 'utf-8'), /Local agent work decisions live here/);
     assert.match(gitignore, /DECISIONS\.md/);
     assert.match(gitignore, /docs-priv\//);
+    assert.equal(queue.match(/Review: approved/g).length, 2);
+    assert.equal(queue.match(/Approved by: human/g).length, 2);
     assert.equal(codexGuide.match(/NEXUS-AGENT-PROTOCOL:START/g).length, 1);
     assert.equal(codexGuide.match(/This project uses Nexus for multi-agent coordination\./g).length, 1);
     assert.match(codexGuide, /### Current File State/);
