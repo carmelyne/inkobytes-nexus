@@ -44,16 +44,20 @@ function readFlag(args, name) {
 export default function claim(args) {
   const positional = [...args];
 
+  const agentFlag = readFlag(positional, '--agent').trim();
+  const intentFlag = readFlag(positional, '--intent').trim();
   const subagents = parseInt(readFlag(positional, '--subagents'), 10) || 0;
   const model = readFlag(positional, '--model').trim();
   const thinking = readFlag(positional, '--thinking').trim().toLowerCase();
 
   let target = positional[0];
-  const agent = positional[1] || 'UnknownAgent';
-  const intent = positional[2] || 'Modifying file';
+  const agent = agentFlag || positional[1] || 'UnknownAgent';
+  const intent = intentFlag || positional[2] || 'Modifying file';
+  const hasAgent = Boolean(agentFlag || positional[1]);
+  const hasIntent = Boolean(intentFlag || positional[2]);
 
   if (!target) {
-    console.error('Usage: nexus claim <filepath_or_dir> <agent> "<intent>" [--subagents <n>] [--model <name>] [--thinking <low|medium|high>]');
+    console.error('Usage: nexus claim <filepath_or_dir> <agent> "<intent>" [--agent <agent>] [--intent <intent>] [--subagents <n>] [--model <name>] [--thinking <low|medium|high>]');
     process.exit(1);
   }
 
@@ -83,6 +87,18 @@ export default function claim(args) {
 
   if (!CANONICAL_MODEL_HANDLE_SET.has(agent.toLowerCase()) && shouldWarnAgentHandle(agent)) {
     console.warn(`[WARN] Use CLI/model names as lock handles: ${CANONICAL_MODEL_HANDLES_TEXT}.`);
+  }
+
+  if (!hasAgent) {
+    console.warn('[WARN] Claim has no agent handle. Use positional `<agent>` or `--agent @handle`.');
+  }
+
+  if (!hasIntent) {
+    console.warn('[WARN] Claim has no intent. Use positional `"<intent>"` or `--intent "intent"`.');
+  }
+
+  if (!model) {
+    console.warn('[WARN] Claim has no model metadata. Add `--model <name>` when available.');
   }
 
   // Update blackboard
