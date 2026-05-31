@@ -6,6 +6,7 @@ import { join } from 'path';
 import { chdir, cwd } from 'process';
 import claim from '../src/commands/claim.js';
 import { resetConfig } from '../src/lib/config.js';
+import { listLocks } from '../src/lib/lockManager.js';
 
 function inTempRepo(fn) {
   const previous = cwd();
@@ -61,5 +62,21 @@ test('claim nudges non-canonical shared model lock handles', () => {
 
     assert.match(output, /Use CLI\/model names as lock handles/);
     assert.match(output, /@agy, @claude, @codex, or @gemini/);
+  });
+});
+
+test('claim stores operator-declared model and thinking metadata', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, 'file.txt'), 'hello\n', 'utf-8');
+
+    capture(() => claim(['file.txt', '@codex', 'test metadata', '--model', 'gpt-5-codex', '--thinking', 'medium']));
+
+    const locks = listLocks();
+    assert.equal(locks.length, 1);
+    assert.equal(locks[0].model, 'gpt-5-codex');
+    assert.equal(locks[0].thinking, 'medium');
   });
 });
