@@ -5,30 +5,20 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Nexus Dashboard</title>
+    <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Epilogue:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=JetBrains+Mono:ital,wght@0,400;0,500;1,400&display=swap"
-      rel="stylesheet">
-    <style>
-      /* ── Keyframes ── */
-      @keyframes brand-pulse {
-
-        0%,
-        100% {
-          box-shadow: 0 2px 8px rgba(14, 116, 128, 0.38), 0 0 0 0 rgba(14, 116, 128, 0);
-        }
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  </head>
+      
+      
 
         50% {
           box-shadow: 0 3px 14px rgba(14, 116, 128, 0.52), 0 0 0 7px rgba(14, 116, 128, 0.07);
         }
       }
 
-      @keyframes fade-up {
-        from {
-          opacity: 0;
-          transform: translateY(10px);
-        }
+      
 
         to {
           opacity: 1;
@@ -36,11 +26,7 @@
         }
       }
 
-      @keyframes scan {
-        0% {
-          transform: translateY(-100%);
-          opacity: 0.5;
-        }
+      
 
         100% {
           transform: translateY(500%);
@@ -48,46 +34,10 @@
         }
       }
 
-      /* ── Tokens ── */
-      :root {
-        --ink: #0c1a16;
-        --ink-2: #233329;
-        --muted: #6b7f74;
-        --muted-2: #92a89e;
-        --paper: #edf0ec;
-        --panel: rgba(255, 255, 255, 0.86);
-        --panel-s: #ffffff;
-        --line: rgba(21, 50, 35, 0.09);
-        --line-2: rgba(21, 50, 35, 0.15);
+      
+      
 
-        --good: #1d7f4f;
-        --good-bg: #e7f5ee;
-        --good-ring: rgba(29, 127, 79, 0.22);
-        --warn: #a85f00;
-        --warn-bg: #fef3e4;
-        --warn-ring: rgba(168, 95, 0, 0.22);
-
-        --err: #c0302a;
-        --err-bg: #fdf0ef;
-
-        --accent: #0e7480;
-        --accent-2: #0b5c66;
-        --accent-soft: #ddf0f2;
-        --accent-dim: rgba(14, 116, 128, 0.09);
-
-        --f-head: 'Epilogue', 'SF Pro Display', ui-sans-serif, sans-serif;
-        --f-body: 'Plus Jakarta Sans', 'SF Pro Text', ui-sans-serif, system-ui, sans-serif;
-        --f-mono: 'JetBrains Mono', 'Cascadia Code', 'Fira Code', ui-monospace, monospace;
-
-        --r: 12px;
-        --r-sm: 7px;
-        --r-pill: 999px;
-
-        --sh: 0 1px 3px rgba(12, 26, 22, 0.07), 0 4px 16px rgba(12, 26, 22, 0.06);
-        --sh-lg: 0 2px 8px rgba(12, 26, 22, 0.08), 0 8px 32px rgba(12, 26, 22, 0.08);
-      }
-
-      /* ── Reset ── */
+      
       *,
       *::before,
       *::after {
@@ -109,7 +59,7 @@
           var(--paper);
       }
 
-      /* ── Header ── */
+      
       header {
         position: sticky;
         top: 0;
@@ -174,7 +124,7 @@
         margin-top: 2px;
       }
 
-      /* ── Status badge ── */
+      
       .status-wrap {
         display: inline-flex;
         align-items: center;
@@ -189,7 +139,7 @@
         transition: background 0.25s, border-color 0.25s, color 0.25s;
       }
 
-      /* When health div has .warn, re-skin the whole badge */
+      
       .status-wrap:has(#health.warn) {
         background: var(--warn-bg);
         border-color: var(--warn-ring);
@@ -201,7 +151,7 @@
         height: 13px;
       }
 
-      /* JS sets class on #health — keep these for compat */
+      
       .status {
         font-weight: 600;
         color: inherit;
@@ -223,7 +173,7 @@
         color: var(--muted-2);
       }
 
-      /* ── Section labels ── */
+      
       h2 {
         display: flex;
         align-items: center;
@@ -248,7 +198,7 @@
         opacity: 0.8;
       }
 
-      /* ── SVG icons ── */
+      
       .icon {
         width: 16px;
         height: 16px;
@@ -260,7 +210,7 @@
         flex: 0 0 auto;
       }
 
-      /* ── Grid ── */
+      
       main {
         display: grid;
         grid-template-columns: repeat(12, 1fr);
@@ -270,7 +220,7 @@
         margin: 0 auto;
       }
 
-      /* ── Cards ── */
+      
       section {
         position: relative;
         grid-column: span 6;
@@ -285,7 +235,7 @@
         animation: fade-up 0.4s ease both;
       }
 
-      /* Gradient accent bar across top of each card */
+      
       section::after {
         content: '';
         position: absolute;
@@ -326,7 +276,7 @@
         grid-column: span 12;
       }
 
-      /* ── Queue section overrides ── */
+      
       .queue-section {
         padding: 0;
       }
@@ -423,7 +373,7 @@
         box-shadow: 0 0 0 2px rgba(29, 127, 79, 0.2);
       }
 
-      /* Icon inside tab button */
+      
       .queue-tab [data-icon] {
         display: inline-flex;
         flex-shrink: 0;
@@ -433,7 +383,7 @@
         padding: 16px 20px 20px;
       }
 
-      /* ── Queue segments ── */
+      
       .queue-segment+.queue-segment {
         margin-top: 16px;
         padding-top: 16px;
@@ -465,7 +415,7 @@
         color: var(--warn);
       }
 
-      /* ── Tasks ── */
+      
       .task {
         border-top: 1px solid var(--line);
         padding: 12px 0;
@@ -492,7 +442,7 @@
         text-decoration: line-through;
       }
 
-      /* ── Task header row ── */
+      
       .task-header {
         display: flex;
         align-items: flex-start;
@@ -517,7 +467,7 @@
       }
       .task-peek:hover { color: var(--accent); }
 
-      /* ── Task detail popover ── */
+      
       .task-popover {
         position: fixed;
         inset: unset;
@@ -550,7 +500,7 @@
         padding-right: 8px;
       }
 
-      /* ── Meta chips row ── */
+      
       .pop-meta {
         display: flex;
         flex-wrap: wrap;
@@ -576,7 +526,7 @@
       .pop-meta-item[data-tip]:hover svg {
         color: var(--accent);
       }
-      /* CSS tooltip */
+      
       .pop-meta-item[data-tip]::before {
         content: attr(data-tip);
         position: absolute;
@@ -599,7 +549,7 @@
       }
       .pop-meta-item[data-tip]:hover::before { opacity: 1; }
 
-      /* ── Files row ── */
+      
       .pop-files {
         display: flex;
         align-items: flex-start;
@@ -615,7 +565,7 @@
       }
       .pop-files svg { flex-shrink: 0; margin-top: 1px; color: var(--muted-2); }
 
-      /* ── Notes ── */
+      
       .pop-notes {
         border-top: 1px solid var(--line);
         padding-top: 13px;
@@ -646,7 +596,7 @@
         color: var(--accent-2);
       }
 
-      /* ── Pills ── */
+      
       .pill {
         display: inline-flex;
         align-items: center;
@@ -661,7 +611,7 @@
         letter-spacing: 0.01em;
       }
 
-      /* ── Accordion locks ── */
+      
       .lock-group {
         border-top: 1px solid var(--line);
       }
@@ -792,7 +742,7 @@
         margin-left: 4px;
       }
 
-      /* ── Feed / Timeline ── */
+      
       dl {
         margin: 0;
       }
@@ -808,7 +758,7 @@
         padding-top: 0;
       }
 
-      /* Timeline vertical bar */
+      
       .feed-row::before {
         content: '';
         position: absolute;
@@ -820,7 +770,7 @@
         border-radius: 2px;
       }
 
-      /* Timeline dot */
+      
       .feed-row::after {
         content: '';
         position: absolute;
@@ -875,7 +825,7 @@
         opacity: 0.75;
       }
 
-      /* ── Git / Terminal section ── */
+      
       .terminal-section {
         background: #0d1c18 !important;
         border-color: rgba(14, 116, 128, 0.28) !important;
@@ -883,13 +833,13 @@
           inset 0 1px 0 rgba(14, 116, 128, 0.12) !important;
       }
 
-      /* Override card accent line for terminal */
+      
       .terminal-section::after {
         background: linear-gradient(90deg, rgba(14, 116, 128, 0.55) 0%, rgba(14, 116, 128, 0.08) 100%) !important;
         opacity: 1;
       }
 
-      /* Scan line shimmer */
+      
       .terminal-section::before {
         content: '';
         position: absolute;
@@ -967,7 +917,7 @@
         text-underline-offset: 3px;
       }
 
-      /* ── Inline code (non-terminal) ── */
+      
       code {
         font-family: var(--f-mono);
         font-size: 12px;
@@ -977,7 +927,7 @@
         border-radius: 5px;
       }
 
-      /* ── Health issues list ── */
+      
       #health-details ul {
         list-style: none;
         padding: 0;
@@ -1021,7 +971,7 @@
         font-size: 10px;
       }
 
-      /* ── Misc ── */
+      
       ul {
         margin: 0;
         padding-left: 18px;
@@ -1040,7 +990,7 @@
         font-size: 13px;
       }
 
-      /* ── Health alert (floating, only appears when broken) ── */
+      
       .health-alert {
         max-width: 1440px;
         margin: 14px auto -6px;
@@ -1067,13 +1017,13 @@
       .health-alert li { font-family: var(--f-mono); font-size: 12px; color: var(--err); margin: 0; }
       .health-alert li.lethal { font-weight: 600; }
 
-      /* ── Section sizing overrides ── */
+      
       .now-section  { grid-column: span 9; }
       .ring-section { grid-column: span 3; min-height: unset; display: flex; flex-direction: column; }
       .chart-sm     { grid-column: span 4; }
       #ring-chart   { flex: 1; display: flex; align-items: center; justify-content: center; }
 
-      /* ── Ring chart ── */
+      
       .ring-wrap {
         display: flex;
         flex-direction: column;
@@ -1112,7 +1062,7 @@
       .ring-caption { font-size: 11.5px; color: var(--muted); text-align: center; line-height: 1.5; }
       .ring-caption strong { display: block; color: var(--ink-2); font-size: 13px; font-weight: 600; }
 
-      /* ── Horizontal bar charts ── */
+      
       .chart-list { display: flex; flex-direction: column; gap: 11px; padding: 4px 0; }
       .chart-row { display: flex; flex-direction: column; gap: 4px; }
       .chart-row-header { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
@@ -1138,7 +1088,7 @@
       .chart-bar-fill.clr-medium { background: var(--accent); }
       .chart-bar-fill.clr-large  { background: #a85f00; }
 
-      /* ── Vertical column chart (cost split) ── */
+      
       .chart-sm { display: flex; flex-direction: column; }
       #chart-cost { flex: 1; display: flex; flex-direction: column; }
       .vchart-wrap {
@@ -1185,7 +1135,7 @@
         flex-shrink: 0;
       }
 
-      /* ── Pie chart (agent workload) ── */
+      
       .pie-wrap {
         display: flex;
         align-items: center;
@@ -1209,7 +1159,7 @@
       .agent-tab[data-idle="true"] .presence-dot { background: #eab308; }
       .agent-tab[data-online="false"][data-idle="false"] .presence-dot { background: #6b7f74; }
 
-      /* ── Responsive ── */
+      
       @media (max-width: 900px) {
         header {
           height: auto;
