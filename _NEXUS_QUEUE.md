@@ -50,10 +50,10 @@
   - Auto-flow: yes
   - Notes: _NEXUS_REPORT.md currently has two formats — compact auto-log lines at top (legacy) and structured Done claim blocks below (current). Unify into one format per entry that includes: timestamp, agent, target, commit message. Remove the empty Done claim / Adversarial result template boilerplate since agents rarely fill it in. Result should be a clean append-only log that `nexus metrics` can parse reliably.
 
-- [ ] TASK/Codex: Build nexus metrics command
+- [x] TASK/Codex: Build nexus metrics command
   - Id: nexus-metrics
   - Epic: Metrics & observability
-  - Status: Ready
+  - Status: Done
   - Depends on: commit-attribution, report-unification
   - Files: src/commands/metrics.js, bin/nexus.js
   - Affinity: cli, metrics, reporting
