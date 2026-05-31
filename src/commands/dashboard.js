@@ -39,6 +39,8 @@ export function buildSnapshot() {
     agent: lock.agent || '',
     intent: lock.intent || '',
     subagents: lock.subagents || 0,
+    model: lock.model || '',
+    thinking: lock.thinking || '',
   }));
 
   const queueText = readText(config.queue);
