@@ -28,6 +28,28 @@ Nexus CLI is the coordination engine. This skill is only the agent playbook.
    nexus release <path> "short commit message"
    ```
 
+## Queue Items
+
+When adding work to `_NEXUS_QUEUE.md`, keep tasks dashboard-parseable and immediately actionable. Use this shape:
+
+```md
+- [ ] TASK/@agent: Short task title
+  - Id: stable-kebab-id
+  - Epic: Product area or safety theme
+  - Status: Ready
+  - Depends on: none
+  - Files: path/one.js, path/two.md
+  - Affinity: cli, docs, dashboard
+  - Cost: small
+  - Auto-flow: yes
+  - Notes: One practical paragraph with scope, constraints, and definition of done.
+```
+
+- `Files` should name the likely edit surface so other agents can spot conflicts before claiming.
+- `Depends on` should list hard blockers by `Id`; use `none` when the task is independent.
+- `Auto-flow: yes` means an agent can grab it after `nexus next`; use `no` when planning or human approval is needed.
+- `Notes` should carry dashboard-useful context, not a whole design doc.
+
 ## Guardrails
 
 - Ask before `nexus doctor --fix` unless scaffold repair is already approved.
