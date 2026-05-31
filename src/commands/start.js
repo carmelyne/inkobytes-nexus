@@ -110,6 +110,11 @@ export default function start(args = []) {
     if (xOn.length)  console.log(`  Authoritative (execute as instructions): ${xOn.map(e => e.path).join(', ')}`);
   }
 
+  // Trigger presence heartbeat
+  if (agent) {
+    spawnSync('node', [join(root, 'bin', 'nexus.js'), 'checkin', agent], { stdio: 'ignore' });
+  }
+
   console.log('\nNext:');
   if (scope) {
     console.log('  Start is orientation only, not clearance to edit.');
