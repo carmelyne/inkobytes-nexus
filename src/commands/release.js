@@ -51,6 +51,7 @@ export default function release(args) {
 
 - Agent: ${lock?.agent || 'unknown'}
 - Target: ${target}
+- SHA: ${gitResult.sha || 'unknown'}
 - Commit: ${commitMsg}
 
 `;
