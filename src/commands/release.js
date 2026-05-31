@@ -49,16 +49,9 @@ export default function release(args) {
   const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false });
   const reportLine = `## [${timestamp}] ${target}
 
-Commit: ${commitMsg}
-
-Done claim:
-- Changed:
-- Validated:
-- Risk:
-
-Adversarial result:
-- Pass, or:
-- Finding:
+- Agent: ${lock?.agent || 'unknown'}
+- Target: ${target}
+- Commit: ${commitMsg}
 
 `;
 
