@@ -10,6 +10,7 @@ DECISIONS.md
 docs-priv/
 .nexus/locks/
 .nexus/drill-runs/
+.nexus/presence/
 tmp/
 *.lockdir
 *.flock
