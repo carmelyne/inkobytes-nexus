@@ -1128,14 +1128,18 @@
       .chart-bar-fill.clr-large  { background: #a85f00; }
 
       /* ── Vertical column chart (cost split) ── */
+      .chart-sm { display: flex; flex-direction: column; }
+      #chart-cost { flex: 1; display: flex; flex-direction: column; }
       .vchart-wrap {
+        flex: 1;
         display: flex;
         flex-direction: column;
       }
       .vchart-bars {
+        flex: 1;
         display: flex;
         gap: 10px;
-        height: 160px;
+        min-height: 80px;
         align-items: stretch;
       }
       .vchart-col {
@@ -1149,7 +1153,7 @@
         font-weight: 700;
         font-family: var(--f-mono);
         color: var(--ink-2);
-        margin-bottom: 5px;
+        margin-bottom: 4px;
         flex-shrink: 0;
       }
       .vchart-spacer { width: 100%; }
@@ -1591,8 +1595,8 @@
           const barFlex = Math.max((count / max) * 100, 4).toFixed(0);
           const spacerFlex = (100 - Number(barFlex)).toFixed(0);
           return '<div class="vchart-col">'
-            + '<span class="vchart-count">' + count + '</span>'
             + '<div class="vchart-spacer" style="flex:' + spacerFlex + '"></div>'
+            + '<span class="vchart-count">' + count + '</span>'
             + '<div class="vchart-bar clr-' + cost + '" style="flex:' + barFlex + '"></div>'
             + '<span class="vchart-label">' + cost.charAt(0).toUpperCase() + cost.slice(1) + '</span>'
             + '</div>';
