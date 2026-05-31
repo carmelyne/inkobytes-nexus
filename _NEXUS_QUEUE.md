@@ -215,7 +215,7 @@
   - Approved by: human
   - Notes: Add `--model <name>` and `--thinking <low|medium|high>` flags to `nexus claim`. Write both to lock dir as `model` and `thinking` files. Read back in listLocks, pass through snapshot. Dashboard shows in accordion header (e.g. "sonnet-4-6 · medium"). IMPORTANT: --model is an operator declaration, not agent self-report. Local/Ollama models running inside Claude Code or Codex CLI have no intrinsic self-knowledge — a llama3.3 given a "you are Claude" system prompt will report itself as Claude. Only the human operator knows the real model. Add `nexus doctor` warning when recent claims have no --model set. Update _NEXUS_CONSTITUTION.md to document this. Feeds nexus-metrics for cost profiling per model.
 
-- [ ] TASK/@claude: Wire nexus checkout to agent session end
+- [x] TASK/@claude: Wire nexus checkout to agent session end
   - Id: presence-checkout-wire
   - Epic: Dashboard observability
   - Status: Ready
@@ -228,7 +228,7 @@
   - Approved by: human
   - Notes: agent-presence review gap — checkout is never called at session end. Add `nexus checkout @agent` to the session end section of each agent entrypoint file. Also add a doctor warning when a presence file is older than staleThreshold but no active lock exists (agent likely crashed without checking out).
 
-- [ ] TASK/@claude: Add .nexus/presence/ to .gitignore
+- [x] TASK/@claude: Add .nexus/presence/ to .gitignore
   - Id: presence-gitignore
   - Epic: Dashboard observability
   - Status: Ready
