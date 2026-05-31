@@ -61,10 +61,10 @@
   - Auto-flow: no
   - Notes: Extend queue parsing to recognize lightweight `Coordinates with:` or `Soft depends on:` lines. These do not block like `Depends on`, but `nexus next` should display them so an agent knows when Claude/Codex/Gemini work may be semantically adjacent. Recoverability principle: make hidden coordination assumptions visible before edits begin.
 
-- [ ] TASK/Codex: Document queue item authoring pattern in Nexus skill
+- [x] TASK/Codex: Document queue item authoring pattern in Nexus skill
   - Id: skill-queue-authoring
   - Epic: Open-source CLI release
-  - Status: Ready
+  - Status: Done
   - Depends on: none
   - Files: skills/nexus/SKILL.md, README.md, test/security.test.js
   - Affinity: skill, docs, queue, dashboard
