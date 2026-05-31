@@ -50,15 +50,14 @@ test('dashboard snapshot summarizes Nexus repo state', () => {
       '@codex: Dashboard v1 started',
     ].join('\n'), 'utf-8');
     writeFileSync(join(root, '_NEXUS_REPORT.md'), [
-      'Commit: docs: placeholder',
-      'Done claim:',
-      '- Changed:',
-      '- Validated:',
-      '- Risk:',
-      'Commit: feat: dashboard',
-      'Done claim:',
-      '- Changed: dashboard',
-      '- Validated: test',
+      '## [12:00:00] docs/README.md',
+      '- Agent: @codex',
+      '- Target: docs/README.md',
+      '- Commit: docs: placeholder',
+      '## [12:01:00] src/commands/dashboard.js',
+      '- Agent: @codex',
+      '- Target: src/commands/dashboard.js',
+      '- Commit: feat: dashboard',
     ].join('\n'), 'utf-8');
 
     const snapshot = buildSnapshot();
@@ -76,7 +75,6 @@ test('dashboard snapshot summarizes Nexus repo state', () => {
     assert.deepEqual(snapshot.releases, [
       { type: 'Commit', title: 'docs: placeholder', meta: '' },
       { type: 'Commit', title: 'feat: dashboard', meta: '' },
-      { type: 'Done Claim', title: 'Changed: dashboard · Validated: test', meta: '' },
     ]);
   });
 });
