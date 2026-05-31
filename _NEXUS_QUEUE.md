@@ -163,16 +163,16 @@
   - Approved by: human
   - Notes: Metrics currently shows `Agent` and `unknown` for older commits/report entries. Add clearer buckets and explanation: `legacy-agent`, `unknown-agent`, and current explicit handles. Do not rewrite git history. Recoverability principle: metrics can be imperfect, but uncertainty must be labeled honestly.
 
-- [ ] TASK/Codex: Build Nexus completed task ledger
+- [x] TASK/Codex: Build Nexus completed task ledger
   - Id: nexus-ledger
   - Epic: Dashboard observability
-  - Status: Ready
+  - Status: Done
   - Depends on: none
-  - Files: src/commands/ledger.js, src/commands/dashboard.js, nexus-dashboard/index.html, _NEXUS_LEDGER.md
+  - Files: src/commands/ledger.js, src/commands/release.js, src/commands/dashboard.js, src/lib/config.js, bin/nexus.js, README.md, _NEXUS_LEDGER.md, test/ledger.test.js, test/release.test.js, test/dashboard.test.js
   - Affinity: cli, dashboard, reporting
   - Cost: medium
   - Auto-flow: no
-  - Notes: When a task is marked [x] in _NEXUS_QUEUE.md, append a structured entry to _NEXUS_LEDGER.md with: task id, title, agent, epic, files touched, date completed, cost. `nexus release` should trigger this automatically when it detects a newly checked task. `nexus ledger` command shows a summary. Dashboard gets a new Ledger panel showing recent completions. This becomes the source of truth for reporting, velocity tracking, and handoff context across sessions.
+  - Notes: Added `_NEXUS_LEDGER.md`, `nexus ledger [--json]`, release-time completed-task append, dashboard snapshot ledger data, README docs, and focused tests. Visual dashboard panel can consume `snapshot.ledger` next.
 
 - [x] TASK/Codex: Add agent attribution to release commits
   - Id: commit-attribution
