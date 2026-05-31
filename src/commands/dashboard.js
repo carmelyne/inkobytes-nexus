@@ -64,7 +64,7 @@ export function buildSnapshot() {
     presence,
     queue: parseQueue(queueText),
     proposed: parseProposed(queueText),
-    ledger: readLedgerEntries().slice(-12).reverse(),
+    ledger: readLedgerEntries().reverse(),
     standup: parseStandupEntries(standupText).slice(-8),
     releases: parseReleaseEntries(reportText).slice(-6),
   };
