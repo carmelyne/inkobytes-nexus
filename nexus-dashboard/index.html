@@ -1127,6 +1127,48 @@
       .chart-bar-fill.clr-medium { background: var(--accent); }
       .chart-bar-fill.clr-large  { background: #a85f00; }
 
+      /* ── Vertical column chart (cost split) ── */
+      .vchart-wrap {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+      .vchart-bars {
+        display: flex;
+        gap: 10px;
+        flex: 1;
+        min-height: 100px;
+        align-items: stretch;
+      }
+      .vchart-col {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .vchart-count {
+        font-size: 12.5px;
+        font-weight: 700;
+        font-family: var(--f-mono);
+        color: var(--ink-2);
+        margin-bottom: 5px;
+        flex-shrink: 0;
+      }
+      .vchart-spacer { width: 100%; }
+      .vchart-bar {
+        width: 100%;
+        border-radius: 6px 6px 0 0;
+        min-height: 5px;
+        flex-shrink: 0;
+      }
+      .vchart-label {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 6px;
+        text-align: center;
+        flex-shrink: 0;
+      }
+
       /* ── Pie chart (agent workload) ── */
       .pie-wrap {
         display: flex;
@@ -1143,6 +1185,7 @@
       .agent-legend { display: flex; flex-direction: column; gap: 7px; }
       .agent-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--ink-2); }
       .agent-legend-dot { width: 9px; height: 9px; border-radius: 99px; flex-shrink: 0; }
+      .pie-caption { font-size: 11px; color: var(--muted); margin-top: 10px; line-height: 1.5; }
 
       /* ── Responsive ── */
       @media (max-width: 900px) {
@@ -1541,15 +1584,18 @@
         if (!queue.length) { el.innerHTML = '<p class="muted">No tasks yet.</p>'; return; }
         const costs = { small: 0, medium: 0, large: 0 };
         for (const task of queue) { const c = (task.cost || '').toLowerCase(); if (c in costs) costs[c]++; }
-        const total = Object.values(costs).reduce((a, b) => a + b, 0) || 1;
-        el.innerHTML = '<div class="chart-list">' + Object.entries(costs).map(([cost, count]) => {
-          const pct = (count / total) * 100;
-          return '<div class="chart-row">'
-            + '<div class="chart-row-header"><span class="chart-row-label">' + cost.charAt(0).toUpperCase() + cost.slice(1) + '</span>'
-            + '<span class="chart-row-val">' + count + '</span></div>'
-            + '<div class="chart-bar-track"><div class="chart-bar-fill clr-' + cost + '" style="width:' + pct.toFixed(1) + '%"></div></div>'
+        const max = Math.max(...Object.values(costs), 1);
+        const cols = Object.entries(costs).map(([cost, count]) => {
+          const barFlex = Math.max((count / max) * 100, 4).toFixed(0);
+          const spacerFlex = (100 - Number(barFlex)).toFixed(0);
+          return '<div class="vchart-col">'
+            + '<span class="vchart-count">' + count + '</span>'
+            + '<div class="vchart-spacer" style="flex:' + spacerFlex + '"></div>'
+            + '<div class="vchart-bar clr-' + cost + '" style="flex:' + barFlex + '"></div>'
+            + '<span class="vchart-label">' + cost.charAt(0).toUpperCase() + cost.slice(1) + '</span>'
             + '</div>';
-        }).join('') + '</div>';
+        }).join('');
+        el.innerHTML = '<div class="vchart-wrap"><div class="vchart-bars">' + cols + '</div></div>';
       }
 
       const AGENT_COLORS = { claude: '#0e7480', codex: '#4f6ef7', gemini: '#9333ea', agy: '#d97706' };
@@ -1586,9 +1632,11 @@
           return '<div class="agent-legend-item"><div class="agent-legend-dot" style="background:' + color + '"></div>@' + escapeHtml(a) + '<span class="chart-row-val">' + n + '</span></div>';
         }).join('');
 
+        const agentCount = entries.length;
         el.innerHTML = '<div class="pie-wrap">'
           + '<svg class="pie-svg" viewBox="0 0 100 100"><g>' + slices + '</g></svg>'
-          + '<div class="agent-legend">' + legend + '</div>'
+          + '<div><div class="agent-legend">' + legend + '</div>'
+          + '<div class="pie-caption">' + total + ' task' + (total !== 1 ? 's' : '') + ' across ' + agentCount + ' agent' + (agentCount !== 1 ? 's' : '') + '</div></div>'
           + '</div>';
       }
 
