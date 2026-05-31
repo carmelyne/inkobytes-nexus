@@ -17,6 +17,7 @@ const CORE_FILES = [
   '_NEXUS_QUEUE.md',
   '_NEXUS_STANDUP.md',
 ];
+const THINKING_LEVELS = new Set(['low', 'medium', 'high']);
 
 function missingCoreFiles() {
   const root = cwd();
@@ -30,16 +31,34 @@ function shouldWarnAgentHandle(agent) {
     || (normalized.startsWith('@') && !CANONICAL_MODEL_HANDLE_SET.has(normalized) && hasAgentAlias(normalized));
 }
 
-export default function claim(args) {
-  let target = args[0];
-  const agent = args[1] || 'UnknownAgent';
-  const intent = args[2] || 'Modifying file';
+function readFlag(args, name) {
+  const index = args.indexOf(name);
+  if (index === -1) return '';
 
-  const subagentsIndex = args.indexOf('--subagents');
-  const subagents = subagentsIndex !== -1 ? parseInt(args[subagentsIndex + 1], 10) || 0 : 0;
+  const value = args[index + 1];
+  const hasValue = value && !String(value).startsWith('--');
+  args.splice(index, hasValue ? 2 : 1);
+  return hasValue ? value : '';
+}
+
+export default function claim(args) {
+  const positional = [...args];
+
+  const subagents = parseInt(readFlag(positional, '--subagents'), 10) || 0;
+  const model = readFlag(positional, '--model').trim();
+  const thinking = readFlag(positional, '--thinking').trim().toLowerCase();
+
+  let target = positional[0];
+  const agent = positional[1] || 'UnknownAgent';
+  const intent = positional[2] || 'Modifying file';
 
   if (!target) {
-    console.error('Usage: nexus claim <filepath_or_dir> <agent> "<intent>" [--subagents <n>]');
+    console.error('Usage: nexus claim <filepath_or_dir> <agent> "<intent>" [--subagents <n>] [--model <name>] [--thinking <low|medium|high>]');
+    process.exit(1);
+  }
+
+  if (thinking && !THINKING_LEVELS.has(thinking)) {
+    console.error('[ERROR] --thinking must be one of: low, medium, high');
     process.exit(1);
   }
 
@@ -50,7 +69,7 @@ export default function claim(args) {
     process.exit(1);
   }
 
-  const result = acquireLock(target, agent, intent, subagents);
+  const result = acquireLock(target, agent, intent, subagents, { model, thinking });
 
   if (!result.success) {
     console.error(`[ERROR] ${result.message}`);
