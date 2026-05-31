@@ -107,3 +107,40 @@ test('metrics --json emits structured summary', () => {
     assert.equal(summary.releasesByAgent['@codex'], 1);
   });
 });
+
+test('metrics labels legacy and unknown identity buckets without rewriting history', () => {
+  inTempRepo((root) => {
+    commit(root, 'legacy.md', 'legacy\n', '[Agent] old release');
+    commit(root, 'plain.md', 'plain\n', 'plain commit');
+    writeFileSync(join(root, '_NEXUS_REPORT.md'), [
+      '## [12:00:00] legacy.md',
+      '',
+      '- Agent: Agent',
+      '- Target: legacy.md',
+      '- SHA: 1111111111111111111111111111111111111111',
+      '- Commit: old release',
+      '## [12:01:00] plain.md',
+      '',
+      '- Target: plain.md',
+      '- SHA: 2222222222222222222222222222222222222222',
+      '- Commit: unknown release',
+    ].join('\n'), 'utf-8');
+
+    const output = captureLogs(() => metrics([]));
+
+    assert.match(output, /legacy-agent: 1/);
+    assert.match(output, /unknown-agent: 1/);
+    assert.match(output, /Identity bucket notes/);
+    assert.match(output, /legacy-agent: Older Nexus releases used the generic \[Agent\]/);
+    assert.match(output, /unknown-agent: No parseable agent label was found/);
+
+    const jsonOutput = captureLogs(() => metrics(['--json']));
+    const summary = JSON.parse(jsonOutput);
+    assert.equal(summary.commitsByAgent['legacy-agent'], 1);
+    assert.equal(summary.commitsByAgent['unknown-agent'], 1);
+    assert.equal(summary.releasesByAgent['legacy-agent'], 1);
+    assert.equal(summary.releasesByAgent['unknown-agent'], 1);
+    assert.match(summary.identityBuckets['legacy-agent'], /generic \[Agent\]/);
+    assert.match(summary.identityBuckets['unknown-agent'], /No parseable agent label/);
+  });
+});
