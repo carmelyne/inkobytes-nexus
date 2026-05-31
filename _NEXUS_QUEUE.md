@@ -6,10 +6,10 @@
 
 ## Ready Queue
 
-- [ ] TASK/@gemini: Add agent presence check-in/check-out system
+- [x] TASK/@gemini: Add agent presence check-in/check-out system
   - Id: agent-presence
   - Epic: Dashboard observability
-  - Status: Ready
+  - Status: Done
   - Depends on: none
   - Files: src/commands/checkin.js, src/commands/checkout.js, src/lib/lockManager.js, src/commands/dashboard.js, nexus-dashboard/index.html, bin/nexus.js
   - Affinity: cli, dashboard, protocol
