@@ -17,6 +17,12 @@
   - Auto-flow: no
   - Notes: Add `nexus checkin @agent` and `nexus checkout @agent` commands. Write a heartbeat timestamp to `.nexus/presence/@agent`. Dashboard reads freshness (online = updated within 60s, idle = 60-300s, offline = >300s or missing). Show green/yellow/gray dot on agent tabs in queue block. Checkin should be called by `nexus start`, checkout by agent on session end. Add `nexus checkout --all` for emergency cleanup.
 
+## Proposed Queue
+
+*(Agent-suggested tasks awaiting human review. nexus next ignores this section.)*
+
+---
+
 - [x] TASK/Codex: Add same-branch HEAD drift warning before release
   - Id: release-head-drift
   - Epic: Same-branch recoverability
@@ -26,6 +32,8 @@
   - Affinity: cli, safety, recoverability
   - Cost: small
   - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
   - Notes: Store claim-time HEAD SHA in lock metadata. On `nexus release`, compare current HEAD to claim HEAD. If HEAD changed, do not block; warn clearly before committing so same-branch interleaving is visible. Recoverability principle: every release should explain whether it was based on the same branch tip it claimed from.
 
 - [ ] TASK/Codex: Add report self-noise handling for _NEXUS_REPORT.md releases
@@ -37,6 +45,8 @@
   - Affinity: cli, reporting, recoverability
   - Cost: small
   - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
   - Notes: Releasing `_NEXUS_REPORT.md` appends a new receipt after the report commit, leaving the file dirty forever. Add an explicit self-noise rule: either skip appending when target is `_NEXUS_REPORT.md`, or append before commit for that target only. Pick the simplest behavior and document it. Recoverability principle: the audit log should not create endless audit-log noise.
 
 - [ ] TASK/Codex: Add hot-file contention warnings to next/status
@@ -48,6 +58,8 @@
   - Affinity: cli, protocol, coordination
   - Cost: medium
   - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
   - Notes: Surface known high-contention paths such as `nexus-dashboard/index.html`, `src/commands/dashboard.js`, `_NEXUS_QUEUE.md`, and `_NEXUS_REPORT.md`. `nexus next` should warn when a suggested task touches hot files; `nexus status` should show hot active locks. Recoverability principle: warn before agents stack work on the same fragile surfaces.
 
 - [ ] TASK/Codex: Add semantic dependency hints for queue tasks
@@ -70,6 +82,8 @@
   - Affinity: skill, docs, queue, dashboard
   - Cost: small
   - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
   - Notes: Add a concise Queue item template to the shipped Nexus skill so devs and agents create tasks with dashboard-parseable fields: Id, Epic, Status, Depends on, Files, Affinity, Cost, Auto-flow, and Notes. Keep it practical and copy-pasteable. Principle: the CLI should help people create useful coordination data instead of making dashboards sparse or misleading.
 
 - [ ] TASK/Codex: Add release recovery command
@@ -136,6 +150,8 @@
   - Affinity: cli, metrics, reporting
   - Cost: small
   - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
   - Notes: Metrics currently shows `Agent` and `unknown` for older commits/report entries. Add clearer buckets and explanation: `legacy-agent`, `unknown-agent`, and current explicit handles. Do not rewrite git history. Recoverability principle: metrics can be imperfect, but uncertainty must be labeled honestly.
 
 - [ ] TASK/Codex: Build Nexus completed task ledger
@@ -158,6 +174,8 @@
   - Affinity: cli, metrics, protocol
   - Cost: small
   - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
   - Notes: Change commit format from `[Agent] message` to `[@agent] message` so every release is attributable. `release.js` reads the agent from the lock file (already stored as `agent` metadata) and passes it to `stageAndCommit`. Update `stageAndCommit` signature to accept optional agent param. This unlocks per-agent git metrics from day forward.
 
 - [x] TASK/Codex: Unify _NEXUS_REPORT.md into single structured format
@@ -169,6 +187,8 @@
   - Affinity: cli, metrics, reporting
   - Cost: small
   - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
   - Notes: _NEXUS_REPORT.md currently has two formats — compact auto-log lines at top (legacy) and structured Done claim blocks below (current). Unify into one format per entry that includes: timestamp, agent, target, commit message. Remove the empty Done claim / Adversarial result template boilerplate since agents rarely fill it in. Result should be a clean append-only log that `nexus metrics` can parse reliably.
 
 - [x] TASK/Codex: Build nexus metrics command
@@ -191,6 +211,8 @@
   - Affinity: cli, metrics, protocol
   - Cost: small
   - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
   - Notes: Add `--model <name>` and `--thinking <low|medium|high>` flags to `nexus claim`. Write both to lock dir as `model` and `thinking` files. Read back in listLocks, pass through snapshot. Dashboard shows in accordion header (e.g. "sonnet-4-6 · medium"). IMPORTANT: --model is an operator declaration, not agent self-report. Local/Ollama models running inside Claude Code or Codex CLI have no intrinsic self-knowledge — a llama3.3 given a "you are Claude" system prompt will report itself as Claude. Only the human operator knows the real model. Add `nexus doctor` warning when recent claims have no --model set. Update _NEXUS_CONSTITUTION.md to document this. Feeds nexus-metrics for cost profiling per model.
 
 - [ ] TASK/@claude: Research local model tooling compatibility with Nexus
@@ -213,6 +235,8 @@
   - Affinity: cli, security, protocol
   - Cost: small
   - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
   - Notes: At claim time, check env vars to determine session trust level. `CLAUDECODE=1` is set by Claude Code CLI for all sessions (Pro, Max, API key) — its presence means the claim comes from a verified Anthropic-backed harness. Absence means local/unverified (Ollama, llama.cpp, LM Studio, etc.). Logic: if CLAUDECODE present → verified=true; else if NEXUS_AGENT env var set by human → verified=true with source=operator; else → verified=false, flag as unverified. Write `verified` and `trust-source` files to lock dir alongside agent/intent. Dashboard shows unverified claims with a distinct indicator (e.g. gray/amber dot vs green). `nexus doctor` warns on unverified claims in active locks. Does NOT block unverified agents — coordination still works, trust is just surfaced transparently. Human can set `export NEXUS_AGENT=@local-llama` before handing terminal to a local model. Core discovery: `env | grep CLAUDE` reveals CLAUDECODE=1, CLAUDE_CODE_SESSION_ID, AI_AGENT=claude-code_version — these are the harness fingerprints.
 
 - [x] TASK/@claude: Design and implement promptCHMOD — file permission model for agents
@@ -246,6 +270,8 @@
   - Affinity: cli, testing
   - Cost: small
   - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
   - Notes: lockManager now stores agent+intent files alongside ts in lock dir. Tests should cover acquireLock writes all three files, releaseLock cleans all three, listLocks reads agent+intent back correctly.
 
 - [x] TASK/Codex: Prepare Nexus CLI for open-source release
