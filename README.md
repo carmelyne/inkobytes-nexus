@@ -278,9 +278,11 @@ Nexus reads tasks from `_NEXUS_QUEUE.md`:
   - Affinity: cli, diagnostics
   - Cost: small
   - Auto-flow: yes
+  - Notes: Add a doctor section for stale locks with tests and clear fix guidance.
 ```
 
 The queue is the executable priority surface. Standup is for comms and human context.
+Keep items dashboard-friendly: include `Id`, `Epic`, `Status`, `Depends on`, `Files`, `Affinity`, `Cost`, `Auto-flow`, and `Notes`. Use `Files` to expose conflict surfaces, `Depends on` for hard blockers, and `Auto-flow: no` when a task needs planning or human approval before an agent grabs it.
 
 ## Agent Protocol
 
