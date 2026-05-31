@@ -28,10 +28,10 @@
   - Auto-flow: no
   - Notes: When a task is marked [x] in _NEXUS_QUEUE.md, append a structured entry to _NEXUS_LEDGER.md with: task id, title, agent, epic, files touched, date completed, cost. `nexus release` should trigger this automatically when it detects a newly checked task. `nexus ledger` command shows a summary. Dashboard gets a new Ledger panel showing recent completions. This becomes the source of truth for reporting, velocity tracking, and handoff context across sessions.
 
-- [ ] TASK/Codex: Add agent attribution to release commits
+- [x] TASK/Codex: Add agent attribution to release commits
   - Id: commit-attribution
   - Epic: Metrics & observability
-  - Status: Ready
+  - Status: Done
   - Depends on: none
   - Files: src/lib/git.js, src/commands/release.js, src/commands/claim.js
   - Affinity: cli, metrics, protocol
@@ -61,10 +61,10 @@
   - Auto-flow: no
   - Notes: Parse git log for `[@agent]` commits and _NEXUS_REPORT.md for release data. Surface: commits per agent, files most frequently released, release velocity by week, cost distribution from queue. Output as formatted table to terminal. Optional `--json` flag for dashboard consumption. Future: surface in dashboard as a Metrics panel.
 
-- [ ] TASK/Codex: Add model + thinking level capture to claim metadata
+- [x] TASK/Codex: Add model + thinking level capture to claim metadata
   - Id: model-capture
   - Epic: Metrics & observability
-  - Status: Ready
+  - Status: Done
   - Depends on: none
   - Files: src/commands/claim.js, src/lib/lockManager.js, src/commands/dashboard.js, nexus-dashboard/index.html, _NEXUS_CONSTITUTION.md
   - Affinity: cli, metrics, protocol
@@ -116,10 +116,10 @@
   - Auto-flow: no
   - Notes: Add `nexus db backup` (manual snapshot), `nexus db list` (show backups), `nexus db restore <stamp>` (rollback). Auto-detect DB type: SQLite (find *.sqlite/*.db), Postgres/MySQL (DATABASE_URL env). Timestamped backups stored in `.nexus/db-backups/`. Wire into PreToolUse Bash hook: detect migration commands (migrate, db:migrate, alembic upgrade, flyway, sequelize) → auto-run `nexus db backup --auto` → log to standup → allow migration to proceed. Hook changes from block to backup-then-allow — zero friction for agents, full recoverability for humans. Also add `nexus db schedule` to set up daily cron backup. Philosophy: total recoverability over prevention.
 
-- [ ] TASK/Codex: Add lock manager tests
+- [x] TASK/Codex: Add lock manager tests
   - Id: lockmanager-tests
   - Epic: Open-source CLI release
-  - Status: Ready
+  - Status: Done
   - Depends on: none
   - Files: test/lockManager.test.js, src/lib/lockManager.js
   - Affinity: cli, testing
