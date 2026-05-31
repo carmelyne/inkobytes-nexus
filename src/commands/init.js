@@ -298,6 +298,7 @@ const GITIGNORE_ENTRY = `
 DECISIONS.md
 docs-priv/
 .nexus/locks/
+.nexus/presence/
 *.lockdir
 *.flock
 `;
@@ -437,8 +438,9 @@ They are exempt from Nexus claim/release unless the user says otherwise.
 - If the index has entries, read the newest \`${scaffold.memoryDir}/YYYY-Month/YYYY-MM-DD-HHMM-topic.md\` entry.
 - Durable architecture and protocol decisions belong in \`DECISIONS.md\`; mention them in \`_NEXUS_STANDUP.md\` only when active agents need to coordinate around them.
 - Memory entries are session handoffs.
-- On session end, pause, or checkpoint request, create one new memory file:
-  \`${scaffold.memoryDir}/YYYY-Month/YYYY-MM-DD-HHMM-topic.md\`.
+- On session end, pause, or checkpoint request:
+  1. Run \`nexus checkout @${scaffold.aliases[0]}\` to clear your presence heartbeat.
+  2. Create one new memory file: \`${scaffold.memoryDir}/YYYY-Month/YYYY-MM-DD-HHMM-topic.md\`.
 - Add the newest file to the top of \`${scaffold.memoryIndex}\`.
 - Keep the index to the 10 newest visible entries.
 - For monthly review, read one month folder such as \`${scaffold.memoryDir}/2026-January/\` and summarize the Markdown files.
