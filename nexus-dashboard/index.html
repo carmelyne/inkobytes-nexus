@@ -1029,6 +1029,121 @@
         font-size: 13px;
       }
 
+      /* ── Health alert (floating, only appears when broken) ── */
+      .health-alert {
+        max-width: 1440px;
+        margin: 14px auto -6px;
+        padding: 0 24px;
+      }
+      .health-alert-inner {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 11px 16px;
+        background: var(--err-bg);
+        border: 1px solid rgba(192, 48, 42, 0.22);
+        border-left: 4px solid var(--err);
+        border-radius: var(--r);
+      }
+      .health-alert-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+      .health-alert-title {
+        font-size: 12.5px;
+        font-weight: 700;
+        color: var(--err);
+        margin-bottom: 5px;
+      }
+      .health-alert ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 3px; }
+      .health-alert li { font-family: var(--f-mono); font-size: 12px; color: var(--err); margin: 0; }
+      .health-alert li.lethal { font-weight: 600; }
+
+      /* ── Section sizing overrides ── */
+      .now-section  { grid-column: span 9; }
+      .ring-section { grid-column: span 3; min-height: unset; display: flex; flex-direction: column; }
+      .chart-sm     { grid-column: span 4; }
+      #ring-chart   { flex: 1; display: flex; align-items: center; justify-content: center; }
+
+      /* ── Ring chart ── */
+      .ring-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 0;
+        width: 100%;
+      }
+      .ring-svg { width: 96px; height: 96px; }
+      .ring-track { fill: none; stroke: var(--line-2); stroke-width: 10; }
+      .ring-fill {
+        fill: none;
+        stroke: var(--accent);
+        stroke-width: 10;
+        stroke-linecap: round;
+        transition: stroke-dasharray 0.6s ease;
+      }
+      .ring-fill.all-done { stroke: var(--good); }
+      .ring-label {
+        text-anchor: middle;
+        dominant-baseline: middle;
+        font-family: var(--f-head);
+        font-size: 15px;
+        font-weight: 700;
+        fill: var(--ink);
+      }
+      .ring-sub {
+        text-anchor: middle;
+        dominant-baseline: middle;
+        font-family: var(--f-body);
+        font-size: 8.5px;
+        fill: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+      .ring-caption { font-size: 11.5px; color: var(--muted); text-align: center; line-height: 1.5; }
+      .ring-caption strong { display: block; color: var(--ink-2); font-size: 13px; font-weight: 600; }
+
+      /* ── Horizontal bar charts ── */
+      .chart-list { display: flex; flex-direction: column; gap: 11px; padding: 4px 0; }
+      .chart-row { display: flex; flex-direction: column; gap: 4px; }
+      .chart-row-header { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+      .chart-row-label {
+        font-size: 12px;
+        color: var(--ink-2);
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .chart-row-val { font-size: 11px; color: var(--muted); font-family: var(--f-mono); flex-shrink: 0; }
+      .chart-bar-track { height: 6px; background: var(--line-2); border-radius: 99px; overflow: hidden; }
+      .chart-bar-fill {
+        height: 100%;
+        border-radius: 99px;
+        background: var(--accent);
+        min-width: 2px;
+        transition: width 0.5s ease;
+      }
+      .chart-bar-fill.clr-done   { background: var(--good); }
+      .chart-bar-fill.clr-small  { background: #5fc8a0; }
+      .chart-bar-fill.clr-medium { background: var(--accent); }
+      .chart-bar-fill.clr-large  { background: #a85f00; }
+
+      /* ── Pie chart (agent workload) ── */
+      .pie-wrap {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 4px 0;
+      }
+      .pie-svg {
+        width: 90px;
+        height: 90px;
+        flex-shrink: 0;
+        filter: drop-shadow(0 1px 3px rgba(0,0,0,0.12));
+      }
+      .agent-legend { display: flex; flex-direction: column; gap: 7px; }
+      .agent-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--ink-2); }
+      .agent-legend-dot { width: 9px; height: 9px; border-radius: 99px; flex-shrink: 0; }
+
       /* ── Responsive ── */
       @media (max-width: 900px) {
         header {
@@ -1089,14 +1204,35 @@
         <div id="updated"></div>
       </div>
     </header>
+    <div id="health-alert" class="health-alert" hidden>
+      <div class="health-alert-inner">
+        <span class="health-alert-icon">🔴</span>
+        <div class="health-alert-body">
+          <div class="health-alert-title">Health issues detected</div>
+          <ul id="health-alert-list"></ul>
+        </div>
+      </div>
+    </div>
     <main>
-      <section>
+      <section class="now-section">
         <h2><span data-icon="lock"></span>Now</h2>
         <div id="locks"></div>
       </section>
-      <section>
-        <h2><span data-icon="heart-pulse"></span>Health</h2>
-        <div id="health-details"></div>
+      <section class="ring-section">
+        <h2><span data-icon="activity"></span>Progress</h2>
+        <div id="ring-chart"></div>
+      </section>
+      <section class="chart-sm">
+        <h2><span data-icon="tag"></span>By Epic</h2>
+        <div id="chart-epic"></div>
+      </section>
+      <section class="chart-sm">
+        <h2><span data-icon="bar-chart-2"></span>Cost Split</h2>
+        <div id="chart-cost"></div>
+      </section>
+      <section class="chart-sm">
+        <h2><span data-icon="users"></span>By Agent</h2>
+        <div id="chart-agent"></div>
       </section>
       <section class="wide queue-section">
         <div class="queue-tabs">
@@ -1152,12 +1288,7 @@
         document.getElementById('health').className = data.health.ok ? 'status' : 'status warn';
         document.querySelector('.status-wrap [data-icon]').dataset.icon = data.health.ok ? 'circle-check' : 'triangle-alert';
         renderIcons();
-        document.getElementById('health-details').innerHTML = data.health.ok
-          ? '<p class="muted">No core health issues.</p>'
-          : '<ul>' + data.health.issues.map(item => {
-            const lethal = /tracked private|exposed|secret|credential/i.test(item);
-            return '<li' + (lethal ? ' class="lethal"' : '') + '>' + escapeHtml(item) + '</li>';
-          }).join('') + '</ul>';
+        renderHealthAlert(data.health);
         const newLocksSig = JSON.stringify(data.locks);
         const locksChanged = newLocksSig !== lastLocksSig;
         if (locksChanged) lastLocksSig = newLocksSig;
@@ -1208,6 +1339,10 @@
           renderQueuePanel(data);
         }
         updateAgentStatus(data);
+        renderProgressRing(data.queue);
+        renderEpicBars(data.queue);
+        renderCostBars(data.queue);
+        renderAgentBars(data.queue);
         fillFeed('standup', data.standup);
         fillFeed('releases', data.releases);
         document.getElementById('git').innerHTML = data.dirtyFiles.length
@@ -1351,9 +1486,118 @@
           btn.dataset.online = online.has(normalizeAgent(btn.dataset.nextAgent)) ? 'true' : 'false';
         });
       }
+      function renderHealthAlert(health) {
+        const el = document.getElementById('health-alert');
+        if (health.ok) { el.hidden = true; return; }
+        el.hidden = false;
+        document.getElementById('health-alert-list').innerHTML = health.issues.map(item => {
+          const lethal = /tracked private|exposed|secret|credential/i.test(item);
+          return '<li' + (lethal ? ' class="lethal"' : '') + '>' + escapeHtml(item) + '</li>';
+        }).join('');
+      }
+
+      function renderProgressRing(queue) {
+        const total = queue.length;
+        const done = queue.filter(t => t.checked).length;
+        const R = 44, circ = 2 * Math.PI * R;
+        const filled = total > 0 ? (done / total) * circ : 0;
+        const allDone = total > 0 && done === total;
+        document.getElementById('ring-chart').innerHTML =
+          '<div class="ring-wrap">'
+          + '<svg class="ring-svg" viewBox="0 0 100 100">'
+          + '<circle class="ring-track" cx="50" cy="50" r="' + R + '"/>'
+          + '<circle class="ring-fill' + (allDone ? ' all-done' : '') + '" cx="50" cy="50" r="' + R + '"'
+          + ' stroke-dasharray="' + filled.toFixed(2) + ' ' + circ.toFixed(2) + '"'
+          + ' transform="rotate(-90 50 50)"/>'
+          + '<text class="ring-label" x="50" y="46">' + done + '/' + total + '</text>'
+          + '<text class="ring-sub" x="50" y="61">tasks done</text>'
+          + '</svg>'
+          + '<div class="ring-caption"><strong>Queue Progress</strong>' + (allDone ? 'All clear ✓' : (total - done) + ' remaining') + '</div>'
+          + '</div>';
+      }
+
+      function renderEpicBars(queue) {
+        const el = document.getElementById('chart-epic');
+        if (!queue.length) { el.innerHTML = '<p class="muted">No tasks yet.</p>'; return; }
+        const epics = {};
+        for (const task of queue) {
+          const epic = task.epic || 'Uncategorized';
+          if (!epics[epic]) epics[epic] = { done: 0, total: 0 };
+          epics[epic].total++;
+          if (task.checked) epics[epic].done++;
+        }
+        el.innerHTML = '<div class="chart-list">' + Object.entries(epics).map(([epic, d]) => {
+          const pct = d.total > 0 ? (d.done / d.total) * 100 : 0;
+          return '<div class="chart-row">'
+            + '<div class="chart-row-header"><span class="chart-row-label">' + escapeHtml(epic) + '</span>'
+            + '<span class="chart-row-val">' + d.done + '/' + d.total + '</span></div>'
+            + '<div class="chart-bar-track"><div class="chart-bar-fill clr-done" style="width:' + pct.toFixed(1) + '%"></div></div>'
+            + '</div>';
+        }).join('') + '</div>';
+      }
+
+      function renderCostBars(queue) {
+        const el = document.getElementById('chart-cost');
+        if (!queue.length) { el.innerHTML = '<p class="muted">No tasks yet.</p>'; return; }
+        const costs = { small: 0, medium: 0, large: 0 };
+        for (const task of queue) { const c = (task.cost || '').toLowerCase(); if (c in costs) costs[c]++; }
+        const total = Object.values(costs).reduce((a, b) => a + b, 0) || 1;
+        el.innerHTML = '<div class="chart-list">' + Object.entries(costs).map(([cost, count]) => {
+          const pct = (count / total) * 100;
+          return '<div class="chart-row">'
+            + '<div class="chart-row-header"><span class="chart-row-label">' + cost.charAt(0).toUpperCase() + cost.slice(1) + '</span>'
+            + '<span class="chart-row-val">' + count + '</span></div>'
+            + '<div class="chart-bar-track"><div class="chart-bar-fill clr-' + cost + '" style="width:' + pct.toFixed(1) + '%"></div></div>'
+            + '</div>';
+        }).join('') + '</div>';
+      }
+
+      const AGENT_COLORS = { claude: '#0e7480', codex: '#4f6ef7', gemini: '#9333ea', agy: '#d97706' };
+      function renderAgentBars(queue) {
+        const el = document.getElementById('chart-agent');
+        if (!queue.length) { el.innerHTML = '<p class="muted">No tasks yet.</p>'; return; }
+        const agents = {};
+        for (const task of queue) {
+          const a = normalizeAgent(task.agent) || 'unknown';
+          agents[a] = (agents[a] || 0) + 1;
+        }
+        const total = Object.values(agents).reduce((a, b) => a + b, 0) || 1;
+        const entries = Object.entries(agents).sort((a, b) => b[1] - a[1]);
+
+        // SVG pie chart
+        const cx = 50, cy = 50, r = 40;
+        let angle = -Math.PI / 2;
+        const slices = entries.map(([a, n]) => {
+          const sweep = (n / total) * 2 * Math.PI;
+          const x1 = cx + r * Math.cos(angle);
+          const y1 = cy + r * Math.sin(angle);
+          angle += sweep;
+          const x2 = cx + r * Math.cos(angle);
+          const y2 = cy + r * Math.sin(angle);
+          const large = sweep > Math.PI ? 1 : 0;
+          const color = AGENT_COLORS[a] || '#6b7f74';
+          return '<path d="M' + cx + ',' + cy + ' L' + x1.toFixed(2) + ',' + y1.toFixed(2)
+            + ' A' + r + ',' + r + ' 0 ' + large + ',1 ' + x2.toFixed(2) + ',' + y2.toFixed(2)
+            + ' Z" fill="' + color + '" stroke="var(--panel)" stroke-width="1.5"><title>@' + escapeHtml(a) + ': ' + n + ' tasks</title></path>';
+        }).join('');
+
+        const legend = entries.map(([a, n]) => {
+          const color = AGENT_COLORS[a] || '#6b7f74';
+          return '<div class="agent-legend-item"><div class="agent-legend-dot" style="background:' + color + '"></div>@' + escapeHtml(a) + '<span class="chart-row-val">' + n + '</span></div>';
+        }).join('');
+
+        el.innerHTML = '<div class="pie-wrap">'
+          + '<svg class="pie-svg" viewBox="0 0 100 100"><g>' + slices + '</g></svg>'
+          + '<div class="agent-legend">' + legend + '</div>'
+          + '</div>';
+      }
+
       function renderIcons() {
         const icons = {
           activity: '<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>',
+          'bar-chart-2': '<line x1="18" x2="18" y1="20" y2="10"></line><line x1="12" x2="12" y1="20" y2="4"></line><line x1="6" x2="6" y1="20" y2="14"></line>',
+          tag: '<path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"></path><circle cx="7.5" cy="7.5" r="1" fill="currentColor" stroke="none"></circle>',
+          users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>',
           'circle-check': '<circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-4"></path>',
           'git-branch': '<line x1="6" x2="6" y1="3" y2="15"></line><circle cx="18" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M18 9a9 9 0 0 1-9 9"></path>',
           'git-commit-horizontal': '<circle cx="12" cy="12" r="3"></circle><line x1="3" x2="9" y1="12" y2="12"></line><line x1="15" x2="21" y1="12" y2="12"></line>',
