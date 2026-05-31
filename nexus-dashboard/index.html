@@ -192,16 +192,17 @@
           }).join(''));
         }
 
-        const newQueueSig = JSON.stringify(data.queue);
+        const newQueueSig = JSON.stringify({ queue: data.queue, ledger: data.ledger });
         if (newQueueSig !== lastQueueSig) {
           lastQueueSig = newQueueSig;
           renderQueuePanel(data);
         }
         updateAgentStatus(data);
-        renderProgressRing(data.queue);
-        renderEpicBars(data.queue);
-        renderCostBars(data.queue);
-        renderAgentBars(data.queue);
+        const chartTasks = getChartTasks(data);
+        renderProgressRing(chartTasks);
+        renderEpicBars(chartTasks);
+        renderCostBars(chartTasks);
+        renderAgentBars(chartTasks);
         fillFeed('standup', data.standup);
         fillFeed('releases', data.releases);
         document.getElementById('git').innerHTML = data.dirtyFiles.length
@@ -247,8 +248,8 @@
 
         if (queueView.mode === 'ledger') {
           document.getElementById('queue').innerHTML = data.ledger && data.ledger.length
-            ? data.ledger.map(renderTask).join('')
-            : '<p class="muted">No ledger entries yet. Completed tasks will appear here once <code>_NEXUS_LEDGER.md</code> is in place.</p>';
+            ? '<div class="ledger-list">' + data.ledger.map(renderLedgerEntry).join('') + '</div>'
+            : '<p class="muted">No ledger entries yet. Completed tasks will appear here after matching releases write <code>_NEXUS_LEDGER.md</code>.</p>';
           return;
         }
 
@@ -333,6 +334,63 @@
           + '<br><code>' + escapeHtml(task.files || 'no files') + '</code>'
           + popover
           + '</div>';
+      }
+
+      function renderLedgerEntry(entry) {
+        const completedAt = entry.completedAt ? new Date(entry.completedAt) : null;
+        const dateText = completedAt && !Number.isNaN(completedAt.getTime())
+          ? completedAt.toLocaleString()
+          : 'unknown time';
+        const files = Array.isArray(entry.files) ? entry.files : [];
+        const fileText = files.length ? files.join(', ') : 'no files';
+        const sha = entry.sha && entry.sha !== 'unknown' ? entry.sha.slice(0, 7) : 'unknown';
+        const commitLine = entry.commit
+          ? '<div class="ledger-commit">' + escapeHtml(entry.commit) + '</div>'
+          : '';
+
+        return '<article class="ledger-entry">'
+          + '<div class="ledger-main">'
+          + '<div class="ledger-title-row">'
+          + '<strong class="ledger-title">' + escapeHtml(entry.title || entry.id || 'Completed task') + '</strong>'
+          + '<code class="ledger-id">' + escapeHtml(entry.id || 'unknown') + '</code>'
+          + '</div>'
+          + '<div class="ledger-meta">'
+          + '<span>' + escapeHtml(dateText) + '</span>'
+          + '<span>' + escapeHtml(entry.agent || 'unknown') + '</span>'
+          + '<span>' + escapeHtml(entry.epic || 'unknown epic') + '</span>'
+          + '<span>' + escapeHtml(entry.cost || 'unknown cost') + '</span>'
+          + '<span>' + escapeHtml(sha) + '</span>'
+          + '</div>'
+          + commitLine
+          + '</div>'
+          + '<div class="ledger-files"><span>Files</span><code>' + escapeHtml(fileText) + '</code></div>'
+          + '</article>';
+      }
+
+      function getChartTasks(data) {
+        const seen = new Set();
+        const tasks = [];
+
+        for (const entry of data.ledger || []) {
+          if (!entry.id || seen.has(entry.id)) continue;
+          seen.add(entry.id);
+          tasks.push({
+            id: entry.id,
+            agent: entry.agent,
+            epic: entry.epic,
+            cost: entry.cost,
+            checked: true,
+            status: 'Done',
+          });
+        }
+
+        for (const task of data.queue || []) {
+          if (task.id && seen.has(task.id)) continue;
+          if (task.id) seen.add(task.id);
+          tasks.push(task);
+        }
+
+        return tasks;
       }
 
       function normalizeAgent(agent) {
