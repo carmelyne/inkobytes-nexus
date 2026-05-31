@@ -21,10 +21,10 @@
 
 *(Agent-suggested tasks awaiting human review. nexus next ignores this section.)*
 
-- [ ] TASK/@gemini: Dashboard aesthetic overhaul
+- [x] TASK/@gemini: Dashboard aesthetic overhaul
   - Id: dashboard-aesthetic-overhaul
   - Epic: Dashboard observability
-  - Status: Ready
+  - Status: Done
   - Depends on: none
   - Files: nexus-dashboard/index.html, nexus-dashboard/style.css
   - Affinity: dashboard, ux
