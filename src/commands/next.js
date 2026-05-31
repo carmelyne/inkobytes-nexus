@@ -44,10 +44,11 @@ export default function next(args) {
   // Load budget if available
   const budget = loadBudget(config.budgetFile, agent);
 
-  // Score and filter tasks
+  // Score and filter tasks — only Ready Queue, only human-approved auto-flow
   const candidates = tasks
     .filter(t => t.status === 'Ready')
     .filter(t => t.autoFlow === 'yes')
+    .filter(t => t.review === 'approved')
     .filter(t => !hasFileConflict(t.files, claimedFiles))
     .filter(t => dependenciesMet(t.dependsOn, tasks, config.root))
     .filter(t => t.cost !== 'spiky')
@@ -87,9 +88,25 @@ function parseRunway(content, agent) {
   return [];
 }
 
-function parseReadyTasks(content) {
-  const tasks = [];
+function extractSection(content, heading) {
   const lines = content.split('\n');
+  let inSection = false;
+  const result = [];
+  for (const line of lines) {
+    if (line.startsWith('## ')) {
+      inSection = line.trim() === heading;
+      continue;
+    }
+    if (inSection) result.push(line);
+  }
+  return result.join('\n');
+}
+
+function parseReadyTasks(content) {
+  // Only read from ## Ready Queue — Proposed section is invisible to nexus next
+  const sectionContent = extractSection(content, '## Ready Queue');
+  const tasks = [];
+  const lines = sectionContent.split('\n');
   let current = null;
 
   for (const line of lines) {
@@ -106,6 +123,8 @@ function parseReadyTasks(content) {
         affinity: [],
         cost: 'medium',
         autoFlow: 'no',
+        review: '',
+        approvedBy: '',
       };
       continue;
     }
@@ -127,6 +146,8 @@ function parseReadyTasks(content) {
         case 'affinity': current.affinity = val.split(',').map(s => s.trim()); break;
         case 'cost': current.cost = val; break;
         case 'auto-flow': current.autoFlow = val; break;
+        case 'review': current.review = val.toLowerCase(); break;
+        case 'approved by': current.approvedBy = val; break;
       }
     }
   }
