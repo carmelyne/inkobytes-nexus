@@ -40,7 +40,7 @@ test('stageAndCommit returns clear message when git index stays locked', () => {
   });
 });
 
-test('release appends done claim and adversarial review template', () => {
+test('release appends structured report entry', () => {
   inTempRepo((root) => {
     writeFileSync(join(root, 'file.txt'), 'hello\n', 'utf-8');
     spawnSync('git', ['add', 'file.txt'], { cwd: root, stdio: 'pipe' });
@@ -51,9 +51,12 @@ test('release appends done claim and adversarial review template', () => {
     release(['file.txt', 'test release report']);
 
     const report = readFileSync(join(root, '_NEXUS_REPORT.md'), 'utf-8');
-    assert.match(report, /Commit: test release report/);
-    assert.match(report, /Done claim:\n- Changed:\n- Validated:\n- Risk:/);
-    assert.match(report, /Adversarial result:\n- Pass, or:\n- Finding:/);
+    assert.match(report, /## \[\d\d:\d\d:\d\d\] file\.txt/);
+    assert.match(report, /- Agent: @codex/);
+    assert.match(report, /- Target: file\.txt/);
+    assert.match(report, /- Commit: test release report/);
+    assert.doesNotMatch(report, /Done claim:/);
+    assert.doesNotMatch(report, /Adversarial result:/);
     const log = spawnSync('git', ['log', '-1', '--pretty=%s'], { cwd: root, encoding: 'utf-8' }).stdout.trim();
     assert.equal(log, '[@codex] test release report');
   });
