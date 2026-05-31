@@ -6,1409 +6,1679 @@ Structured release receipts.
 
 - Agent: unknown
 - Target: src/commands/doctor.js
+- SHA: 16bc2a6dad3b2f9ab5a169d77993bb619e15256c
 - Commit: fix doctor protocol block idempotency
 
 ## [08:09:05] src/commands/init.js
 
 - Agent: unknown
 - Target: src/commands/init.js
+- SHA: ad6eaa1efc489c012170fd9eaafd52712b3cd2f0
 - Commit: align init agent guides with managed protocol blocks
 
 ## [08:09:08] test/doctor.test.js
 
 - Agent: unknown
 - Target: test/doctor.test.js
+- SHA: 8c458c3a09b744e86f13ef57b1210776a4513845
 - Commit: add doctor duplicate protocol regression
 
 ## [08:09:11] test/init.test.js
 
 - Agent: unknown
 - Target: test/init.test.js
+- SHA: 3629950970b69f2cb164962c175fc3e2be57e7de
 - Commit: add init doctor readiness regression
 
 ## [08:11:36] src/commands/doctor.js
 
 - Agent: unknown
 - Target: src/commands/doctor.js
+- SHA: 20d042ef067726dde41788fbc26fff22c8100b97
 - Commit: refresh and dedupe managed agent instructions
 
 ## [08:11:40] test/doctor.test.js
 
 - Agent: unknown
 - Target: test/doctor.test.js
+- SHA: 6e757acb5a6cf167bb2641ba3b0e251f2165a328
 - Commit: cover managed instruction refresh and duplicate cleanup
 
 ## [08:22:57] bin/nexus.js
 
 - Agent: unknown
 - Target: bin/nexus.js
+- SHA: 4af26caca4ed4747543764f56930c672e13e9dec
 - Commit: wire persona command
 
 ## [08:22:57] README.md
 
 - Agent: unknown
 - Target: README.md
+- SHA: 3723ca5d9ca37f8bcbe3f1be357ef0c7434acdd4
 - Commit: document persona overlay command
 
 ## [08:22:57] test/persona.test.js
 
 - Agent: unknown
 - Target: test/persona.test.js
+- SHA: c49cec5838915495a0e8c1d78266175260b21533
 - Commit: cover persona overlay command
 
 ## [08:23:10] src/commands/persona.js
 
 - Agent: unknown
 - Target: src/commands/persona.js
+- SHA: 866d0b5f50b36ad39cd8a9677b3dfa8696181346
 - Commit: add local persona overlay command
 
 ## [08:25:15] test/persona.test.js
 
 - Agent: unknown
 - Target: test/persona.test.js
+- SHA: 8f461bf1dc6fcea89fa2c599d2977d2789113f56
 - Commit: expect generic agent overlay filename
 
 ## [08:25:15] bin/nexus.js
 
 - Agent: unknown
 - Target: bin/nexus.js
+- SHA: cfb6bbb96c52f9011478b1d7d36d97c4c141c94f
 - Commit: use generic agent names in help examples
 
 ## [08:25:27] src/commands/persona.js
 
 - Agent: unknown
 - Target: src/commands/persona.js
+- SHA: 06c045d19d777349a4964e1e16244a5dcc18c5c4
 - Commit: use generic agent overlay filename
 
 ## [08:25:30] README.md
 
 - Agent: unknown
 - Target: README.md
+- SHA: 4a87c4a263d93270bfae182a8afeb88e55f30108
 - Commit: document generic agent overlay filename
 
 ## [08:31:46] bin/nexus.js
 
 - Agent: unknown
 - Target: bin/nexus.js
+- SHA: 0153f1a5fc96c729c71f01fb4c771e2480c09bd7
 - Commit: rename persona command to soul
 
 ## [08:31:50] src/commands/persona.js
 
 - Agent: unknown
 - Target: src/commands/persona.js
+- SHA: ea9088cdc49a50bc0f2a7502b99c4f529c566b3c
 - Commit: remove persona command implementation
 
 ## [08:31:54] src/commands/soul.js
 
 - Agent: unknown
 - Target: src/commands/soul.js
+- SHA: f49956180883ede6bb0e8ccf46baf556bf449e84
 - Commit: add soul overlay command implementation
 
 ## [08:31:58] test/persona.test.js
 
 - Agent: unknown
 - Target: test/persona.test.js
+- SHA: 1abe5dceb9d9945f363954f42979f6acad4141fa
 - Commit: remove persona overlay tests
 
 ## [08:32:04] test/soul.test.js
 
 - Agent: unknown
 - Target: test/soul.test.js
+- SHA: cc520fdf761ac47f429390585013950056186131
 - Commit: add soul overlay tests
 
 ## [08:32:08] README.md
 
 - Agent: unknown
 - Target: README.md
+- SHA: f3a71884d42a22c005580d9effcf06a4bcb26a43
 - Commit: document soul overlay command
 
 ## [20:15:37] src/lib/git.js
 
 - Agent: unknown
 - Target: src/lib/git.js
+- SHA: 0aa792157bc9130159525220b3a970ac2a77b376
 - Commit: make release retry git index locks
 
 ## [20:15:42] src/commands/release.js
 
 - Agent: unknown
 - Target: src/commands/release.js
+- SHA: 2c0c48b670415dd101dbda1f4cfe31de116240d2
 - Commit: surface safer release failures
 
 ## [20:15:48] src/commands/resume.js
 
 - Agent: unknown
 - Target: src/commands/resume.js
+- SHA: aead7effb17024eb0c65aad618064fe8d08b8a23
 - Commit: add local repo resume command
 
 ## [20:15:53] src/commands/doctor.js
 
 - Agent: unknown
 - Target: src/commands/doctor.js
+- SHA: 8a9f40d0e70c044e4d9d17fec1876a20022478b2
 - Commit: add doctor json and package privacy checks
 
 ## [20:15:57] src/commands/soul.js
 
 - Agent: unknown
 - Target: src/commands/soul.js
+- SHA: cc6251a4435ee7288a93cb2ca1185c1dbead36d2
 - Commit: add soul status and remove
 
 ## [20:16:01] bin/nexus.js
 
 - Agent: unknown
 - Target: bin/nexus.js
+- SHA: 74c544f58e2778fbb22c08ea1bf32999ca593edd
 - Commit: update help with resume and structured doctor
 
 ## [20:16:05] test/release.test.js
 
 - Agent: unknown
 - Target: test/release.test.js
+- SHA: cc371ca57438e054de4435526e3a209012077640
 - Commit: cover git index lock release retry
 
 ## [20:16:09] test/resume.test.js
 
 - Agent: unknown
 - Target: test/resume.test.js
+- SHA: 0e5ae29cc67e21980020f04ffc327acf29e6b370
 - Commit: cover resume local facts
 
 ## [20:16:14] test/doctor.test.js
 
 - Agent: unknown
 - Target: test/doctor.test.js
+- SHA: 1f100552b3b05f5e4926a432e9a455abddeb6b38
 - Commit: cover doctor json and package privacy
 
 ## [20:16:18] test/soul.test.js
 
 - Agent: unknown
 - Target: test/soul.test.js
+- SHA: 79a3daa8bfbdfd25eb7d959d3c4956481ab82942
 - Commit: cover soul status and remove
 
 ## [20:16:22] README.md
 
 - Agent: unknown
 - Target: README.md
+- SHA: 6c564cfc1d08cc42769326cd8dec9fa498d6ec38
 - Commit: document resume doctor json and soul polish
 
 ## [15:42:24] .gitignore
 
 - Agent: unknown
 - Target: .gitignore
+- SHA: 898c61397887f4b0955800e763f72d637ca98476
 - Commit: add remotion-labs to gitignore
 
 ## [15:42:29] _NEXUS_STANDUP.md
 
 - Agent: unknown
 - Target: _NEXUS_STANDUP.md
+- SHA: 315e46e2a1af4f040c46d247c32794b2945cde3c
 - Commit: log Besh remotion-labs setup
 
 ## [15:43:44] _NEXUS_STANDUP.md
 
 - Agent: unknown
 - Target: _NEXUS_STANDUP.md
+- SHA: 436d17a91b6c46c1c625b2395d201c9d840bec9a
 - Commit: log remotion-labs private git init
 
 ## [16:43:03] docs/plan/remotion-videos.md
 
 - Agent: unknown
 - Target: docs/plan/remotion-videos.md
+- SHA: 861e5143e1b2aa767fcb02118222ad1aa09dd579
 - Commit: docs: add Remotion how-to video plan
 
 ## [16:46:22] docs/plan/remotion-videos.md
 
 - Agent: unknown
 - Target: docs/plan/remotion-videos.md
+- SHA: 3700369c7ffe00fdec1ea3f07221f7689837e0b6
 - Commit: docs: add agents story video concept (Video 6)
 
 ## [16:53:39] docs/plan/video-6-script.md
 
 - Agent: unknown
 - Target: docs/plan/video-6-script.md
+- SHA: 1cd8ec28aa1812f0fbf12c9c6a05c457e2d85d48
 - Commit: docs: add full Video 6 agent dialogue script
 
 ## [16:57:19] docs/plan/video-6-script.md
 
 - Agent: unknown
 - Target: docs/plan/video-6-script.md
+- SHA: unknown
 - Commit: docs: keep Video 6 script as-is
 
 ## [16:58:55] docs/plan/video-7-script.md
 
 - Agent: unknown
 - Target: docs/plan/video-7-script.md
+- SHA: a4b8ad909fd3dce65d91f9559c4550faa6e4c365
 - Commit: docs: add Video 7 show format script
 
 ## [17:15:06] docs/plan/video-7-script.md
 
 - Agent: unknown
 - Target: docs/plan/video-7-script.md
+- SHA: 17a81630a15e0a2155620ea0dd91d04f7d530b9a
 - Commit: docs: add Toy Story AFK cold open and developer return outro to Video 7
 
 ## [17:19:04] docs/plan/video-7-script.md
 
 - Agent: unknown
 - Target: docs/plan/video-7-script.md
+- SHA: 6cb6cdac07825ff53f0d961527e0ce136ee028b8
 - Commit: docs: add inkobytes sleeping post-credit scene to Video 7
 
 ## [17:28:30] docs/plan/video-7-script.md
 
 - Agent: unknown
 - Target: docs/plan/video-7-script.md
+- SHA: 5a028c8b6042528631f1ed428377be5d44534843
 - Commit: docs: integrate Gemini character punch-ups into Video 7 script
 
 ## [17:29:57] docs/plan/video-7-script.md
 
 - Agent: unknown
 - Target: docs/plan/video-7-script.md
+- SHA: ed453b705f506fc76b1c085f8c88eebd921e327f
 - Commit: docs: fix M1 Max -> M1 16gb
 
 ## [19:32:00] docs/plan/video-7-script.md
 
 - Agent: unknown
 - Target: docs/plan/video-7-script.md
+- SHA: 24ab005aea59bc3ddd92b870d312254855043ced
 - Commit: docs: rewrites — auto-flow beat, kill -9, reply-guy fixes, logo animation notes
 
 ## [19:50:57] docs/plan/video-7-script.md
 
 - Agent: unknown
 - Target: docs/plan/video-7-script.md
+- SHA: 7676d48face0736ecf1cb0a9605086ad770104f4
 - Commit: docs: add spotlight, eye animations, and codex eyeroll to Video 7
 
 ## [15:52:47] _NEXUS_CONSTITUTION.md
 
 - Agent: unknown
 - Target: _NEXUS_CONSTITUTION.md
+- SHA: 72b3a7fd37646a30c7df6d90f608738d6d65097f
 - Commit: docs: add root-cause guardrails
 
 ## [15:52:52] DECISIONS.md
 
 - Agent: unknown
 - Target: DECISIONS.md
+- SHA: 73d94533d921367e13868659c651e0d58c2014a5
 - Commit: docs: add decision log
 
 ## [16:13:03] evals/nexus-agent-protocol/cases/stale-lock-after-commit.yaml
 
 - Agent: unknown
 - Target: evals/nexus-agent-protocol/cases/stale-lock-after-commit.yaml
+- SHA: c691870c2729e054ab89c5f14a27230da8581c65
 - Commit: eval: add stale lock after commit case
 
 ## [16:13:09] evals/nexus-agent-protocol/README.md
 
 - Agent: unknown
 - Target: evals/nexus-agent-protocol/README.md
+- SHA: 52517eac52dd90079ff89a910d977e8f157f1e92
 - Commit: docs: list stale lock eval
 
 ## [16:13:12] DECISIONS.md
 
 - Agent: unknown
 - Target: DECISIONS.md
+- SHA: a24d7fdd0b7fcc73d3e148a4dbc8962f5601302d
 - Commit: docs: record stale lock eval decision
 
 ## [16:17:21] evals/nexus-agent-protocol/README.md
 
 - Agent: unknown
 - Target: evals/nexus-agent-protocol/README.md
+- SHA: 49f0ed704f158ae090dea60b20011552cc6d1442
 - Commit: docs: define protocol evals
 
 ## [13:01:35] .gitignore
 
 - Agent: unknown
 - Target: .gitignore
+- SHA: ed8afa0c5c3cbffbaf777ddf43efcda70a4ce464
 - Commit: feat(drill): add protocol drill command family
 
 ## [13:01:36] drills
 
 - Agent: unknown
 - Target: drills
+- SHA: unknown
 - Commit: feat(drill): add protocol drill command family
 
 ## [09:06:38] .gitignore
 
 - Agent: unknown
 - Target: .gitignore
+- SHA: ca72e85d5a7b18c64729d6e5e3f087c4c64e46a7
 - Commit: chore: initial commit
 
 ## [09:06:38] _NEXUS.md
 
 - Agent: unknown
 - Target: _NEXUS.md
+- SHA: ca72e85d5a7b18c64729d6e5e3f087c4c64e46a7
 - Commit: chore: initial commit
 
 ## [09:06:38] _NEXUS_CONSTITUTION.md
 
 - Agent: unknown
 - Target: _NEXUS_CONSTITUTION.md
+- SHA: ca72e85d5a7b18c64729d6e5e3f087c4c64e46a7
 - Commit: chore: initial commit
 
 ## [09:06:38] _NEXUS_QUEUE.md
 
 - Agent: unknown
 - Target: _NEXUS_QUEUE.md
+- SHA: ca72e85d5a7b18c64729d6e5e3f087c4c64e46a7
 - Commit: chore: initial commit
 
 ## [09:06:38] _NEXUS_REPORT.md
 
 - Agent: unknown
 - Target: _NEXUS_REPORT.md
+- SHA: ca72e85d5a7b18c64729d6e5e3f087c4c64e46a7
 - Commit: chore: initial commit
 
 ## [09:06:38] _NEXUS_STANDUP.md
 
 - Agent: unknown
 - Target: _NEXUS_STANDUP.md
+- SHA: ca72e85d5a7b18c64729d6e5e3f087c4c64e46a7
 - Commit: chore: initial commit
 
 ## [09:06:38] src/hello.js
 
 - Agent: unknown
 - Target: src/hello.js
+- SHA: ca72e85d5a7b18c64729d6e5e3f087c4c64e46a7
 - Commit: chore: initial commit
 
 ## [09:07:34] src/utils.js
 
 - Agent: unknown
 - Target: src/utils.js
+- SHA: e40e7921f78c0ad791ba705f7e829bdff5f22518
 - Commit: feat: utils.js with getGreeting helper for Hello World
 
 ## [14:03:45] .gitignore
 
 - Agent: unknown
 - Target: .gitignore
+- SHA: 2f430004761bfd4c74718ec9782553695492084b
 - Commit: chore: prepare nexus cli release baseline
 
 ## [14:03:45] LICENSE
 
 - Agent: unknown
 - Target: LICENSE
+- SHA: 2f430004761bfd4c74718ec9782553695492084b
 - Commit: chore: prepare nexus cli release baseline
 
 ## [14:03:45] _NEXUS.md
 
 - Agent: unknown
 - Target: _NEXUS.md
+- SHA: 2f430004761bfd4c74718ec9782553695492084b
 - Commit: chore: prepare nexus cli release baseline
 
 ## [14:03:45] _NEXUS_CONSTITUTION.md
 
 - Agent: unknown
 - Target: _NEXUS_CONSTITUTION.md
+- SHA: 2f430004761bfd4c74718ec9782553695492084b
 - Commit: chore: prepare nexus cli release baseline
 
 ## [14:03:45] _NEXUS_QUEUE.md
 
 - Agent: unknown
 - Target: _NEXUS_QUEUE.md
+- SHA: 2f430004761bfd4c74718ec9782553695492084b
 - Commit: chore: prepare nexus cli release baseline
 
 ## [14:03:45] _NEXUS_REPORT.md
 
 - Agent: unknown
 - Target: _NEXUS_REPORT.md
+- SHA: 2f430004761bfd4c74718ec9782553695492084b
 - Commit: chore: prepare nexus cli release baseline
 
 ## [14:03:45] _NEXUS_STANDUP.md
 
 - Agent: unknown
 - Target: _NEXUS_STANDUP.md
+- SHA: 2f430004761bfd4c74718ec9782553695492084b
 - Commit: chore: prepare nexus cli release baseline
 
 ## [14:03:45] docs/handoff/2026-05-20-basa-to-nexus-cli-inbox-handoff.md
 
 - Agent: unknown
 - Target: docs/handoff/2026-05-20-basa-to-nexus-cli-inbox-handoff.md
+- SHA: 2f430004761bfd4c74718ec9782553695492084b
 - Commit: chore: prepare nexus cli release baseline
 
 ## [14:03:45] docs/plan/agent-inbox-release-loop.md
 
 - Agent: unknown
 - Target: docs/plan/agent-inbox-release-loop.md
+- SHA: 2f430004761bfd4c74718ec9782553695492084b
 - Commit: chore: prepare nexus cli release baseline
 
 ## [14:03:45] docs/plan/nexit-agent-native-version-control.md
 
 - Agent: unknown
 - Target: docs/plan/nexit-agent-native-version-control.md
+- SHA: 2f430004761bfd4c74718ec9782553695492084b
 - Commit: chore: prepare nexus cli release baseline
 
 ## [14:03:45] package.json
 
 - Agent: unknown
 - Target: package.json
+- SHA: 2f430004761bfd4c74718ec9782553695492084b
 - Commit: chore: prepare nexus cli release baseline
 
 ## [14:03:45] src/commands/claim.js
 
 - Agent: unknown
 - Target: src/commands/claim.js
+- SHA: 2f430004761bfd4c74718ec9782553695492084b
 - Commit: chore: prepare nexus cli release baseline
 
 ## [14:03:45] src/commands/clean.js
 
 - Agent: unknown
 - Target: src/commands/clean.js
+- SHA: 2f430004761bfd4c74718ec9782553695492084b
 - Commit: chore: prepare nexus cli release baseline
 
 ## [14:03:45] src/commands/help.js
 
 - Agent: unknown
 - Target: src/commands/help.js
+- SHA: 2f430004761bfd4c74718ec9782553695492084b
 - Commit: chore: prepare nexus cli release baseline
 
 ## [14:03:45] src/commands/next.js
 
 - Agent: unknown
 - Target: src/commands/next.js
+- SHA: 2f430004761bfd4c74718ec9782553695492084b
 - Commit: chore: prepare nexus cli release baseline
 
 ## [14:03:45] src/commands/status.js
 
 - Agent: unknown
 - Target: src/commands/status.js
+- SHA: 2f430004761bfd4c74718ec9782553695492084b
 - Commit: chore: prepare nexus cli release baseline
 
 ## [14:03:45] src/hello.js
 
 - Agent: unknown
 - Target: src/hello.js
+- SHA: 2f430004761bfd4c74718ec9782553695492084b
 - Commit: chore: prepare nexus cli release baseline
 
 ## [14:03:45] src/lib/blackboard.js
 
 - Agent: unknown
 - Target: src/lib/blackboard.js
+- SHA: 2f430004761bfd4c74718ec9782553695492084b
 - Commit: chore: prepare nexus cli release baseline
 
 ## [14:03:45] src/lib/config.js
 
 - Agent: unknown
 - Target: src/lib/config.js
+- SHA: 2f430004761bfd4c74718ec9782553695492084b
 - Commit: chore: prepare nexus cli release baseline
 
 ## [14:03:45] src/lib/dump.js
 
 - Agent: unknown
 - Target: src/lib/dump.js
+- SHA: 2f430004761bfd4c74718ec9782553695492084b
 - Commit: chore: prepare nexus cli release baseline
 
 ## [14:03:45] src/lib/lockManager.js
 
 - Agent: unknown
 - Target: src/lib/lockManager.js
+- SHA: 2f430004761bfd4c74718ec9782553695492084b
 - Commit: chore: prepare nexus cli release baseline
 
 ## [14:03:45] src/lib/pathSafety.js
 
 - Agent: unknown
 - Target: src/lib/pathSafety.js
+- SHA: 2f430004761bfd4c74718ec9782553695492084b
 - Commit: chore: prepare nexus cli release baseline
 
 ## [14:03:45] src/utils.js
 
 - Agent: unknown
 - Target: src/utils.js
+- SHA: 2f430004761bfd4c74718ec9782553695492084b
 - Commit: chore: prepare nexus cli release baseline
 
 ## [14:03:45] test/security.test.js
 
 - Agent: unknown
 - Target: test/security.test.js
+- SHA: 2f430004761bfd4c74718ec9782553695492084b
 - Commit: chore: prepare nexus cli release baseline
 
 ## [14:04:00] src/commands/doctor.js
 
 - Agent: unknown
 - Target: src/commands/doctor.js
+- SHA: 6f74ea7d04d773127108114de2146c089829df3a
 - Commit: feat: add fresh file truth protocol
 
 ## [14:04:00] src/commands/init.js
 
 - Agent: unknown
 - Target: src/commands/init.js
+- SHA: 6f74ea7d04d773127108114de2146c089829df3a
 - Commit: feat: add fresh file truth protocol
 
 ## [14:04:00] test/doctor.test.js
 
 - Agent: unknown
 - Target: test/doctor.test.js
+- SHA: 6f74ea7d04d773127108114de2146c089829df3a
 - Commit: feat: add fresh file truth protocol
 
 ## [14:04:00] test/init.test.js
 
 - Agent: unknown
 - Target: test/init.test.js
+- SHA: 6f74ea7d04d773127108114de2146c089829df3a
 - Commit: feat: add fresh file truth protocol
 
 ## [14:21:31] README.md
 
 - Agent: unknown
 - Target: README.md
+- SHA: f32652293f1413d78b895ada1b8c4fb6f63286b6
 - Commit: feat: ship nexus agent skill
 
 ## [14:21:31] package.json
 
 - Agent: unknown
 - Target: package.json
+- SHA: f32652293f1413d78b895ada1b8c4fb6f63286b6
 - Commit: feat: ship nexus agent skill
 
 ## [14:21:31] skills/nexus/SKILL.md
 
 - Agent: unknown
 - Target: skills/nexus/SKILL.md
+- SHA: f32652293f1413d78b895ada1b8c4fb6f63286b6
 - Commit: feat: ship nexus agent skill
 
 ## [14:21:31] test/security.test.js
 
 - Agent: unknown
 - Target: test/security.test.js
+- SHA: f32652293f1413d78b895ada1b8c4fb6f63286b6
 - Commit: feat: ship nexus agent skill
 
 ## [21:09:39] README.md
 
 - Agent: unknown
 - Target: README.md
+- SHA: d49632b758af93e333289fd748648e9b1dbbfe16
 - Commit: feat: harden nexus agent coordination flow
 
 ## [21:09:39] _NEXUS.md
 
 - Agent: unknown
 - Target: _NEXUS.md
+- SHA: d49632b758af93e333289fd748648e9b1dbbfe16
 - Commit: feat: harden nexus agent coordination flow
 
 ## [21:09:39] _NEXUS_REPORT.md
 
 - Agent: unknown
 - Target: _NEXUS_REPORT.md
+- SHA: d49632b758af93e333289fd748648e9b1dbbfe16
 - Commit: feat: harden nexus agent coordination flow
 
 ## [21:09:39] bin/nexus.js
 
 - Agent: unknown
 - Target: bin/nexus.js
+- SHA: d49632b758af93e333289fd748648e9b1dbbfe16
 - Commit: feat: harden nexus agent coordination flow
 
 ## [21:09:39] docs/plan/agent-inbox-release-loop.md
 
 - Agent: unknown
 - Target: docs/plan/agent-inbox-release-loop.md
+- SHA: d49632b758af93e333289fd748648e9b1dbbfe16
 - Commit: feat: harden nexus agent coordination flow
 
 ## [21:09:39] skills/nexus/SKILL.md
 
 - Agent: unknown
 - Target: skills/nexus/SKILL.md
+- SHA: d49632b758af93e333289fd748648e9b1dbbfe16
 - Commit: feat: harden nexus agent coordination flow
 
 ## [21:09:39] src/commands/claim.js
 
 - Agent: unknown
 - Target: src/commands/claim.js
+- SHA: d49632b758af93e333289fd748648e9b1dbbfe16
 - Commit: feat: harden nexus agent coordination flow
 
 ## [21:09:39] src/commands/doctor.js
 
 - Agent: unknown
 - Target: src/commands/doctor.js
+- SHA: d49632b758af93e333289fd748648e9b1dbbfe16
 - Commit: feat: harden nexus agent coordination flow
 
 ## [21:09:39] src/commands/init.js
 
 - Agent: unknown
 - Target: src/commands/init.js
+- SHA: d49632b758af93e333289fd748648e9b1dbbfe16
 - Commit: feat: harden nexus agent coordination flow
 
 ## [21:09:39] src/commands/release.js
 
 - Agent: unknown
 - Target: src/commands/release.js
+- SHA: d49632b758af93e333289fd748648e9b1dbbfe16
 - Commit: feat: harden nexus agent coordination flow
 
 ## [21:09:39] src/commands/resume.js
 
 - Agent: unknown
 - Target: src/commands/resume.js
+- SHA: d49632b758af93e333289fd748648e9b1dbbfe16
 - Commit: feat: harden nexus agent coordination flow
 
 ## [21:09:39] src/commands/soul.js
 
 - Agent: unknown
 - Target: src/commands/soul.js
+- SHA: d49632b758af93e333289fd748648e9b1dbbfe16
 - Commit: feat: harden nexus agent coordination flow
 
 ## [21:09:39] src/commands/start.js
 
 - Agent: unknown
 - Target: src/commands/start.js
+- SHA: d49632b758af93e333289fd748648e9b1dbbfe16
 - Commit: feat: harden nexus agent coordination flow
 
 ## [21:09:39] src/lib/agentScopes.js
 
 - Agent: unknown
 - Target: src/lib/agentScopes.js
+- SHA: d49632b758af93e333289fd748648e9b1dbbfe16
 - Commit: feat: harden nexus agent coordination flow
 
 ## [21:09:39] test/claim.test.js
 
 - Agent: unknown
 - Target: test/claim.test.js
+- SHA: d49632b758af93e333289fd748648e9b1dbbfe16
 - Commit: feat: harden nexus agent coordination flow
 
 ## [21:09:39] test/doctor.test.js
 
 - Agent: unknown
 - Target: test/doctor.test.js
+- SHA: d49632b758af93e333289fd748648e9b1dbbfe16
 - Commit: feat: harden nexus agent coordination flow
 
 ## [21:09:39] test/init.test.js
 
 - Agent: unknown
 - Target: test/init.test.js
+- SHA: d49632b758af93e333289fd748648e9b1dbbfe16
 - Commit: feat: harden nexus agent coordination flow
 
 ## [21:09:39] test/release.test.js
 
 - Agent: unknown
 - Target: test/release.test.js
+- SHA: d49632b758af93e333289fd748648e9b1dbbfe16
 - Commit: feat: harden nexus agent coordination flow
 
 ## [21:09:39] test/resume.test.js
 
 - Agent: unknown
 - Target: test/resume.test.js
+- SHA: d49632b758af93e333289fd748648e9b1dbbfe16
 - Commit: feat: harden nexus agent coordination flow
 
 ## [21:09:39] test/security.test.js
 
 - Agent: unknown
 - Target: test/security.test.js
+- SHA: d49632b758af93e333289fd748648e9b1dbbfe16
 - Commit: feat: harden nexus agent coordination flow
 
 ## [21:09:39] test/start.test.js
 
 - Agent: unknown
 - Target: test/start.test.js
+- SHA: d49632b758af93e333289fd748648e9b1dbbfe16
 - Commit: feat: harden nexus agent coordination flow
 
 ## [22:57:51] evals/nexus-agent-protocol/README.md
 
 - Agent: unknown
 - Target: evals/nexus-agent-protocol/README.md
+- SHA: f2598bc1eb3ac8af05e7201ac6f1d9852ec43b83
 - Commit: test: add nexus protocol eval cases
 
 ## [22:57:51] evals/nexus-agent-protocol/cases/claim-before-edit.yaml
 
 - Agent: unknown
 - Target: evals/nexus-agent-protocol/cases/claim-before-edit.yaml
+- SHA: f2598bc1eb3ac8af05e7201ac6f1d9852ec43b83
 - Commit: test: add nexus protocol eval cases
 
 ## [22:57:51] evals/nexus-agent-protocol/cases/done-claim-adversarial.yaml
 
 - Agent: unknown
 - Target: evals/nexus-agent-protocol/cases/done-claim-adversarial.yaml
+- SHA: f2598bc1eb3ac8af05e7201ac6f1d9852ec43b83
 - Commit: test: add nexus protocol eval cases
 
 ## [22:57:51] evals/nexus-agent-protocol/cases/fresh-file-truth.yaml
 
 - Agent: unknown
 - Target: evals/nexus-agent-protocol/cases/fresh-file-truth.yaml
+- SHA: f2598bc1eb3ac8af05e7201ac6f1d9852ec43b83
 - Commit: test: add nexus protocol eval cases
 
 ## [22:57:51] evals/nexus-agent-protocol/cases/private-path-protection.yaml
 
 - Agent: unknown
 - Target: evals/nexus-agent-protocol/cases/private-path-protection.yaml
+- SHA: f2598bc1eb3ac8af05e7201ac6f1d9852ec43b83
 - Commit: test: add nexus protocol eval cases
 
 ## [22:57:51] evals/nexus-agent-protocol/cases/queue-is-thin-index.yaml
 
 - Agent: unknown
 - Target: evals/nexus-agent-protocol/cases/queue-is-thin-index.yaml
+- SHA: f2598bc1eb3ac8af05e7201ac6f1d9852ec43b83
 - Commit: test: add nexus protocol eval cases
 
 ## [22:57:51] evals/nexus-agent-protocol/cases/remove-agent-folders-from-git.yaml
 
 - Agent: unknown
 - Target: evals/nexus-agent-protocol/cases/remove-agent-folders-from-git.yaml
+- SHA: f2598bc1eb3ac8af05e7201ac6f1d9852ec43b83
 - Commit: test: add nexus protocol eval cases
 
 ## [22:57:51] evals/nexus-agent-protocol/cases/wrong-repo-push.yaml
 
 - Agent: unknown
 - Target: evals/nexus-agent-protocol/cases/wrong-repo-push.yaml
+- SHA: f2598bc1eb3ac8af05e7201ac6f1d9852ec43b83
 - Commit: test: add nexus protocol eval cases
 
 ## [23:48:24] README.md
 
 - Agent: unknown
 - Target: README.md
+- SHA: 194ddc9fdfcb506a4bc9759aed25237f01af8c15
 - Commit: fix(start): make claim release loop explicit
 
 ## [23:48:24] evals/nexus-agent-protocol/README.md
 
 - Agent: unknown
 - Target: evals/nexus-agent-protocol/README.md
+- SHA: 194ddc9fdfcb506a4bc9759aed25237f01af8c15
 - Commit: fix(start): make claim release loop explicit
 
 ## [23:48:24] evals/nexus-agent-protocol/cases/start-does-not-replace-claim-release.yaml
 
 - Agent: unknown
 - Target: evals/nexus-agent-protocol/cases/start-does-not-replace-claim-release.yaml
+- SHA: 194ddc9fdfcb506a4bc9759aed25237f01af8c15
 - Commit: fix(start): make claim release loop explicit
 
 ## [23:48:24] skills/nexus/SKILL.md
 
 - Agent: unknown
 - Target: skills/nexus/SKILL.md
+- SHA: 194ddc9fdfcb506a4bc9759aed25237f01af8c15
 - Commit: fix(start): make claim release loop explicit
 
 ## [23:48:24] src/commands/start.js
 
 - Agent: unknown
 - Target: src/commands/start.js
+- SHA: 194ddc9fdfcb506a4bc9759aed25237f01af8c15
 - Commit: fix(start): make claim release loop explicit
 
 ## [23:48:24] test/start.test.js
 
 - Agent: unknown
 - Target: test/start.test.js
+- SHA: 194ddc9fdfcb506a4bc9759aed25237f01af8c15
 - Commit: fix(start): make claim release loop explicit
 
 ## [13:00:58] DECISIONS.md
 
 - Agent: unknown
 - Target: DECISIONS.md
+- SHA: ed8afa0c5c3cbffbaf777ddf43efcda70a4ce464
 - Commit: feat(drill): add protocol drill command family
 
 ## [13:00:58] README.md
 
 - Agent: unknown
 - Target: README.md
+- SHA: ed8afa0c5c3cbffbaf777ddf43efcda70a4ce464
 - Commit: feat(drill): add protocol drill command family
 
 ## [13:00:58] bin/nexus.js
 
 - Agent: unknown
 - Target: bin/nexus.js
+- SHA: ed8afa0c5c3cbffbaf777ddf43efcda70a4ce464
 - Commit: feat(drill): add protocol drill command family
 
 ## [13:00:58] drills/nexus-agent-protocol/README.md
 
 - Agent: unknown
 - Target: drills/nexus-agent-protocol/README.md
+- SHA: ed8afa0c5c3cbffbaf777ddf43efcda70a4ce464
 - Commit: feat(drill): add protocol drill command family
 
 ## [13:00:58] drills/nexus-agent-protocol/cases/claim-before-edit.yaml
 
 - Agent: unknown
 - Target: drills/nexus-agent-protocol/cases/claim-before-edit.yaml
+- SHA: ed8afa0c5c3cbffbaf777ddf43efcda70a4ce464
 - Commit: feat(drill): add protocol drill command family
 
 ## [13:00:58] drills/nexus-agent-protocol/cases/done-claim-adversarial.yaml
 
 - Agent: unknown
 - Target: drills/nexus-agent-protocol/cases/done-claim-adversarial.yaml
+- SHA: ed8afa0c5c3cbffbaf777ddf43efcda70a4ce464
 - Commit: feat(drill): add protocol drill command family
 
 ## [13:00:58] drills/nexus-agent-protocol/cases/fresh-file-truth.yaml
 
 - Agent: unknown
 - Target: drills/nexus-agent-protocol/cases/fresh-file-truth.yaml
+- SHA: ed8afa0c5c3cbffbaf777ddf43efcda70a4ce464
 - Commit: feat(drill): add protocol drill command family
 
 ## [13:00:58] drills/nexus-agent-protocol/cases/private-path-protection.yaml
 
 - Agent: unknown
 - Target: drills/nexus-agent-protocol/cases/private-path-protection.yaml
+- SHA: ed8afa0c5c3cbffbaf777ddf43efcda70a4ce464
 - Commit: feat(drill): add protocol drill command family
 
 ## [13:00:58] drills/nexus-agent-protocol/cases/queue-is-thin-index.yaml
 
 - Agent: unknown
 - Target: drills/nexus-agent-protocol/cases/queue-is-thin-index.yaml
+- SHA: ed8afa0c5c3cbffbaf777ddf43efcda70a4ce464
 - Commit: feat(drill): add protocol drill command family
 
 ## [13:00:58] drills/nexus-agent-protocol/cases/remove-agent-folders-from-git.yaml
 
 - Agent: unknown
 - Target: drills/nexus-agent-protocol/cases/remove-agent-folders-from-git.yaml
+- SHA: ed8afa0c5c3cbffbaf777ddf43efcda70a4ce464
 - Commit: feat(drill): add protocol drill command family
 
 ## [13:00:58] drills/nexus-agent-protocol/cases/stale-lock-after-commit.yaml
 
 - Agent: unknown
 - Target: drills/nexus-agent-protocol/cases/stale-lock-after-commit.yaml
+- SHA: ed8afa0c5c3cbffbaf777ddf43efcda70a4ce464
 - Commit: feat(drill): add protocol drill command family
 
 ## [13:00:58] drills/nexus-agent-protocol/cases/start-does-not-replace-claim-release.yaml
 
 - Agent: unknown
 - Target: drills/nexus-agent-protocol/cases/start-does-not-replace-claim-release.yaml
+- SHA: ed8afa0c5c3cbffbaf777ddf43efcda70a4ce464
 - Commit: feat(drill): add protocol drill command family
 
 ## [13:00:58] drills/nexus-agent-protocol/cases/wrong-repo-push.yaml
 
 - Agent: unknown
 - Target: drills/nexus-agent-protocol/cases/wrong-repo-push.yaml
+- SHA: ed8afa0c5c3cbffbaf777ddf43efcda70a4ce464
 - Commit: feat(drill): add protocol drill command family
 
 ## [13:00:58] package.json
 
 - Agent: unknown
 - Target: package.json
+- SHA: ed8afa0c5c3cbffbaf777ddf43efcda70a4ce464
 - Commit: feat(drill): add protocol drill command family
 
 ## [13:00:58] src/commands/drill.js
 
 - Agent: unknown
 - Target: src/commands/drill.js
+- SHA: ed8afa0c5c3cbffbaf777ddf43efcda70a4ce464
 - Commit: feat(drill): add protocol drill command family
 
 ## [13:00:58] test/drill.test.js
 
 - Agent: unknown
 - Target: test/drill.test.js
+- SHA: ed8afa0c5c3cbffbaf777ddf43efcda70a4ce464
 - Commit: feat(drill): add protocol drill command family
 
 ## [15:14:37] DECISIONS.md
 
 - Agent: unknown
 - Target: DECISIONS.md
+- SHA: a8f48aebcf5899f726793097e72e69efb64fc5ed
 - Commit: rename: fresh-file-truth → current-file-state throughout
 
 ## [15:14:37] drills/nexus-agent-protocol/cases/claim-before-edit.yaml
 
 - Agent: unknown
 - Target: drills/nexus-agent-protocol/cases/claim-before-edit.yaml
+- SHA: a8f48aebcf5899f726793097e72e69efb64fc5ed
 - Commit: rename: fresh-file-truth → current-file-state throughout
 
 ## [15:14:37] drills/nexus-agent-protocol/cases/current-file-state.yaml
 
 - Agent: unknown
 - Target: drills/nexus-agent-protocol/cases/current-file-state.yaml
+- SHA: a8f48aebcf5899f726793097e72e69efb64fc5ed
 - Commit: rename: fresh-file-truth → current-file-state throughout
 
 ## [15:14:37] skills/nexus/SKILL.md
 
 - Agent: unknown
 - Target: skills/nexus/SKILL.md
+- SHA: a8f48aebcf5899f726793097e72e69efb64fc5ed
 - Commit: rename: fresh-file-truth → current-file-state throughout
 
 ## [15:14:37] test/drill.test.js
 
 - Agent: unknown
 - Target: test/drill.test.js
+- SHA: a8f48aebcf5899f726793097e72e69efb64fc5ed
 - Commit: rename: fresh-file-truth → current-file-state throughout
 
 ## [15:14:37] test/security.test.js
 
 - Agent: unknown
 - Target: test/security.test.js
+- SHA: a8f48aebcf5899f726793097e72e69efb64fc5ed
 - Commit: rename: fresh-file-truth → current-file-state throughout
 
 ## [15:15:14] drills/nexus-agent-protocol/README.md
 
 - Agent: unknown
 - Target: drills/nexus-agent-protocol/README.md
+- SHA: 5a9900411ad042f9750bd8c491e0025e773ab21e
 - Commit: feat(drills): add new protocol drill cases
 
 ## [15:15:14] drills/nexus-agent-protocol/cases/data-boundary-table-header.yaml
 
 - Agent: unknown
 - Target: drills/nexus-agent-protocol/cases/data-boundary-table-header.yaml
+- SHA: 5a9900411ad042f9750bd8c491e0025e773ab21e
 - Commit: feat(drills): add new protocol drill cases
 
 ## [15:15:14] drills/nexus-agent-protocol/cases/data-mutation-delete-rows.yaml
 
 - Agent: unknown
 - Target: drills/nexus-agent-protocol/cases/data-mutation-delete-rows.yaml
+- SHA: 5a9900411ad042f9750bd8c491e0025e773ab21e
 - Commit: feat(drills): add new protocol drill cases
 
 ## [15:15:14] drills/nexus-agent-protocol/cases/ghost-file-claim-loop.yaml
 
 - Agent: unknown
 - Target: drills/nexus-agent-protocol/cases/ghost-file-claim-loop.yaml
+- SHA: 5a9900411ad042f9750bd8c491e0025e773ab21e
 - Commit: feat(drills): add new protocol drill cases
 
 ## [15:15:14] drills/nexus-agent-protocol/cases/removal-scope.yaml
 
 - Agent: unknown
 - Target: drills/nexus-agent-protocol/cases/removal-scope.yaml
+- SHA: 5a9900411ad042f9750bd8c491e0025e773ab21e
 - Commit: feat(drills): add new protocol drill cases
 
 ## [15:15:14] drills/nexus-agent-protocol/cases/task-contract.yaml
 
 - Agent: unknown
 - Target: drills/nexus-agent-protocol/cases/task-contract.yaml
+- SHA: 5a9900411ad042f9750bd8c491e0025e773ab21e
 - Commit: feat(drills): add new protocol drill cases
 
 ## [15:15:14] drills/nexus-agent-protocol/cases/vendor-cleanup-preserve-history.yaml
 
 - Agent: unknown
 - Target: drills/nexus-agent-protocol/cases/vendor-cleanup-preserve-history.yaml
+- SHA: 5a9900411ad042f9750bd8c491e0025e773ab21e
 - Commit: feat(drills): add new protocol drill cases
 
 ## [15:15:25] _NEXUS_CONSTITUTION.md
 
 - Agent: unknown
 - Target: _NEXUS_CONSTITUTION.md
+- SHA: 83f954ce4e424a2db9cc4735185056236fc6b913
 - Commit: feat(protocol): task contract guardrail, recipe router, standby rule
 
 ## [15:15:25] src/commands/doctor.js
 
 - Agent: unknown
 - Target: src/commands/doctor.js
+- SHA: 83f954ce4e424a2db9cc4735185056236fc6b913
 - Commit: feat(protocol): task contract guardrail, recipe router, standby rule
 
 ## [15:15:25] src/commands/init.js
 
 - Agent: unknown
 - Target: src/commands/init.js
+- SHA: 83f954ce4e424a2db9cc4735185056236fc6b913
 - Commit: feat(protocol): task contract guardrail, recipe router, standby rule
 
 ## [15:15:25] test/doctor.test.js
 
 - Agent: unknown
 - Target: test/doctor.test.js
+- SHA: 83f954ce4e424a2db9cc4735185056236fc6b913
 - Commit: feat(protocol): task contract guardrail, recipe router, standby rule
 
 ## [15:15:25] test/init.test.js
 
 - Agent: unknown
 - Target: test/init.test.js
+- SHA: 83f954ce4e424a2db9cc4735185056236fc6b913
 - Commit: feat(protocol): task contract guardrail, recipe router, standby rule
 
 ## [15:15:38] bin/nexus.js
 
 - Agent: unknown
 - Target: bin/nexus.js
+- SHA: 00b428e664f38e329633999d388454a4a80f24e5
 - Commit: feat(dashboard): add nexus dashboard --serve command
 
 ## [15:15:38] nexus-dashboard/index.html
 
 - Agent: unknown
 - Target: nexus-dashboard/index.html
+- SHA: 00b428e664f38e329633999d388454a4a80f24e5
 - Commit: feat(dashboard): add nexus dashboard --serve command
 
 ## [15:15:38] package.json
 
 - Agent: unknown
 - Target: package.json
+- SHA: 00b428e664f38e329633999d388454a4a80f24e5
 - Commit: feat(dashboard): add nexus dashboard --serve command
 
 ## [15:15:38] src/commands/dashboard.js
 
 - Agent: unknown
 - Target: src/commands/dashboard.js
+- SHA: 00b428e664f38e329633999d388454a4a80f24e5
 - Commit: feat(dashboard): add nexus dashboard --serve command
 
 ## [15:15:38] test/dashboard.test.js
 
 - Agent: unknown
 - Target: test/dashboard.test.js
+- SHA: 00b428e664f38e329633999d388454a4a80f24e5
 - Commit: feat(dashboard): add nexus dashboard --serve command
 
 ## [15:16:37] recipes/README.md
 
 - Agent: unknown
 - Target: recipes/README.md
+- SHA: 0d307173dc34216c219d1a6fad9e0ed0fa72ea81
 - Commit: feat(recipes): add local situation handler recipes
 
 ## [15:16:37] recipes/blocked.md
 
 - Agent: unknown
 - Target: recipes/blocked.md
+- SHA: 0d307173dc34216c219d1a6fad9e0ed0fa72ea81
 - Commit: feat(recipes): add local situation handler recipes
 
 ## [15:16:37] recipes/data-mutation.md
 
 - Agent: unknown
 - Target: recipes/data-mutation.md
+- SHA: 0d307173dc34216c219d1a6fad9e0ed0fa72ea81
 - Commit: feat(recipes): add local situation handler recipes
 
 ## [15:16:37] recipes/issue-found.md
 
 - Agent: unknown
 - Target: recipes/issue-found.md
+- SHA: 0d307173dc34216c219d1a6fad9e0ed0fa72ea81
 - Commit: feat(recipes): add local situation handler recipes
 
 ## [15:16:37] recipes/removal-scope.md
 
 - Agent: unknown
 - Target: recipes/removal-scope.md
+- SHA: 0d307173dc34216c219d1a6fad9e0ed0fa72ea81
 - Commit: feat(recipes): add local situation handler recipes
 
 ## [15:16:37] recipes/task-contract.md
 
 - Agent: unknown
 - Target: recipes/task-contract.md
+- SHA: 0d307173dc34216c219d1a6fad9e0ed0fa72ea81
 - Commit: feat(recipes): add local situation handler recipes
 
 ## [15:16:45] .gitignore
 
 - Agent: unknown
 - Target: .gitignore
+- SHA: 76495934eb7f855e283a00c6a777a2e0abd049bc
 - Commit: chore: project cleanup — stale locks cleared, docs pruned, gitignore updated
 
 ## [15:16:45] README.md
 
 - Agent: unknown
 - Target: README.md
+- SHA: 76495934eb7f855e283a00c6a777a2e0abd049bc
 - Commit: chore: project cleanup — stale locks cleared, docs pruned, gitignore updated
 
 ## [15:16:45] _NEXUS.md
 
 - Agent: unknown
 - Target: _NEXUS.md
+- SHA: 76495934eb7f855e283a00c6a777a2e0abd049bc
 - Commit: chore: project cleanup — stale locks cleared, docs pruned, gitignore updated
 
 ## [15:16:45] _NEXUS_REPORT.md
 
 - Agent: unknown
 - Target: _NEXUS_REPORT.md
+- SHA: 76495934eb7f855e283a00c6a777a2e0abd049bc
 - Commit: chore: project cleanup — stale locks cleared, docs pruned, gitignore updated
 
 ## [15:16:45] docs/handoff/2026-05-20-basa-to-nexus-cli-inbox-handoff.md
 
 - Agent: unknown
 - Target: docs/handoff/2026-05-20-basa-to-nexus-cli-inbox-handoff.md
+- SHA: 76495934eb7f855e283a00c6a777a2e0abd049bc
 - Commit: chore: project cleanup — stale locks cleared, docs pruned, gitignore updated
 
 ## [15:16:45] docs/plan/agent-inbox-release-loop.md
 
 - Agent: unknown
 - Target: docs/plan/agent-inbox-release-loop.md
+- SHA: 76495934eb7f855e283a00c6a777a2e0abd049bc
 - Commit: chore: project cleanup — stale locks cleared, docs pruned, gitignore updated
 
 ## [15:16:45] docs/plan/nexit-agent-native-version-control.md
 
 - Agent: unknown
 - Target: docs/plan/nexit-agent-native-version-control.md
+- SHA: 76495934eb7f855e283a00c6a777a2e0abd049bc
 - Commit: chore: project cleanup — stale locks cleared, docs pruned, gitignore updated
 
 ## [15:16:45] docs/plan/remotion-videos.md
 
 - Agent: unknown
 - Target: docs/plan/remotion-videos.md
+- SHA: 76495934eb7f855e283a00c6a777a2e0abd049bc
 - Commit: chore: project cleanup — stale locks cleared, docs pruned, gitignore updated
 
 ## [15:16:45] docs/plan/video-6-script.md
 
 - Agent: unknown
 - Target: docs/plan/video-6-script.md
+- SHA: 76495934eb7f855e283a00c6a777a2e0abd049bc
 - Commit: chore: project cleanup — stale locks cleared, docs pruned, gitignore updated
 
 ## [15:16:45] docs/plan/video-7-script.md
 
 - Agent: unknown
 - Target: docs/plan/video-7-script.md
+- SHA: 76495934eb7f855e283a00c6a777a2e0abd049bc
 - Commit: chore: project cleanup — stale locks cleared, docs pruned, gitignore updated
 
 ## [22:28:35] nexus-dashboard/index.html
 
 - Agent: unknown
 - Target: nexus-dashboard/index.html
+- SHA: a08d54998d6fe28130c22e5d763c829bdacee495
 - Commit: premium dashboard redesign: fonts, cards, health alerts, clickable locks and git links
 
 ## [22:38:25] test/agentScopes.test.js
 
 - Agent: unknown
 - Target: test/agentScopes.test.js
+- SHA: c75c5ff09e279497317ede0deea600c1e28c8d0f
 - Commit: add unit tests for all 6 lib modules: config, pathSafety, agentScopes, dump, blackboard, git — 95/95 passing
 
 ## [22:38:25] test/blackboard.test.js
 
 - Agent: unknown
 - Target: test/blackboard.test.js
+- SHA: c75c5ff09e279497317ede0deea600c1e28c8d0f
 - Commit: add unit tests for all 6 lib modules: config, pathSafety, agentScopes, dump, blackboard, git — 95/95 passing
 
 ## [22:38:25] test/config.test.js
 
 - Agent: unknown
 - Target: test/config.test.js
+- SHA: c75c5ff09e279497317ede0deea600c1e28c8d0f
 - Commit: add unit tests for all 6 lib modules: config, pathSafety, agentScopes, dump, blackboard, git — 95/95 passing
 
 ## [22:38:25] test/dump.test.js
 
 - Agent: unknown
 - Target: test/dump.test.js
+- SHA: c75c5ff09e279497317ede0deea600c1e28c8d0f
 - Commit: add unit tests for all 6 lib modules: config, pathSafety, agentScopes, dump, blackboard, git — 95/95 passing
 
 ## [22:38:25] test/git.test.js
 
 - Agent: unknown
 - Target: test/git.test.js
+- SHA: c75c5ff09e279497317ede0deea600c1e28c8d0f
 - Commit: add unit tests for all 6 lib modules: config, pathSafety, agentScopes, dump, blackboard, git — 95/95 passing
 
 ## [22:38:25] test/pathSafety.test.js
 
 - Agent: unknown
 - Target: test/pathSafety.test.js
+- SHA: c75c5ff09e279497317ede0deea600c1e28c8d0f
 - Commit: add unit tests for all 6 lib modules: config, pathSafety, agentScopes, dump, blackboard, git — 95/95 passing
 
 ## [22:43:25] _NEXUS_STANDUP.md
 
 - Agent: unknown
 - Target: _NEXUS_STANDUP.md
+- SHA: 8bd374a2f9fb45a002f73dc5532883b16290e729
 - Commit: log subagent test run results for Codex
 
 ## [22:44:55] src/lib/lockManager.js
 
 - Agent: unknown
 - Target: src/lib/lockManager.js
+- SHA: b03d6d9227fe8e0dafee719fc28a7daa830a6256
 - Commit: persist agent+intent in lock dir, read back in listLocks for dashboard
 
 ## [22:44:55] src/commands/dashboard.js
 
 - Agent: unknown
 - Target: src/commands/dashboard.js
+- SHA: 77b95c85486f620f322773b477060a5f3f7d8c2f
 - Commit: pass agent+intent through to snapshot locks
 
 ## [08:58:28] _NEXUS_QUEUE.md
 
 - Agent: unknown
 - Target: _NEXUS_QUEUE.md
+- SHA: cdb77c8dd38bb51237838aac1655f499c77635b7
 - Commit: add agent-presence and lockmanager-tests tasks to queue
 
 ## [09:13:38] _NEXUS_QUEUE.md
 
 - Agent: unknown
 - Target: _NEXUS_QUEUE.md
+- SHA: 625a38b72962400acf143fa471c08b550d7dc784
 - Commit: add nexus-ledger task — completed task log for reporting and velocity tracking
 
 ## [09:33:27] src/lib/lockManager.js
 
 - Agent: unknown
 - Target: src/lib/lockManager.js
+- SHA: cfb64ee1693fa623caa519b10d96e2b92c73cfa6
 - Commit: add subagents count to lock metadata — write/read/cleanup
 
 ## [09:33:29] src/commands/claim.js
 
 - Agent: unknown
 - Target: src/commands/claim.js
+- SHA: bf6510199ecbf11f6825b12a5c795d0f4fb88192
 - Commit: parse --subagents <n> flag and pass to acquireLock
 
 ## [09:33:30] src/commands/dashboard.js
 
 - Agent: unknown
 - Target: src/commands/dashboard.js
+- SHA: a3b5cb9858956f3b32aa35bd1a4bd7670febcdf6
 - Commit: pass subagents count through snapshot
 
 ## [09:33:30] nexus-dashboard/index.html
 
 - Agent: unknown
 - Target: nexus-dashboard/index.html
+- SHA: 336fc3ee31d6637207cd286a58658984b1098cbe
 - Commit: render +subagents (N) badge in Now block
 
 ## [09:59:11] _NEXUS_QUEUE.md
 
 - Agent: unknown
 - Target: _NEXUS_QUEUE.md
+- SHA: 381754bc51ae5930138024f203b4df348f401fbc
 - Commit: add commit-attribution, report-unification, and nexus-metrics tasks to queue
 
 ## [10:04:03] nexus-dashboard/index.html
 
 - Agent: unknown
 - Target: nexus-dashboard/index.html
+- SHA: 0c7866d76d9ccff529659fec68ea45400f8d2ba6
 - Commit: accordion Now block — grouped by agent, collapsible with file count and chevron
 
 ## [10:08:25] _NEXUS_QUEUE.md
 
 - Agent: unknown
 - Target: _NEXUS_QUEUE.md
+- SHA: 83d80fc326fbc76bd80bf9b8c98278d75271ca01
 - Commit: add model-capture task — --model and --thinking flags on claim for real model attribution including Ollama
 
 ## [10:39:56] _NEXUS_QUEUE.md
 
 - Agent: unknown
 - Target: _NEXUS_QUEUE.md
+- SHA: f521b2d96dfe7f373104e03e9ab10ebab114cfb3
 - Commit: update model-capture task with operator declaration note + add local-model-tooling research task
 
 ## [22:22:50] _NEXUS_QUEUE.md
 
 - Agent: unknown
 - Target: _NEXUS_QUEUE.md
+- SHA: a7c9db94c88bc370602973c9112e842af778eb8e
 - Commit: add nexus-db-protect task — backup before migration, recoverability epic
 
 ## [22:33:23] src/lib/pathSafety.js
 
 - Agent: unknown
 - Target: src/lib/pathSafety.js
+- SHA: 1f48bad3386451341302480eeab3097fd9eae7d4
 - Commit: fix lockNameToTarget — re-validate decoded path through normalizeTarget to close path traversal gap
 
 ## [22:33:23] src/lib/lockManager.js
 
 - Agent: unknown
 - Target: src/lib/lockManager.js
+- SHA: 5979977575471f37fbb6929303060acbe4831716
 - Commit: wrap lockNameToTarget in listLocks with try/catch — skips crafted lock entries that fail validation
 
 ## [22:37:03] _NEXUS_QUEUE.md
 
 - Agent: unknown
 - Target: _NEXUS_QUEUE.md
+- SHA: b691f61e20417764a455f33693517bc752092d73
 - Commit: add prompt-chmod task — rwx permission model for agents, closes Gap 1 prompt injection
 
 ## [22:39:17] _NEXUS_QUEUE.md
 
 - Agent: unknown
 - Target: _NEXUS_QUEUE.md
+- SHA: b4d04bedcfbb7288abd6b03b185a182f4c0b0560
 - Commit: add agent-identity task — CLAUDECODE env var verification, closes Gap 3
 
 ## [22:44:43] src/commands/dashboard.js
 
 - Agent: unknown
 - Target: src/commands/dashboard.js
+- SHA: a2214b9a5a1783cb7077df651275cb8fb724b100
 - Commit: parse epic, depends, notes fields from queue tasks for popover
 
 ## [22:45:59] nexus-dashboard/index.html
 
 - Agent: unknown
 - Target: nexus-dashboard/index.html
+- SHA: c7fa78ab816214b7b662499a78e65597859a969e
 - Commit: add task detail popover — ⓘ button on each queue task, shows epic/cost/depends/files/notes, native popover API, backdrop blur
 
 ## [22:48:56] nexus-dashboard/index.html
 
 - Agent: unknown
 - Target: nexus-dashboard/index.html
+- SHA: b50836f69c70223d664a79fe9d8431666a80fea6
 - Commit: fix auto-refresh destroying open popovers — skip render when popover open, skip queue/locks render when data unchanged
 
 ## [04:09:36] nexus-dashboard/index.html
 
 - Agent: unknown
 - Target: nexus-dashboard/index.html
+- SHA: a78d1d41d23cf7f37653b58c9682c6741f9d6371
 - Commit: fix popover — scrollable, notes readable, backtick spans render as code
 
 ## [04:16:23] nexus-dashboard/index.html
 
 - Agent: unknown
 - Target: nexus-dashboard/index.html
+- SHA: c89b46ea3b3dcb263d96ef684e46a33453fff831
 - Commit: redesign task popover — icon chips with hover tooltips, depends-on label, files block, notes section
 
 ## [09:56:49] nexus-dashboard/logo-nexus.svg
 
 - Agent: unknown
 - Target: nexus-dashboard/logo-nexus.svg
+- SHA: 4f5ab3725bdae86d9a22cd82072f00da18f02944
 - Commit: keep dashboard logo asset
 
 ## [10:02:50] test/lockManager.test.js
 
 - Agent: unknown
 - Target: test/lockManager.test.js
+- SHA: 5bc29a32661ce480466156ef5bf4a951ca5f00b7
 - Commit: add lock manager metadata tests
 
 ## [10:04:12] src/lib/git.js
 
 - Agent: @codex
 - Target: src/lib/git.js
+- SHA: cb388a82eae49f36700916f6e7bf7ccf636c24e3
 - Commit: add agent release attribution
 
 ## [10:04:15] src/commands/release.js
 
 - Agent: @codex
 - Target: src/commands/release.js
+- SHA: b826d9c544c45b5ea996777d513b92c6e16f8512
 - Commit: use lock agent for release commits
 
 ## [10:04:19] test/git.test.js
 
 - Agent: @codex
 - Target: test/git.test.js
+- SHA: bcae28eddc69d5fe7156878a7039c702bad9b696
 - Commit: test agent commit attribution
 
 ## [10:04:22] test/release.test.js
 
 - Agent: @codex
 - Target: test/release.test.js
+- SHA: 568ca5b57ac677b4acdb98c6ffbb5d343282e16c
 - Commit: test release commit attribution
 
 ## [10:07:26] src/lib/lockManager.js
 
 - Agent: @codex
 - Target: src/lib/lockManager.js
+- SHA: 3a8580ac70644b8d4be8425a93b237e477c2e8f3
 - Commit: store model thinking lock metadata
 
 ## [10:07:30] src/commands/claim.js
 
 - Agent: @codex
 - Target: src/commands/claim.js
+- SHA: 0f3767fadedce6f8f294754c3db06eb730cd939c
 - Commit: add model thinking claim flags
 
 ## [10:07:34] src/commands/dashboard.js
 
 - Agent: @codex
 - Target: src/commands/dashboard.js
+- SHA: 5ca5469d1f8fc6b90955c2dc069fd9568cf4d872
 - Commit: surface model thinking in dashboard snapshot
 
 ## [10:07:37] nexus-dashboard/index.html
 
 - Agent: @codex
 - Target: nexus-dashboard/index.html
+- SHA: a33827f87612046d84efc9a673f586aeaf431f11
 - Commit: show model thinking in lock headers
 
 ## [10:07:41] src/commands/doctor.js
 
 - Agent: @codex
 - Target: src/commands/doctor.js
+- SHA: 78f3c989b2b943f88953d56878728d0032e65caa
 - Commit: warn when claims omit model metadata
 
 ## [10:07:44] _NEXUS_CONSTITUTION.md
 
 - Agent: @codex
 - Target: _NEXUS_CONSTITUTION.md
+- SHA: bddfd183c3db1c4184ca7501b9bacf6ae53d0384
 - Commit: document operator declared model metadata
 
 ## [10:07:47] test/lockManager.test.js
 
 - Agent: @codex
 - Target: test/lockManager.test.js
+- SHA: 4bac81a41f6653a7832bda8e5a4d12328e6bc579
 - Commit: test model thinking lock metadata
 
 ## [10:07:51] test/claim.test.js
 
 - Agent: @codex
 - Target: test/claim.test.js
+- SHA: ab4acdaded60a8b99da09d8afb41fe282979ffc8
 - Commit: test model thinking claim flags
 
 ## [10:07:54] test/dashboard.test.js
 
 - Agent: @codex
 - Target: test/dashboard.test.js
+- SHA: 128d52db4a8aad8b88f77dc76290285d2e1678d4
 - Commit: test model thinking dashboard snapshot
 
 ## [10:07:57] test/doctor.test.js
 
 - Agent: @codex
 - Target: test/doctor.test.js
+- SHA: 9e5df3a08b33a86aeb7db062c63d8aff1d426782
 - Commit: test missing model metadata warning
 
 ## [10:08:24] _NEXUS_QUEUE.md
 
 - Agent: @codex
 - Target: _NEXUS_QUEUE.md
+- SHA: fa1559e7f51598520c0fb57234384cf920037e2d
 - Commit: mark completed auto-flow tasks done
 
 ## [11:42:19] src/commands/release.js
 
 - Agent: @codex
 - Target: src/commands/release.js
+- SHA: 8fadc38673016207f40719a49a6302df3097c1d3
 - Commit: unify release report format
 
 ## [11:42:24] src/commands/dashboard.js
 
 - Agent: unknown
 - Target: src/commands/dashboard.js
+- SHA: 38890309701de4ee399cb05f51ec06e1dd7b55d5
 - Commit: parse structured report commits
 
 ## [11:42:31] test/release.test.js
 
 - Agent: @codex
 - Target: test/release.test.js
+- SHA: 353ab508c1159d92f598129eec1f68dc324faac4
 - Commit: test structured release report format
 
 ## [11:42:36] test/dashboard.test.js
 
 - Agent: @codex
 - Target: test/dashboard.test.js
+- SHA: 418387c90c2d4eacd0cab368724b81ca38cf3388
 - Commit: test structured report parsing
 
 ## [11:42:52] _NEXUS_QUEUE.md
 
 - Agent: @codex
 - Target: _NEXUS_QUEUE.md
+- SHA: bbb9e70541f08d590ce71e29969b93b0dddaf9ec
 - Commit: mark report unification done
+
+## [11:42:58] _NEXUS_REPORT.md
+
+- Agent: @codex
+- Target: _NEXUS_REPORT.md
+- SHA: d6f525cf8171faa6dd1bbc39aa13f6cc9a79fb5c
+- Commit: normalize report receipts
+
+## [11:56:26] src/lib/git.js
+
+- Agent: @codex
+- Target: src/lib/git.js
+- SHA: 1b471d1754d4d57c10406c8d34b5cbfb5eb1d341
+- Commit: return release commit sha
+
+## [11:56:30] src/commands/release.js
+
+- Agent: @codex
+- Target: src/commands/release.js
+- SHA: 547aaa8b574e1fbd211df8acb89ec7502874ad64
+- Commit: write sha in report receipts
+
+## [11:56:36] test/git.test.js
+
+- Agent: @codex
+- Target: test/git.test.js
+- SHA: 6f093d37bdcf2f3d8fa0e7703b91f6db341d765b
+- Commit: test release commit sha return
+
+## [11:56:44] test/release.test.js
+
+- Agent: @codex
+- Target: test/release.test.js
+- SHA: 275b226c9927579593c133a8d0865c6595033db4
+- Commit: test report receipt sha
 
