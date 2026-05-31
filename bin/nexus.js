@@ -15,6 +15,7 @@ const COMMANDS = {
   start: () => import('../src/commands/start.js'),
   dashboard: () => import('../src/commands/dashboard.js'),
   metrics: () => import('../src/commands/metrics.js'),
+  ledger: () => import('../src/commands/ledger.js'),
   drill: () => import('../src/commands/drill.js'),
   soul: () => import('../src/commands/soul.js'),
   chmod: () => import('../src/commands/chmod.js'),
@@ -71,6 +72,7 @@ Commands:
   start [--agent @handle]           Orient an agent entering this repo
   dashboard --serve [--port <port>]  Serve live local Nexus dashboard
   metrics [--json]                   Summarize commits, releases, and queue cost
+  ledger [--json]                    Show completed task ledger
   chmod [--list] [--init]            Show or set promptCHMOD permissions
   db <backup|list|restore|schedule>  Database backup and recovery
   drill <list|show|run|report>       Inspect or run protocol drills
@@ -86,6 +88,8 @@ Examples:
   nexus dashboard --serve
   nexus metrics
   nexus metrics --json
+  nexus ledger
+  nexus ledger --json
   nexus drill list
   nexus drill show wrong-repo-push
   nexus drill run wrong-repo-push
