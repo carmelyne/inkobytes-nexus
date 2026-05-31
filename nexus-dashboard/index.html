@@ -1204,6 +1204,11 @@
       #chart-agent { display: flex; flex-direction: column; gap: 10px; }
       .pie-caption { font-size: 11px; color: var(--muted); line-height: 1.5; border-top: 1px solid var(--line-2); padding-top: 8px; }
 
+      .agent-tab .presence-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #6b7f74; margin-left: 6px; }
+      .agent-tab[data-online="true"] .presence-dot { background: #22c55e; }
+      .agent-tab[data-idle="true"] .presence-dot { background: #eab308; }
+      .agent-tab[data-online="false"][data-idle="false"] .presence-dot { background: #6b7f74; }
+
       /* ── Responsive ── */
       @media (max-width: 900px) {
         header {
@@ -1299,10 +1304,10 @@
           <button class="tab-button queue-tab active" data-queue-mode="queue"><span
               data-icon="list-checks"></span>Queue</button>
           <span class="next-label">Next for:</span>
-          <button class="tab-button agent-tab" data-next-agent="@codex">codex</button>
-          <button class="tab-button agent-tab" data-next-agent="@gemini">gemini</button>
-          <button class="tab-button agent-tab" data-next-agent="@claude">claude</button>
-          <button class="tab-button agent-tab" data-next-agent="@agy">agy</button>
+          <button class="tab-button agent-tab" data-next-agent="@codex">codex <span class="presence-dot"></span></button>
+          <button class="tab-button agent-tab" data-next-agent="@gemini">gemini <span class="presence-dot"></span></button>
+          <button class="tab-button agent-tab" data-next-agent="@claude">claude <span class="presence-dot"></span></button>
+          <button class="tab-button agent-tab" data-next-agent="@agy">agy <span class="presence-dot"></span></button>
           <button class="tab-button queue-tab ledger-tab" data-queue-mode="ledger"><svg
               xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1546,9 +1551,22 @@
       }
 
       function updateAgentStatus(data) {
-        const online = new Set(data.locks.map(l => normalizeAgent(l.agent)));
+        const now = Math.floor(Date.now() / 1000);
         document.querySelectorAll('[data-next-agent]').forEach(btn => {
-          btn.dataset.online = online.has(normalizeAgent(btn.dataset.nextAgent)) ? 'true' : 'false';
+          const agent = normalizeAgent(btn.dataset.nextAgent);
+          const presence = data.presence && data.presence[agent];
+          
+          let online = false;
+          let idle = false;
+          
+          if (presence) {
+            const age = now - presence;
+            if (age < 60) online = true;
+            else if (age < 300) idle = true;
+          }
+          
+          btn.dataset.online = online.toString();
+          btn.dataset.idle = idle.toString();
         });
       }
       function renderHealthAlert(health) {
