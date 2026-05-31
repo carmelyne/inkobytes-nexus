@@ -136,3 +136,47 @@
   - Affinity: cli, release
   - Cost: medium
   - Auto-flow: no
+
+- [x] TASK/@claude: Dashboard layout overhaul — Active block, Progress ring, Health alert
+  - Id: dashboard-layout-overhaul
+  - Epic: Dashboard observability
+  - Status: Done
+  - Depends on: none
+  - Files: nexus-dashboard/index.html, src/commands/dashboard.js
+  - Affinity: dashboard, ux
+  - Cost: medium
+  - Auto-flow: no
+  - Notes: Replaced equal NOW/HEALTH two-column layout. NOW renamed Active (span 9) + Progress ring (span 3) in first row. Health section demoted to floating red alert card that only appears when nexus doctor finds issues — hidden when clean. Progress ring shows done/total queue tasks as SVG donut with smooth transition.
+
+- [x] TASK/@claude: Dashboard chart row — By Epic
+  - Id: dashboard-chart-epic
+  - Epic: Dashboard observability
+  - Status: Done
+  - Depends on: dashboard-layout-overhaul
+  - Files: nexus-dashboard/index.html
+  - Affinity: dashboard, ux, charts
+  - Cost: small
+  - Auto-flow: no
+  - Notes: Horizontal bar chart per epic showing done/total. Reads from queue snapshot — live, not accumulated. Each bar fills proportionally to completion %. Data source is _NEXUS_QUEUE.md via /api/snapshot; will improve once nexus-ledger ships.
+
+- [x] TASK/@claude: Dashboard chart row — Cost Split
+  - Id: dashboard-chart-cost
+  - Epic: Dashboard observability
+  - Status: Done
+  - Depends on: dashboard-layout-overhaul
+  - Files: nexus-dashboard/index.html
+  - Affinity: dashboard, ux, charts
+  - Cost: small
+  - Auto-flow: no
+  - Notes: Vertical column chart for small/medium/large task cost distribution. Uses flex-ratio trick (spacer + bar as flex children) so bars grow with card height automatically. Count label sits just above each bar. chart-sm sections are display:flex flex-direction:column to cascade height from grid row down to bars.
+
+- [x] TASK/@claude: Dashboard chart row — By Agent pie
+  - Id: dashboard-chart-agent
+  - Epic: Dashboard observability
+  - Status: Done
+  - Depends on: dashboard-layout-overhaul
+  - Files: nexus-dashboard/index.html
+  - Affinity: dashboard, ux, charts
+  - Cost: small
+  - Auto-flow: no
+  - Notes: SVG pie chart (not donut) showing task distribution by agent. Width: 60% of card with aspect-ratio:1. Colors synced from remotion-labs/src/tokens.ts AGENTS object (codex #2dd4bf, claude #F4845F, gemini #0EA5E9). Caption row "N tasks across N agents" pinned below pie+legend as separate block with top border.
