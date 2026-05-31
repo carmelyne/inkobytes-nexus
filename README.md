@@ -202,6 +202,7 @@ Lock a file or directory before reading or editing it.
 
 ```bash
 nexus claim src/lib/components/login/ @claude "Building login UI"
+nexus claim src/lib/components/login/ --agent @claude --intent "Building login UI"
 nexus claim src-tauri/src/commands/auth.rs @gemini "Adding auth command"
 ```
 
@@ -210,6 +211,7 @@ Claims are hierarchy-aware:
 - a claimed directory blocks claims inside it
 - a claimed child file blocks a parent directory claim
 - stale locks older than the configured threshold are auto-broken
+- missing agent, intent, or model metadata is allowed but warned
 - missing core Nexus protocol files produce a short `nexus doctor` warning
 - fresh file state is printed so the agent starts from disk truth
 
