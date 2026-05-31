@@ -17,6 +17,72 @@
   - Auto-flow: no
   - Notes: Add `nexus checkin @agent` and `nexus checkout @agent` commands. Write a heartbeat timestamp to `.nexus/presence/@agent`. Dashboard reads freshness (online = updated within 60s, idle = 60-300s, offline = >300s or missing). Show green/yellow/gray dot on agent tabs in queue block. Checkin should be called by `nexus start`, checkout by agent on session end. Add `nexus checkout --all` for emergency cleanup.
 
+- [ ] TASK/Codex: Add same-branch HEAD drift warning before release
+  - Id: release-head-drift
+  - Epic: Same-branch recoverability
+  - Status: Ready
+  - Depends on: commit-attribution
+  - Files: src/commands/claim.js, src/commands/release.js, src/lib/lockManager.js, test/release.test.js, test/lockManager.test.js
+  - Affinity: cli, safety, recoverability
+  - Cost: small
+  - Auto-flow: yes
+  - Notes: Store claim-time HEAD SHA in lock metadata. On `nexus release`, compare current HEAD to claim HEAD. If HEAD changed, do not block; warn clearly before committing so same-branch interleaving is visible. Recoverability principle: every release should explain whether it was based on the same branch tip it claimed from.
+
+- [ ] TASK/Codex: Add report self-noise handling for _NEXUS_REPORT.md releases
+  - Id: report-self-noise
+  - Epic: Same-branch recoverability
+  - Status: Ready
+  - Depends on: report-unification
+  - Files: src/commands/release.js, test/release.test.js, _NEXUS_CONSTITUTION.md
+  - Affinity: cli, reporting, recoverability
+  - Cost: small
+  - Auto-flow: yes
+  - Notes: Releasing `_NEXUS_REPORT.md` appends a new receipt after the report commit, leaving the file dirty forever. Add an explicit self-noise rule: either skip appending when target is `_NEXUS_REPORT.md`, or append before commit for that target only. Pick the simplest behavior and document it. Recoverability principle: the audit log should not create endless audit-log noise.
+
+- [ ] TASK/Codex: Add hot-file contention warnings to next/status
+  - Id: hot-file-contention
+  - Epic: Same-branch recoverability
+  - Status: Ready
+  - Depends on: none
+  - Files: src/commands/next.js, src/commands/status.js, test/next.test.js, test/status.test.js
+  - Affinity: cli, protocol, coordination
+  - Cost: medium
+  - Auto-flow: yes
+  - Notes: Surface known high-contention paths such as `nexus-dashboard/index.html`, `src/commands/dashboard.js`, `_NEXUS_QUEUE.md`, and `_NEXUS_REPORT.md`. `nexus next` should warn when a suggested task touches hot files; `nexus status` should show hot active locks. Recoverability principle: warn before agents stack work on the same fragile surfaces.
+
+- [ ] TASK/Codex: Add semantic dependency hints for queue tasks
+  - Id: semantic-dependency-hints
+  - Epic: Same-branch recoverability
+  - Status: Ready
+  - Depends on: none
+  - Files: _NEXUS_QUEUE.md, src/commands/next.js, test/next.test.js
+  - Affinity: cli, queue, coordination
+  - Cost: medium
+  - Auto-flow: no
+  - Notes: Extend queue parsing to recognize lightweight `Coordinates with:` or `Soft depends on:` lines. These do not block like `Depends on`, but `nexus next` should display them so an agent knows when Claude/Codex/Gemini work may be semantically adjacent. Recoverability principle: make hidden coordination assumptions visible before edits begin.
+
+- [ ] TASK/Codex: Add release recovery command
+  - Id: release-recovery
+  - Epic: Same-branch recoverability
+  - Status: Ready
+  - Depends on: report-unification
+  - Files: src/commands/recover.js, bin/nexus.js, test/recover.test.js
+  - Affinity: cli, recoverability, git
+  - Cost: medium
+  - Auto-flow: no
+  - Notes: Add `nexus recover <sha|target>` as a read-only helper that prints the release receipt, git show summary, files changed, and suggested rollback/reapply commands without executing destructive actions. This is the core advantage of 3 SOTA on one branch: when things go wrong, recovery should be fast, local, and evidence-backed.
+
+- [ ] TASK/Codex: Add identity cleanup for legacy Agent/unknown metrics
+  - Id: metrics-identity-cleanup
+  - Epic: Metrics & observability
+  - Status: Ready
+  - Depends on: nexus-metrics
+  - Files: src/commands/metrics.js, test/metrics.test.js
+  - Affinity: cli, metrics, reporting
+  - Cost: small
+  - Auto-flow: yes
+  - Notes: Metrics currently shows `Agent` and `unknown` for older commits/report entries. Add clearer buckets and explanation: `legacy-agent`, `unknown-agent`, and current explicit handles. Do not rewrite git history. Recoverability principle: metrics can be imperfect, but uncertainty must be labeled honestly.
+
 - [ ] TASK/Codex: Build Nexus completed task ledger
   - Id: nexus-ledger
   - Epic: Dashboard observability
