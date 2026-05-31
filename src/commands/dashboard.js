@@ -271,8 +271,8 @@ function parseReleaseEntries(content) {
     const line = lines[index].trim();
     if (!line || line.startsWith('#') || line.startsWith('---')) continue;
 
-    if (line.startsWith('Commit:')) {
-      entries.push({ type: 'Commit', title: line.replace(/^Commit:\s*/, ''), meta: '' });
+    if (line.startsWith('Commit:') || line.startsWith('- Commit:')) {
+      entries.push({ type: 'Commit', title: line.replace(/^-?\s*Commit:\s*/, ''), meta: '' });
       continue;
     }
 
