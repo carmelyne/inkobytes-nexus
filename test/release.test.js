@@ -66,6 +66,31 @@ test('release appends structured report entry', () => {
   });
 });
 
+test('release appends matching completed queue task to ledger', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, 'file.txt'), 'hello\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), [
+      '- [x] TASK/Codex: Release ledger data',
+      '  - Id: release-ledger-data',
+      '  - Epic: Dashboard observability',
+      '  - Files: file.txt',
+      '  - Cost: small',
+    ].join('\n'), 'utf-8');
+    spawnSync('git', ['add', 'file.txt', '_NEXUS_QUEUE.md'], { cwd: root, stdio: 'pipe' });
+    spawnSync('git', ['commit', '-m', 'init'], { cwd: root, stdio: 'pipe' });
+    writeFileSync(join(root, 'file.txt'), 'hello again\n', 'utf-8');
+    acquireLock('file.txt', '@codex', 'test release ledger');
+
+    release(['file.txt', 'release-ledger-data: test release ledger']);
+
+    const ledger = readFileSync(join(root, '_NEXUS_LEDGER.md'), 'utf-8');
+    assert.match(ledger, /## release-ledger-data/);
+    assert.match(ledger, /- Agent: @codex/);
+    assert.match(ledger, /- Files: file\.txt/);
+    assert.match(ledger, /- Commit: release-ledger-data: test release ledger/);
+  });
+});
+
 test('release warns and reports when HEAD changed since claim', () => {
   inTempRepo((root) => {
     writeFileSync(join(root, 'file.txt'), 'hello\n', 'utf-8');
