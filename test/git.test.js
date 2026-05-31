@@ -34,6 +34,7 @@ test('stageAndCommit succeeds on a real git repo with a new file', () => {
     writeFileSync(join(root, 'agent-output.md'), 'hello world\n', 'utf-8');
     const result = stageAndCommit('agent-output.md', 'add agent-output.md');
     assert.equal(result.success, true);
+    assert.match(result.sha, /^[0-9a-f]{40}$/);
   });
 });
 
