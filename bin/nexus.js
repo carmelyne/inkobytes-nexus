@@ -12,6 +12,7 @@ const COMMANDS = {
   next: () => import('../src/commands/next.js'),
   start: () => import('../src/commands/start.js'),
   dashboard: () => import('../src/commands/dashboard.js'),
+  metrics: () => import('../src/commands/metrics.js'),
   drill: () => import('../src/commands/drill.js'),
   soul: () => import('../src/commands/soul.js'),
   help: () => import('../src/commands/help.js'),
@@ -63,6 +64,7 @@ Commands:
   next <agent>                      Suggest next safe task from queue
   start [--agent @handle]           Orient an agent entering this repo
   dashboard --serve [--port <port>]  Serve live local Nexus dashboard
+  metrics [--json]                   Summarize commits, releases, and queue cost
   drill <list|show|run|report>       Inspect or run protocol drills
   soul [--file <path>] [--status | --remove]
                                     Manage local soul overlay in agent files
@@ -74,6 +76,8 @@ Examples:
   nexus doctor --json
   nexus start
   nexus dashboard --serve
+  nexus metrics
+  nexus metrics --json
   nexus drill list
   nexus drill show wrong-repo-push
   nexus drill run wrong-repo-push
