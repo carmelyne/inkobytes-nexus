@@ -6,6 +6,17 @@
 
 ## Ready Queue
 
+- [ ] TASK/@claude: Build NexusShort — pure motion graphics short-form video
+  - Id: nexus-short-video
+  - Epic: Content & documentation
+  - Status: In Progress
+  - Depends on: none
+  - Files: remotion-labs/src/scenes/NsScene1.tsx, remotion-labs/src/scenes/NsSceneBridge.tsx, remotion-labs/src/scenes/NsScene2.tsx, remotion-labs/src/scenes/NsScene3.tsx, remotion-labs/src/scenes/NsScene4.tsx, remotion-labs/src/scenes/NsScene5.tsx, remotion-labs/src/NsComposition.tsx, remotion-labs/docs/short-form-motion-graphics.md
+  - Affinity: remotion, video, motion-graphics, content
+  - Cost: large
+  - Auto-flow: no
+  - Notes: 90s pure kinetic typography short-form video for Nexus. No agent panels, no terminals — motion graphics only. 11 scenes covering: the problem (chaos, merge conflicts), the fix (@inkobytes/nexus), 18 commands, no conflicts, memory/continuity, security, drills, dashboard, scale, solo use, close. Screenshots and short clips allowed as inserts. Scenes 1–5 + bridge built; scenes 6–10 remaining.
+
 - [x] TASK/Codex: Release dashboard docs and reset recovery cleanup
   - Id: dashboard-docs-release-cleanup
   - Epic: Open-source CLI release
