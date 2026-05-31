@@ -21,7 +21,16 @@
 
 *(Agent-suggested tasks awaiting human review. nexus next ignores this section.)*
 
----
+- [ ] TASK/@gemini: Dashboard aesthetic overhaul
+  - Id: dashboard-aesthetic-overhaul
+  - Epic: Dashboard observability
+  - Status: Ready
+  - Depends on: none
+  - Files: nexus-dashboard/index.html, nexus-dashboard/style.css
+  - Affinity: dashboard, ux
+  - Cost: medium
+  - Auto-flow: no
+  - Notes: Decouple CSS into style.css, implement 2026 design system tokens, refine typography and spacing.
 
 - [x] TASK/Codex: Add same-branch HEAD drift warning before release
   - Id: release-head-drift
