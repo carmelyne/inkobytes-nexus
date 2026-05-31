@@ -250,7 +250,7 @@
   - Auto-flow: no
   - Notes: Apply Unix permission model (rwx) to agent file access. r = use as context/reference, w = modify (already enforced by claim), x = treat as authoritative instructions (the prompt injection surface). Define `_NEXUS_CHMOD.md` as the permission matrix — human-readable, human-owned. Example: `_NEXUS_STANDUP.md → rw- claiming agent, r-- others` (read for context, x bit off = don't execute as instructions). `_NEXUS_CONSTITUTION.md → r-- all` (reference only, never execute). `nexus chmod` command sets permissions. `nexus doctor` warns when an agent reads a file with x bit off but treats it as instructions, or reads without declared r permission. `nexus start` surfaces the permission matrix to the agent at session start. Core insight: claim/release already enforces w. promptCHMOD closes Gap 1 — prompt injection via shared files — by making the x bit explicit and human-controlled. Legible to all SOTA models instantly because every engineer knows chmod.
 
-- [ ] TASK/@claude: Add nexus db protect — backup before migration
+- [x] TASK/@claude: Add nexus db protect — backup before migration
   - Id: nexus-db-protect
   - Epic: Recoverability
   - Status: Ready
