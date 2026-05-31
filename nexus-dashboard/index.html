@@ -704,6 +704,17 @@
         border-radius: var(--r-pill);
       }
 
+      .trust-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        display: inline-block;
+      }
+      .trust-dot[data-trust="harness"]    { background: var(--good); box-shadow: 0 0 0 2px rgba(29,127,79,0.18); }
+      .trust-dot[data-trust="operator"]   { background: var(--warn); box-shadow: 0 0 0 2px rgba(168,95,0,0.18); }
+      .trust-dot[data-trust="unverified"] { background: var(--muted-2); box-shadow: 0 0 0 2px rgba(146,168,158,0.18); }
+
       .lock-group-count {
         font-size: 11px;
         color: var(--muted-2);
@@ -1348,11 +1359,12 @@
           const groups = {};
           for (const lock of data.locks) {
             const key = lock.agent || 'unknown';
-            if (!groups[key]) groups[key] = { locks: [], subagents: 0, modelLabels: new Set() };
+            if (!groups[key]) groups[key] = { locks: [], subagents: 0, modelLabels: new Set(), trustSource: lock.trustSource || 'unverified', verified: lock.verified ?? true };
             groups[key].locks.push(lock);
             if ((lock.subagents || 0) > groups[key].subagents) groups[key].subagents = lock.subagents;
             const modelLabel = [lock.model, lock.thinking].filter(Boolean).join(' · ');
             if (modelLabel) groups[key].modelLabels.add(modelLabel);
+            if (!lock.verified) { groups[key].verified = false; groups[key].trustSource = lock.trustSource || 'unverified'; }
           }
           const chevron = '<svg class="lock-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>';
           locksChanged && (document.getElementById('locks').innerHTML = Object.entries(groups).map(([agent, group]) => {
@@ -1369,8 +1381,12 @@
                 + '<div class="lock-age">Age: ' + formatAge(lock.age) + staleTag + '</div>'
                 + '</div>';
             }).join('');
+            const trustSource = group.trustSource || 'unverified';
+            const trustTip = trustSource === 'harness' ? 'Verified (Claude Code harness)' : trustSource === 'operator' ? 'Operator-declared (NEXUS_AGENT)' : 'Unverified — no harness fingerprint detected';
+            const trustDot = '<span class="trust-dot" data-trust="' + trustSource + '" title="' + trustTip + '"></span>';
             return '<details class="lock-group" open>'
               + '<summary class="lock-group-header">'
+              + trustDot
               + '<span class="lock-group-agent">' + escapeHtml(agent) + '</span>'
               + modelTag
               + subagentsTag
