@@ -52,6 +52,12 @@ export default function release(args) {
   // Remove from blackboard
   removeEntry(`🔒 **${target}**`);
 
+  if (target === '_NEXUS_REPORT.md') {
+    console.log('[INFO] Skipped report append for _NEXUS_REPORT.md release to avoid self-noise.');
+    console.log('[LOCK RELEASED & COMMITTED]');
+    return;
+  }
+
   // Append to report
   const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false });
   const reportLine = `## [${timestamp}] ${target}
