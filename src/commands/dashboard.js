@@ -4,9 +4,10 @@
  */
 
 import { createServer } from 'http';
-import { existsSync, readFileSync } from 'fs';
+import { existsSync, readFileSync, readdirSync } from 'fs';
 import { spawnSync } from 'child_process';
 import { networkInterfaces } from 'os';
+import { join } from 'path';
 import { getConfig } from '../lib/config.js';
 import { listLocks } from '../lib/lockManager.js';
 
@@ -19,17 +20,7 @@ export default function dashboard(args) {
     console.log(JSON.stringify(buildSnapshot(), null, 2));
     return;
   }
-
-  if (!args.includes('--serve')) {
-    console.log('Usage: nexus dashboard --serve [--port <port>]');
-    console.log(`Default port: ${DEFAULT_PORT}`);
-    return;
-  }
-
-  const port = resolveDashboardPort(args);
-  serveDashboard(port);
-}
-
+...
 export function buildSnapshot() {
   const config = getConfig();
   const locks = listLocks().map(lock => ({
@@ -45,6 +36,15 @@ export function buildSnapshot() {
     trustSource: lock.trustSource || 'unverified',
   }));
 
+  const presence = {};
+  if (existsSync(join(config.root, '.nexus', 'presence'))) {
+    for (const file of readdirSync(join(config.root, '.nexus', 'presence'))) {
+      try {
+        presence[file] = parseInt(readFileSync(join(config.root, '.nexus', 'presence', file), 'utf-8').trim(), 10);
+      } catch { /* ignore */ }
+    }
+  }
+
   const queueText = readText(config.queue);
   const standupText = readText(config.standup);
   const reportText = readText(config.report);
@@ -57,12 +57,14 @@ export function buildSnapshot() {
     dirtyFiles: git.files,
     health: getHealth(config),
     locks,
+    presence,
     queue: parseQueue(queueText),
     proposed: parseProposed(queueText),
     standup: parseStandupEntries(standupText).slice(-8),
     releases: parseReleaseEntries(reportText).slice(-6),
   };
 }
+...
 
 function serveDashboard(port) {
   const clients = new Set();
