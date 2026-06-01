@@ -2132,3 +2132,63 @@ Structured release receipts.
 - SHA: 899247792fb7e5e827eba2edab1a64c7032c7c5d
 - Commit: memory-month-folder-boundary: record completed task
 
+## [08:38:41] src/commands/dashboard.js
+
+- Agent: @codex
+- Target: src/commands/dashboard.js
+- Claim HEAD: c03cb6f5e052b22adec9cf02d77964a1040020cb
+- Release HEAD: c03cb6f5e052b22adec9cf02d77964a1040020cb
+- Drift: no
+- SHA: a31cef550c1f4b70f561824781d9ec821c08a4ee
+- Commit: standup-dated-format: parse dated standup entries
+
+## [08:38:59] src/commands/init.js
+
+- Agent: @codex
+- Target: src/commands/init.js
+- Claim HEAD: c03cb6f5e052b22adec9cf02d77964a1040020cb
+- Release HEAD: a31cef550c1f4b70f561824781d9ec821c08a4ee
+- Drift: yes
+- SHA: 78f6ee5ff25a870fe01f6aca9d78c784de79894a
+- Commit: standup-dated-format: scaffold dated standup format
+
+## [08:39:02] test/dashboard.test.js
+
+- Agent: @codex
+- Target: test/dashboard.test.js
+- Claim HEAD: c03cb6f5e052b22adec9cf02d77964a1040020cb
+- Release HEAD: 78f6ee5ff25a870fe01f6aca9d78c784de79894a
+- Drift: yes
+- SHA: 376d15b627378fca776bdf31de5d68584a469c97
+- Commit: standup-dated-format: test dated standup parsing
+
+## [08:39:05] _NEXUS_STANDUP.md
+
+- Agent: @codex
+- Target: _NEXUS_STANDUP.md
+- Claim HEAD: c03cb6f5e052b22adec9cf02d77964a1040020cb
+- Release HEAD: 376d15b627378fca776bdf31de5d68584a469c97
+- Drift: yes
+- SHA: 868163d6647d5807672cd9dbaa7841642c916850
+- Commit: standup-dated-format: document dated comms format
+
+## [08:39:10] _NEXUS_QUEUE.md
+
+- Agent: @codex
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: c03cb6f5e052b22adec9cf02d77964a1040020cb
+- Release HEAD: 868163d6647d5807672cd9dbaa7841642c916850
+- Drift: yes
+- SHA: ead4145ed4d95346282dd1c890bf2f5f7674958b
+- Commit: standup-dated-format: queue metrics entry
+
+## [08:39:14] _NEXUS_LEDGER.md
+
+- Agent: @codex
+- Target: _NEXUS_LEDGER.md
+- Claim HEAD: a31cef550c1f4b70f561824781d9ec821c08a4ee
+- Release HEAD: ead4145ed4d95346282dd1c890bf2f5f7674958b
+- Drift: yes
+- SHA: 2d3d302ce44ba0a7257e6555510bb829437b2254
+- Commit: standup-dated-format: record completed task
+
