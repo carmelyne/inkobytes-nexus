@@ -6,6 +6,19 @@
 
 ## Ready Queue
 
+- [x] TASK/Codex: Replace Standup @agent labels with agent icon
+  - Id: standup-agent-icon-label
+  - Epic: Dashboard observability
+  - Status: Done
+  - Depends on: standup-unlabeled-standard-layout
+  - Files: nexus-dashboard/index.html, nexus-dashboard/style.css, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+  - Affinity: dashboard, standup, ux
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Render Standup agent identity with the bot icon and plain agent name so `@agent` does not look like a human mention.
+
 - [x] TASK/Codex: Make CLI Docs TOC sticky
   - Id: dashboard-docs-sticky-toc
   - Epic: Dashboard observability
