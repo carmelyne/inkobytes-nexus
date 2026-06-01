@@ -67,8 +67,8 @@ export function buildSnapshot() {
     queue: parseQueue(queueText),
     proposed: parseProposed(queueText),
     ledger: readLedgerEntries().reverse(),
-    standup: parseStandupEntries(standupText).slice(-8),
-    releases: parseReleaseEntries(reportText).slice(-16),
+    standup: parseStandupEntries(standupText).slice(-8).reverse(),
+    releases: parseReleaseEntries(reportText).slice(-16).reverse(),
     report: reportText,
   };
 }
@@ -301,7 +301,7 @@ function parseStandupEntries(content) {
       continue;
     }
 
-    const datedAgent = line.match(/^(\d{4}-\d{2}-\d{2}(?:[ T]\d{2}:\d{2})?)\s+(@\S+)(?:\s+\[([A-Z][A-Z0-9_-]*)\])?:\s*(.+)$/);
+    const datedAgent = line.match(/^(\d{4}-\d{2}-\d{2}(?:[ T]\d{1,2}:\d{2}(?:\s?(?:AM|PM|am|pm))?)?)\s+(@\S+)(?:\s+\[([A-Z][A-Z0-9_-]*)\])?:\s*(.+)$/);
     if (datedAgent) {
       entries.push({
         type: datedAgent[2],
