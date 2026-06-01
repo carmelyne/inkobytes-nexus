@@ -168,9 +168,9 @@ Keep this note.
     assert.match(next, /atomic lock-and-read boundary/);
     assert.match(next, /read a shared file before claiming it, treat that read as stale after claim succeeds/);
     assert.match(next, /claim appears stale/);
-    assert.match(next, /### Recipes/);
-    assert.match(next, /Recipe routing is defined in `_NEXUS_CONSTITUTION\.md`/);
-    assert.match(next, /If the constitution routes this situation to a recipe, read that recipe before acting/);
+    assert.match(next, /### Drills/);
+    assert.match(next, /Drill guidance is defined in `_NEXUS_CONSTITUTION\.md`/);
+    assert.match(next, /If the situation resembles a drill, use that drill before acting/);
     assert.doesNotMatch(next, /recipes\/task-contract\.md/);
     assert.match(next, /### Delegated Work/);
     assert.match(next, /Lead agents own the repo effects of their subagents/);
