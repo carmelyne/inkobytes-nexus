@@ -31,6 +31,10 @@ function shouldWarnAgentHandle(agent) {
     || (normalized.startsWith('@') && !CANONICAL_MODEL_HANDLE_SET.has(normalized) && hasAgentAlias(normalized));
 }
 
+function isAgentHandle(agent) {
+  return typeof agent === 'string' && /^@[a-z0-9][a-z0-9_-]*$/i.test(agent);
+}
+
 function readFlag(args, name) {
   const index = args.indexOf(name);
   if (index === -1) return '';
@@ -51,13 +55,27 @@ export default function claim(args) {
   const thinking = readFlag(positional, '--thinking').trim().toLowerCase();
 
   let target = positional[0];
-  const agent = agentFlag || positional[1] || 'UnknownAgent';
-  const intent = intentFlag || positional[2] || 'Modifying file';
+  const agent = agentFlag || positional[1] || '';
+  const intent = intentFlag || positional[2] || '';
   const hasAgent = Boolean(agentFlag || positional[1]);
   const hasIntent = Boolean(intentFlag || positional[2]);
 
   if (!target) {
     console.error('Usage: nexus claim <filepath_or_dir> <agent> "<intent>" [--agent <agent>] [--intent <intent>] [--subagents <n>] [--model <name>] [--thinking <low|medium|high>]');
+    process.exit(1);
+  }
+
+  if (!hasAgent || !isAgentHandle(agent)) {
+    console.error('[ERROR] Missing or invalid claim agent.');
+    console.error('Use: nexus claim <path> @codex "intent"');
+    console.error('Or:  nexus claim <path> --agent @codex --intent "intent"');
+    process.exit(1);
+  }
+
+  if (!hasIntent) {
+    console.error('[ERROR] Missing claim intent.');
+    console.error('Use: nexus claim <path> @codex "intent"');
+    console.error('Or:  nexus claim <path> --agent @codex --intent "intent"');
     process.exit(1);
   }
 
@@ -87,14 +105,6 @@ export default function claim(args) {
 
   if (!CANONICAL_MODEL_HANDLE_SET.has(agent.toLowerCase()) && shouldWarnAgentHandle(agent)) {
     console.warn(`[WARN] Use CLI/model names as lock handles: ${CANONICAL_MODEL_HANDLES_TEXT}.`);
-  }
-
-  if (!hasAgent) {
-    console.warn('[WARN] Claim has no agent handle. Use positional `<agent>` or `--agent @handle`.');
-  }
-
-  if (!hasIntent) {
-    console.warn('[WARN] Claim has no intent. Use positional `"<intent>"` or `--intent "intent"`.');
   }
 
   if (!model) {
