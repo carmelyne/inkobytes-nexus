@@ -69,7 +69,7 @@ export function buildSnapshot() {
     ledger: readLedgerEntries().reverse(),
     standup: parseStandupEntries(standupText).filter(entry => entry.type.startsWith('@')).slice(-8).reverse(),
     releases: parseReleaseEntries(reportText).slice(-16).reverse(),
-    report: reportText,
+    report: sortReportBlocksLatestFirst(reportText),
   };
 }
 
@@ -361,6 +361,24 @@ function hasReleaseDetailValue(detail) {
   const colon = detail.indexOf(':');
   if (colon === -1) return detail.trim().length > 0;
   return detail.slice(colon + 1).trim().length > 0;
+}
+
+function sortReportBlocksLatestFirst(content) {
+  const trimmed = content.trim();
+  if (!trimmed) return content;
+
+  const firstBlock = trimmed.search(/^## \[/m);
+  if (firstBlock === -1) return content;
+
+  const intro = trimmed.slice(0, firstBlock).trimEnd();
+  const blockText = trimmed.slice(firstBlock);
+  const blocks = blockText
+    .split(/\n(?=## \[)/)
+    .map((block) => block.trimEnd())
+    .filter(Boolean)
+    .reverse();
+
+  return `${intro ? `${intro}\n\n` : ''}${blocks.join('\n\n')}\n`;
 }
 
 function readDashboardHtml() {
