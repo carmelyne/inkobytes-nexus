@@ -2807,3 +2807,83 @@ Structured release receipts.
 - SHA: b08a29bfaba9b9cbaaa503fe81e862c5b539b71d
 - Commit: claim-agent-handle-required: record queue metric
 
+## [2026-06-01 11:14:13 PM] drills/nexus-agent-protocol/cases
+
+- Agent: @codex
+- Target: drills/nexus-agent-protocol/cases
+- Claim HEAD: 87a44d172c1b9c9c9e1722824d399ecb62b9478b
+- Release HEAD: 87a44d172c1b9c9c9e1722824d399ecb62b9478b
+- Drift: no
+- SHA: 9772a1f2110c3d3061c04d1893472b0e0f8e4bad
+- Commit: replace recipe handlers with drills
+
+## [2026-06-01 11:14:17 PM] drills/nexus-agent-protocol/README.md
+
+- Agent: unknown
+- Target: drills/nexus-agent-protocol/README.md
+- Claim HEAD: unknown
+- Release HEAD: 9772a1f2110c3d3061c04d1893472b0e0f8e4bad
+- Drift: no
+- SHA: ad3a55d11d6c998719b0c1b47ab2b86d1798ca92
+- Commit: document new protocol drills
+
+## [2026-06-01 11:14:25 PM] _NEXUS_CONSTITUTION.md
+
+- Agent: @codex
+- Target: _NEXUS_CONSTITUTION.md
+- Claim HEAD: 87a44d172c1b9c9c9e1722824d399ecb62b9478b
+- Release HEAD: ad3a55d11d6c998719b0c1b47ab2b86d1798ca92
+- Drift: yes
+- SHA: 490daf7ec7e967358e1a450837582cdd11140563
+- Commit: route protocol guidance to drills
+
+## [2026-06-01 11:14:30 PM] src/commands/init.js
+
+- Agent: @codex
+- Target: src/commands/init.js
+- Claim HEAD: 87a44d172c1b9c9c9e1722824d399ecb62b9478b
+- Release HEAD: 490daf7ec7e967358e1a450837582cdd11140563
+- Drift: yes
+- SHA: 16c0328db6595c2c7b14908f25b4020f46880669
+- Commit: generate drill guidance in protocol scaffolds
+
+## [2026-06-01 11:14:33 PM] src/commands/doctor.js
+
+- Agent: @codex
+- Target: src/commands/doctor.js
+- Claim HEAD: 87a44d172c1b9c9c9e1722824d399ecb62b9478b
+- Release HEAD: 16c0328db6595c2c7b14908f25b4020f46880669
+- Drift: yes
+- SHA: 9da82788085b3c34139cabec54a6b0a3dd1505c6
+- Commit: generate drill guidance in doctor scaffolds
+
+## [2026-06-01 11:14:38 PM] test/init.test.js
+
+- Agent: @codex
+- Target: test/init.test.js
+- Claim HEAD: 87a44d172c1b9c9c9e1722824d399ecb62b9478b
+- Release HEAD: 9da82788085b3c34139cabec54a6b0a3dd1505c6
+- Drift: yes
+- SHA: 408d91eb775a2f8b217333e27a9786460ea6da2c
+- Commit: assert drill guidance scaffolds
+
+## [2026-06-01 11:14:41 PM] test/doctor.test.js
+
+- Agent: @codex
+- Target: test/doctor.test.js
+- Claim HEAD: 87a44d172c1b9c9c9e1722824d399ecb62b9478b
+- Release HEAD: 408d91eb775a2f8b217333e27a9786460ea6da2c
+- Drift: yes
+- SHA: 2c8183aa6a64d009f7f2ca23f53ba29f9f5f6fe7
+- Commit: assert doctor drill guidance repair
+
+## [2026-06-01 11:15:10 PM] recipes
+
+- Agent: @codex
+- Target: recipes
+- Claim HEAD: 87a44d172c1b9c9c9e1722824d399ecb62b9478b
+- Release HEAD: 2c8183aa6a64d009f7f2ca23f53ba29f9f5f6fe7
+- Drift: yes
+- SHA: 5bf53b13b355b7111ae57fb6e3dc7e5aaed156fe
+- Commit: remove retired recipes
+
