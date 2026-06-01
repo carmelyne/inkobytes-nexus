@@ -466,3 +466,16 @@
 - Commit: standup-missing-date-warning: warn on legacy standup lines
 - Source: release
 
+## drill-agent-playbook-copy
+
+- Id: drill-agent-playbook-copy
+- Title: Reframe drills as agent playbooks
+- Agent: @codex
+- Epic: Open-source CLI release
+- Cost: small
+- Completed At: 2026-06-01T08:20:13.957Z
+- Files: README.md, drills/nexus-agent-protocol/README.md, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+- SHA: e689d45837e05edd325b97e6f5643a57b5e6f985
+- Commit: drill-agent-playbook-copy: clarify drills as recovery playbooks
+- Source: release
+

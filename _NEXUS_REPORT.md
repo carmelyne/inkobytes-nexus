@@ -2542,3 +2542,33 @@ Structured release receipts.
 - SHA: 6997961eaac6af645f0cdc2ed57240148e7d766b
 - Commit: standup-missing-date-warning: queue dashboard metric
 
+## [2026-06-01 04:20:13 PM] README.md
+
+- Agent: @codex
+- Target: README.md
+- Claim HEAD: e1fe7ab14ca1f3485b83419f4cfee50aa2976225
+- Release HEAD: e1fe7ab14ca1f3485b83419f4cfee50aa2976225
+- Drift: no
+- SHA: e689d45837e05edd325b97e6f5643a57b5e6f985
+- Commit: drill-agent-playbook-copy: clarify drills as recovery playbooks
+
+## [2026-06-01 04:20:13 PM] _NEXUS_QUEUE.md
+
+- Agent: @codex
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: e1fe7ab14ca1f3485b83419f4cfee50aa2976225
+- Release HEAD: e1fe7ab14ca1f3485b83419f4cfee50aa2976225
+- Drift: no
+- SHA: fc861aaab84faccac3f8e25aeadcbcce10c2554f
+- Commit: drill-agent-playbook-copy: queue drill copy metric
+
+## [2026-06-01 04:20:14 PM] drills/nexus-agent-protocol/README.md
+
+- Agent: @codex
+- Target: drills/nexus-agent-protocol/README.md
+- Claim HEAD: e1fe7ab14ca1f3485b83419f4cfee50aa2976225
+- Release HEAD: e1fe7ab14ca1f3485b83419f4cfee50aa2976225
+- Drift: no
+- SHA: 57f8b6bbddaf47ea17e5f20e79130ebc78800e18
+- Commit: drill-agent-playbook-copy: document drill guidance role
+
