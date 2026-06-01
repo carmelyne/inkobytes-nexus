@@ -6,6 +6,19 @@
 
 ## Ready Queue
 
+- [x] TASK/Codex: Make queue presence dots follow active locks
+  - Id: queue-presence-dot-active-locks
+  - Epic: Dashboard observability
+  - Status: Done
+  - Depends on: agent-presence
+  - Files: nexus-dashboard/index.html, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+  - Affinity: dashboard, presence, locks
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Mark queue agent presence dots online when the agent has a non-stale active lock, even if no heartbeat file is present.
+
 - [x] TASK/Codex: Replace Standup @agent labels with agent icon
   - Id: standup-agent-icon-label
   - Epic: Dashboard observability
