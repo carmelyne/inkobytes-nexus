@@ -86,6 +86,33 @@ test('doctor reports stale managed protocol blocks without supply-chain safety',
   });
 });
 
+test('doctor --fix repairs standup date guidance without removing entries', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), [
+      '# Standup',
+      '',
+      '*Rules: Append new entries at the bottom. One line per message. Use `YYYY-MM-DD HH:MM @agent [STATUS]: message` so relevance is visible.*',
+      '',
+      '2026-06-01 08:38 @codex [DONE]: Old entry keeps its text.',
+      '',
+    ].join('\n'), 'utf-8');
+
+    const report = captureLogs(() => doctor([]));
+    assert.match(report, /_NEXUS_STANDUP\.md is missing standard dated AM\/PM message guidance/);
+
+    captureLogs(() => doctor(['--fix']));
+
+    const standup = readFileSync(join(root, '_NEXUS_STANDUP.md'), 'utf-8');
+    assert.match(standup, /YYYY-MM-DD HH:MM AM\/PM @agent \[STATUS\]: message/);
+    assert.match(standup, /Old entry keeps its text/);
+
+    const cleanReport = captureLogs(() => doctor([]));
+    assert.doesNotMatch(cleanReport, /_NEXUS_STANDUP\.md is missing standard dated AM\/PM message guidance/);
+  });
+});
+
 test('doctor --fix replaces unmarked protocol text instead of duplicating it', () => {
   inTempRepo((root) => {
     writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
