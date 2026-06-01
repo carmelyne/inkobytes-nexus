@@ -556,3 +556,16 @@
 - SHA: 9b41f15c3f0ad8c0a127df12f5f9c6f74dd54c95
 - Commit: next-related-drills: surface related drill ids
 - Source: release
+## claim-agent-handle-required
+
+- Id: claim-agent-handle-required
+- Title: Hard-fail invalid claim agent handles
+- Agent: @codex
+- Epic: Agent guardrails
+- Cost: small
+- Completed At: 2026-06-01T13:26:23.054Z
+- Files: src/commands/claim.js, test/claim.test.js, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+- SHA: eebc78ed84da3c279d0c6617a12115d8c239ac33
+- Commit: claim-agent-handle-required: reject invalid agent handles
+- Source: release
+

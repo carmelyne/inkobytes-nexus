@@ -2777,3 +2777,33 @@ Structured release receipts.
 - Drift: yes
 - SHA: 6fc1e89365d7859d694c5a9e9fc18095509a5a26
 - Commit: next-related-drills: record queue metric
+## [2026-06-01 09:26:23 PM] src/commands/claim.js
+
+- Agent: @codex
+- Target: src/commands/claim.js
+- Claim HEAD: e56eff5b5fba0ba4d256f29ae130d929cfced33d
+- Release HEAD: e56eff5b5fba0ba4d256f29ae130d929cfced33d
+- Drift: no
+- SHA: eebc78ed84da3c279d0c6617a12115d8c239ac33
+- Commit: claim-agent-handle-required: reject invalid agent handles
+
+## [2026-06-01 09:26:27 PM] test/claim.test.js
+
+- Agent: @codex
+- Target: test/claim.test.js
+- Claim HEAD: e56eff5b5fba0ba4d256f29ae130d929cfced33d
+- Release HEAD: eebc78ed84da3c279d0c6617a12115d8c239ac33
+- Drift: yes
+- SHA: f09a8f6ed94b72b36bdf5ffca5923e08be531efd
+- Commit: claim-agent-handle-required: cover invalid agent rejection
+
+## [2026-06-01 09:26:31 PM] _NEXUS_QUEUE.md
+
+- Agent: @codex
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: e56eff5b5fba0ba4d256f29ae130d929cfced33d
+- Release HEAD: f09a8f6ed94b72b36bdf5ffca5923e08be531efd
+- Drift: yes
+- SHA: b08a29bfaba9b9cbaaa503fe81e862c5b539b71d
+- Commit: claim-agent-handle-required: record queue metric
+
