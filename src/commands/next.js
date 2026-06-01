@@ -154,7 +154,7 @@ function relatedDrillsForTask(task) {
       }
     }
   }
-  return [...new Set(matches)].slice(0, 3);
+  return [...new Set(matches)];
 }
 
 function parseRunway(content, agent) {
