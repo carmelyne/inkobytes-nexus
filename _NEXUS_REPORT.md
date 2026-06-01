@@ -2937,3 +2937,13 @@ Structured release receipts.
 - SHA: 0312606d1f6a7bcdfdb2dd3bf98f90e4d64b0b1c
 - Commit: document standup command in dashboard docs
 
+## [2026-06-02 12:43:09 AM] _NEXUS_QUEUE.md
+
+- Agent: @codex
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: 6ab1ab160cac12cfbd8d279b75f363ec39d0c3bc
+- Release HEAD: 6ab1ab160cac12cfbd8d279b75f363ec39d0c3bc
+- Drift: no
+- SHA: 41f504c8f3b498ccb207cb1f5201d3b027903614
+- Commit: draft drill-triggering queue item
+
