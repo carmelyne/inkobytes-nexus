@@ -9,6 +9,7 @@ const COMMANDS = {
   checkout: () => import('../src/commands/checkout.js'),
   claim: () => import('../src/commands/claim.js'),
   release: () => import('../src/commands/release.js'),
+  standup: () => import('../src/commands/standup.js'),
   status: () => import('../src/commands/status.js'),
   clean: () => import('../src/commands/clean.js'),
   next: () => import('../src/commands/next.js'),
@@ -67,6 +68,7 @@ Commands:
   claim <path> <agent> "<intent>"   Lock a file or directory
                                     Also accepts --agent and --intent
   release <path> "<commit msg>"     Unlock, auto-commit, and log
+  standup "<dated message>"          Append a validated standup line
   status                            Show current blackboard state
   clean [--stale | <path>]          Prune locks (surgical, stale, or nuke)
   next <agent>                      Suggest next safe task from queue
@@ -99,6 +101,7 @@ Examples:
   nexus soul
   nexus claim src/lib/components/login/ @claude "Building login UI"
   nexus release src/lib/components/login/ "feat: login form component"
+  nexus standup "2026-06-01 08:38 AM @codex [DONE]: Updated tests"
   nexus clean --stale
   nexus next @claude
 `);
