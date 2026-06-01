@@ -54,6 +54,10 @@ test('dashboard snapshot summarizes Nexus repo state', () => {
       '2026-06-01 09:30 AM @codex [DONE]: Dashboard v1 shipped',
     ].join('\n'), 'utf-8');
     writeFileSync(join(root, '_NEXUS_REPORT.md'), [
+      '# Nexus Report',
+      '',
+      'Structured release receipts.',
+      '',
       '## [12:00:00] docs/README.md',
       '- Agent: @codex',
       '- Target: docs/README.md',
@@ -101,6 +105,8 @@ test('dashboard snapshot summarizes Nexus repo state', () => {
       { type: 'Commit', title: 'feat: dashboard', meta: '' },
       { type: 'Commit', title: 'docs: placeholder', meta: '' },
     ]);
+    assert.ok(snapshot.report.indexOf('## [12:01:00] src/commands/dashboard.js') < snapshot.report.indexOf('## [12:00:00] docs/README.md'));
+    assert.match(snapshot.report, /^# Nexus Report\n\nStructured release receipts\./);
     assert.equal(snapshot.ledger[0].id, 'dashboard-v1');
     assert.equal(snapshot.ledger[0].epic, 'Dashboard observability');
   });
