@@ -41,6 +41,8 @@ Cases live in `cases/*.yaml`.
 - `cases/done-claim-adversarial.yaml`
 - `cases/current-file-state.yaml`
 - `cases/ghost-file-claim-loop.yaml`
+- `cases/blocked.yaml`
+- `cases/issue-found.yaml`
 - `cases/task-contract.yaml`
 - `cases/removal-scope.yaml`
 - `cases/data-boundary-table-header.yaml`
