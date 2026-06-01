@@ -2412,3 +2412,53 @@ Structured release receipts.
 - SHA: 3cedd74866584d5e065685057207abfa174dc3f0
 - Commit: standup-feed-labels: style standup labels
 
+## [2026-06-01 03:25:43 PM] test/dashboard.test.js
+
+- Agent: @codex
+- Target: test/dashboard.test.js
+- Claim HEAD: 7ecc5e470ffe34f33a2d6d43a8bde69c1452dcd8
+- Release HEAD: 7ecc5e470ffe34f33a2d6d43a8bde69c1452dcd8
+- Drift: no
+- SHA: 3ef8b799eca07468d8f29376aa9f3d8981ef4b1d
+- Commit: standup-clean-dated-layout: test dated standup feed
+
+## [2026-06-01 03:25:43 PM] nexus-dashboard/index.html
+
+- Agent: @codex
+- Target: nexus-dashboard/index.html
+- Claim HEAD: 7ecc5e470ffe34f33a2d6d43a8bde69c1452dcd8
+- Release HEAD: 7ecc5e470ffe34f33a2d6d43a8bde69c1452dcd8
+- Drift: no
+- SHA: b1332aafca496c20a678737d2b1028f09baf80a9
+- Commit: standup-clean-dated-layout: order standup fields
+
+## [2026-06-01 03:25:44 PM] src/commands/dashboard.js
+
+- Agent: @codex
+- Target: src/commands/dashboard.js
+- Claim HEAD: 7ecc5e470ffe34f33a2d6d43a8bde69c1452dcd8
+- Release HEAD: 7ecc5e470ffe34f33a2d6d43a8bde69c1452dcd8
+- Drift: no
+- SHA: 08aa28ca2feee2ea06210a04945db20715530ec4
+- Commit: standup-clean-dated-layout: show only dated standup entries
+
+## [2026-06-01 03:25:45 PM] nexus-dashboard/style.css
+
+- Agent: @codex
+- Target: nexus-dashboard/style.css
+- Claim HEAD: 7ecc5e470ffe34f33a2d6d43a8bde69c1452dcd8
+- Release HEAD: 7ecc5e470ffe34f33a2d6d43a8bde69c1452dcd8
+- Drift: no
+- SHA: ff8f50881721511894b47e7c4999e62190b6cc2d
+- Commit: standup-clean-dated-layout: add standup title gap
+
+## [2026-06-01 03:25:54 PM] _NEXUS_QUEUE.md
+
+- Agent: @codex
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: 7ecc5e470ffe34f33a2d6d43a8bde69c1452dcd8
+- Release HEAD: ff8f50881721511894b47e7c4999e62190b6cc2d
+- Drift: yes
+- SHA: 7e5b4f1f55f54c25d25e0d95b9db19ce3101df34
+- Commit: standup-clean-dated-layout: queue dashboard cleanup metric
+

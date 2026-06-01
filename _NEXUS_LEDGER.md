@@ -427,3 +427,16 @@
 - Commit: standup-feed-labels: queue dashboard label metric
 - Source: release
 
+## standup-clean-dated-layout
+
+- Id: standup-clean-dated-layout
+- Title: Clean Standup dashboard row order
+- Agent: @codex
+- Epic: Dashboard observability
+- Cost: small
+- Completed At: 2026-06-01T07:25:43.061Z
+- Files: src/commands/dashboard.js, test/dashboard.test.js, nexus-dashboard/index.html, nexus-dashboard/style.css, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+- SHA: 3ef8b799eca07468d8f29376aa9f3d8981ef4b1d
+- Commit: standup-clean-dated-layout: test dated standup feed
+- Source: release
+
