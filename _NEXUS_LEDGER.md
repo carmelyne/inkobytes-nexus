@@ -336,3 +336,16 @@
 - Commit: standup-dated-format: parse dated standup entries
 - Source: release
 
+## npm-publish-metadata-cleanup
+
+- Id: npm-publish-metadata-cleanup
+- Title: Clean npm publish metadata warnings
+- Agent: @codex
+- Epic: Open-source CLI release
+- Cost: small
+- Completed At: 2026-06-01T01:16:16.959Z
+- Files: package.json, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+- SHA: e2ad203425942c48437617e960915b52be145c31
+- Commit: npm-publish-metadata-cleanup: normalize package metadata
+- Source: release
+
