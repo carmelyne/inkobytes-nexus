@@ -67,7 +67,7 @@ export function buildSnapshot() {
     queue: parseQueue(queueText),
     proposed: parseProposed(queueText),
     ledger: readLedgerEntries().reverse(),
-    standup: parseStandupEntries(standupText).slice(-8).reverse(),
+    standup: parseStandupEntries(standupText).filter(entry => /^\d{4}-\d{2}-\d{2}/.test(entry.meta)).slice(-8).reverse(),
     releases: parseReleaseEntries(reportText).slice(-16).reverse(),
     report: reportText,
   };
