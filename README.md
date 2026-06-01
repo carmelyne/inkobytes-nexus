@@ -1,40 +1,57 @@
 # @inkobytes/nexus
 
-Local coordination for AI coding agents sharing one Git repository.
+Run more than one AI coding agent in the same project without them stepping on each other.
 
-Nexus is a small CLI that gives multiple agent sessions a shared queue, file locks, release receipts, and a read-only dashboard. It is local-first, Git-backed, Markdown-readable, and does not require a server.
+The hard part starts when they are working at the same time.
 
-## Why Nexus Exists
-
-Claude Code, Codex CLI, Gemini CLI, and other agents can all work in the same repo, but they need a shared operating protocol. Without one, agents can collide on files, pollute each other's staging area, lose context, or ask the human to keep the whole work map in their head.
-
-Nexus keeps coordination in repo-local files. Everyone sees the same queue, locks, standup notes, and latest Git state. Claims and scoped releases give separate CLI sessions enough lane discipline to work in the same repo without a separate coordination service.
-
-Nexus gives the agent team a simple loop:
+Nexus gives the repo a simple traffic system:
 
 ```text
 start -> claim -> work -> release -> next
 ```
 
-Git still stores the real commits. Nexus handles the agent coordination around those commits.
+Agents use Nexus to say:
+
+- "I am working on this file."
+- "This is why I claimed it."
+- "This task is done."
+- "These are the files I changed."
+- "Here is what the next agent should know."
+
+Everything stays local in the repo. No server. No database. No cloud dashboard. Just files, Git, and a small CLI.
+
+Nexus is focused on one specific problem: multiple AI coding agents working at the same time in one local checkout, with explicit file claims, queue state, release receipts, and handoff notes.
+
+## Why Nexus Exists
+
+If two agents touch the same files, things get messy fast:
+
+- one agent may overwrite another agent's work
+- one agent may commit files it did not mean to commit
+- agents may lose track of what was already done
+- after a reset, nobody knows what was safe or unfinished
+- the human ends up with the mess
+
+With Nexus, Git still stores the code history. Nexus tracks the operational state around Git: who claimed what, what task they are doing, what got released, and what another agent should read next.
 
 ## What Nexus Is And Is Not
 
 Nexus is:
 
-- a repo-local coordination layer for humans running one or more coding agents
-- a claim/release workflow that stages only the claimed path
-- a Markdown queue, standup, report log, and completed-task ledger
-- a local dashboard over those same files
-- protocol drills for testing known shared-repo failure modes
+- a way for agents to reserve files before editing them
+- a queue so agents know what is safe to pick up next
+- a release command that commits only the claimed path
+- a standup and report log humans can read
+- a local dashboard over the same repo files
+- a drill set for testing known multi-agent failure cases
 
 Nexus is not:
 
-- an autonomous agent runtime
-- a replacement for Git, tests, review, or human judgment
-- a cloud orchestrator, daemon, database, or hosted service
-- a guarantee that agents cannot make bad edits
-- a benchmark or leaderboard for models
+- a tool that runs the agents for you
+- a replacement for Git, tests, review, or judgment
+- a hosted service or cloud control panel
+- a promise that agents cannot make bad edits
+- a model benchmark
 
 ## Install
 
@@ -132,8 +149,8 @@ Doctor reports grouped issues:
 - missing Nexus files
 - package script exfiltration and install-hook risks
 - package privacy risks for local/private files
-- stale locks
-- missing agent instructions
+- stale nexus locks
+- missing agent instructions specifically for nexus
 - missing continuity and memory scaffolds
 - legacy `_nexus_*.sh` helper references
 
@@ -154,9 +171,11 @@ nexus soul --remove
 nexus soul --file .nexus/local/my-agent-overlay.md
 ```
 
-By default, Nexus creates `.nexus/local/agent-overlay.md` if it does not exist, then inserts that file above the managed Nexus protocol block in `.codex/AGENTS.md`, `.claude/CLAUDE.md`, and `.gemini/GEMINI.md`. Edit the overlay file locally, then rerun `nexus soul` to refresh the inserted blocks.
+Use `nexus soul` for local agent persona text: tone, collaboration style, and identity notes that the human wants their agents to carry in this repo.
 
-The overlay content is local repo state, not package content. `nexus doctor` ignores soul blocks and only manages the public Nexus protocol block.
+Nexus stores the persona text in `.nexus/local/agent-overlay.md`, then copies it into local agent guide files above the managed Nexus protocol block. Edit `.nexus/local/agent-overlay.md`, rerun `nexus soul`, and the local agent persona layer is refreshed.
+
+Do not use soul for project rules that every contributor needs. Put those in `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, or the repo docs. `nexus doctor` manages only the public Nexus protocol block and leaves soul persona text alone.
 
 ### `nexus start`
 
@@ -170,7 +189,7 @@ Start reports only local facts: repo path, branch, last commits, dirty files, ac
 
 ### `nexus dashboard --serve [--port <port>]`
 
-Serve a read-only local dashboard for human Nexus status checks.
+Serve a read-only local Nexus dashboard to see progress and issues.
 
 ```bash
 nexus dashboard --serve
