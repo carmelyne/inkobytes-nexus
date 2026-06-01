@@ -2262,3 +2262,33 @@ Structured release receipts.
 - SHA: 0171dec79eceb0fd10841771f322b45ef594abc4
 - Commit: npm-publish-metadata-cleanup: fix repository url
 
+## [13:54:23] README.md
+
+- Agent: @codex
+- Target: README.md
+- Claim HEAD: 2ed1327173acaa0c938c5d9d9b30923c3c562ec9
+- Release HEAD: 2ed1327173acaa0c938c5d9d9b30923c3c562ec9
+- Drift: no
+- SHA: ffc7e2cb5871948917db6f4bd91d049cd0143f87
+- Commit: readme-public-release-pass: clarify public positioning
+
+## [13:54:26] _NEXUS_QUEUE.md
+
+- Agent: @codex
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: 2ed1327173acaa0c938c5d9d9b30923c3c562ec9
+- Release HEAD: ffc7e2cb5871948917db6f4bd91d049cd0143f87
+- Drift: yes
+- SHA: 86f6705bae2eb108473a49ea6e09b818c30e1a78
+- Commit: readme-public-release-pass: queue release metric
+
+## [13:54:39] _NEXUS_LEDGER.md
+
+- Agent: @codex
+- Target: _NEXUS_LEDGER.md
+- Claim HEAD: 86f6705bae2eb108473a49ea6e09b818c30e1a78
+- Release HEAD: 86f6705bae2eb108473a49ea6e09b818c30e1a78
+- Drift: no
+- SHA: 9288f225a20d6d55c5c55197dd9c9cd6d99f59fb
+- Commit: readme-public-release-pass: record completed task
+
