@@ -6,6 +6,19 @@
 
 ## Ready Queue
 
+- [x] TASK/Codex: Clean npm publish metadata warnings
+  - Id: npm-publish-metadata-cleanup
+  - Epic: Open-source CLI release
+  - Status: Done
+  - Depends on: none
+  - Files: package.json, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+  - Affinity: release, npm, package
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Normalize package metadata that npm publish dry-run auto-corrected (`bin.nexus` path and repository URL) so final publish dry-run is clean and deterministic.
+
 - [x] TASK/Codex: Add dated standup entry format
   - Id: standup-dated-format
   - Epic: Dashboard observability
