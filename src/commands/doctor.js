@@ -50,6 +50,8 @@ Local agent work decisions live here. This file is gitignored by Nexus.
 `;
 
 const LOCAL_GITIGNORE_LINES = ['DECISIONS.md', 'docs-priv/', '.nexus/presence/'];
+const STANDUP_FORMAT_GUIDANCE = 'YYYY-MM-DD HH:MM AM/PM @agent [STATUS]: message';
+const STANDUP_RULES_LINE = `*Rules: Append new entries at the bottom. One line per message. Use \`${STANDUP_FORMAT_GUIDANCE}\` so relevance is visible. Use 🧵 for long discussions.*`;
 
 const MEMORY_INDEX_TEMPLATE = `# Memory Index
 
@@ -317,6 +319,28 @@ function ensureGitignoreLines(root, lines, fix, changes) {
   return true;
 }
 
+function repairStandupGuidance(content) {
+  if (content.includes(STANDUP_FORMAT_GUIDANCE)) return content;
+
+  const newline = content.includes('\r\n') ? '\r\n' : '\n';
+  const lines = content.split(/\r?\n/);
+  const rulesIndex = lines.findIndex((line) => line.includes('*Rules:') && line.includes('@agent'));
+
+  if (rulesIndex !== -1) {
+    lines[rulesIndex] = STANDUP_RULES_LINE;
+    return lines.join(newline);
+  }
+
+  const firstHeadingIndex = lines.findIndex((line) => line.trim().startsWith('#'));
+  if (firstHeadingIndex !== -1) {
+    lines.splice(firstHeadingIndex + 1, 0, '', STANDUP_RULES_LINE);
+    return lines.join(newline);
+  }
+
+  const trimmed = content.trimEnd();
+  return `${trimmed}${trimmed ? `${newline}${newline}` : ''}${STANDUP_RULES_LINE}${newline}`;
+}
+
 export default function doctor(args) {
   const fix = args.includes('--fix');
   const json = args.includes('--json');
@@ -358,6 +382,23 @@ export default function doctor(args) {
         issue: `Missing ${file}`,
         fix: 'Run `nexus init` or restore the Nexus protocol files.',
       });
+    }
+  }
+
+  const standupPath = join(root, '_NEXUS_STANDUP.md');
+  if (existsSync(standupPath)) {
+    const existing = readFileSync(standupPath, 'utf-8');
+    const next = repairStandupGuidance(existing);
+    if (next !== existing) {
+      if (fix) {
+        writeFileSync(standupPath, next, 'utf-8');
+        changes.push('updated _NEXUS_STANDUP.md date guidance');
+      } else {
+        sections['Nexus Files'].push({
+          issue: '_NEXUS_STANDUP.md is missing standard dated AM/PM message guidance',
+          fix: 'Run `nexus doctor --fix`.',
+        });
+      }
     }
   }
 
