@@ -6,6 +6,19 @@
 
 ## Ready Queue
 
+- [x] TASK/Codex: Show Nexus Report dashboard entries latest first
+  - Id: dashboard-report-latest-first
+  - Epic: Dashboard observability
+  - Status: Done
+  - Depends on: dashboard-latest-first-feeds
+  - Files: src/commands/dashboard.js, test/dashboard.test.js, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+  - Affinity: dashboard, report, comms
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Keep `_NEXUS_REPORT.md` append-friendly on disk, but render dashboard report receipt blocks newest-first like Standup and Recent Releases.
+
 - [x] TASK/Codex: Carry Standup date guidance through doctor
   - Id: standup-doctor-format-fix
   - Epic: Dashboard observability
