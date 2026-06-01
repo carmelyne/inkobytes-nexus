@@ -518,3 +518,16 @@
 - Commit: dashboard-docs-sticky-toc: pin docs toc
 - Source: release
 
+## standup-agent-icon-label
+
+- Id: standup-agent-icon-label
+- Title: Replace Standup @agent labels with agent icon
+- Agent: @codex
+- Epic: Dashboard observability
+- Cost: small
+- Completed At: 2026-06-01T12:03:15.622Z
+- Files: nexus-dashboard/index.html, nexus-dashboard/style.css, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+- SHA: 72bfb631e34396865afe667dab738ce80453f315
+- Commit: standup-agent-icon-label: render bot icon
+- Source: release
+
