@@ -6,6 +6,19 @@
 
 ## Ready Queue
 
+- [x] TASK/Codex: Warn on undated Standup messages
+  - Id: standup-missing-date-warning
+  - Epic: Dashboard observability
+  - Status: Done
+  - Depends on: standup-clean-dated-layout
+  - Files: src/commands/dashboard.js, test/dashboard.test.js, nexus-dashboard/index.html, nexus-dashboard/style.css, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+  - Affinity: dashboard, ux, comms
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Keep legacy `@agent: message` standups visible, but warn when a message is missing date/time and show the standard dated format to use.
+
 - [x] TASK/Codex: Remove Standup dashboard labels
   - Id: standup-unlabeled-standard-layout
   - Epic: Dashboard observability
