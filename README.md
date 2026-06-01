@@ -43,7 +43,7 @@ Nexus is:
 - a release command that commits only the claimed path
 - a standup and report log humans can read
 - a local dashboard over the same repo files
-- a drill set for testing known multi-agent failure cases
+- preventive drills for known multi-agent failure cases
 
 Nexus is not:
 
@@ -222,11 +222,11 @@ nexus drill run wrong-repo-push --input judge-results.json
 nexus drill report
 ```
 
-Drills are scenario playbooks for known agent failure modes. They are not model benchmarks or leaderboards.
+Drills are preventive scenario guides for known agent failure modes. They are not model benchmarks or leaderboards.
 
-A drill captures a situation where an agent may get blocked, confused, or tempted to do the wrong thing, then records the expected recovery path. Use drills as guidance when a similar situation comes up again: known failure -> expected move -> safer next action.
+Each drill captures a situation where an agent is likely to make a bad move, then records the expected behavior before the agent acts. Nexus can surface drill summaries near risky commands, queue work, or guardrail changes so agents get the right move in context without loading every drill.
 
-Drills are also useful after changing Nexus instructions, queue behavior, release behavior, safety guardrails, or `doctor --fix` updates to existing agent files, because you can rerun the same scenarios and check whether the expected behavior still holds.
+Use drills when an agent is about to do work that resembles a known failure mode, or when changing Nexus instructions, queue behavior, release behavior, or safety guardrails and you need to confirm the same failure mode is still covered.
 
 `run` writes artifacts under `.nexus/drill-runs/<timestamp>/`. When given judge input, Nexus validates and normalizes each result into `pass`, `fail`, or `needs_review`; any matched `fail_if` condition overrides expected behavior. Unknown drill ids, invalid statuses, malformed match arrays, and out-of-range confidence values fail loudly. Missing results in a suite run are recorded as `needs_review`. `report` reads the latest run artifacts and summarizes outcomes without rerunning drills.
 
@@ -336,6 +336,14 @@ Nexus reads tasks from `_NEXUS_QUEUE.md`:
 
 The queue is the executable priority surface. Standup is for comms and human context.
 Keep items dashboard-friendly: include `Id`, `Epic`, `Status`, `Depends on`, `Files`, `Affinity`, `Cost`, `Auto-flow`, and `Notes`. Use `Files` to expose conflict surfaces, `Depends on` for hard blockers, and `Auto-flow: no` when a task needs planning or human approval before an agent grabs it.
+
+Add `Drills` when a task has known failure-mode guidance:
+
+```md
+  - Drills: data-mutation-delete-rows, task-contract
+```
+
+When `Drills` is absent, `nexus next` may surface obvious related drills from task metadata. It prints only drill ids and a `nexus drill show <id>` hint so agents get preventive guidance without loading full drill files by default.
 
 ## Agent Protocol
 
