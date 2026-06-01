@@ -1,4 +1,5 @@
 - 🔒 **src/commands/start.js** - Locked by **@codex**: remove hardcoded Pong from startup guidance
 - 🔒 **skills/nexus/SKILL.md** - Locked by **@codex**: document USER.md in Nexus agent playbook
 - 🔒 **src/commands/start.js** - Locked by **@codex**: use shared agent scope metadata
-- 🔒 **_NEXUS.md** - Locked by **@codex**: clean dated standup lock board
+- 🔒 **_NEXUS_REPORT.md** - Locked by **@codex**: settle final dated standup release receipt
+- 🔒 **_NEXUS.md** - Locked by **@codex**: settle final dated standup lock board
