@@ -2602,3 +2602,33 @@ Structured release receipts.
 - SHA: 3b9ecf48d0686ad0d02a7128b2b1f358f0c7fa02
 - Commit: standup-doctor-format-fix: record queue metric
 
+## [2026-06-01 07:39:56 PM] src/commands/dashboard.js
+
+- Agent: @codex
+- Target: src/commands/dashboard.js
+- Claim HEAD: bbb02e703963a8bd741d4ca179490b7d5972811f
+- Release HEAD: bbb02e703963a8bd741d4ca179490b7d5972811f
+- Drift: no
+- SHA: 0414e684b51fdbe5bb31c51de8fb187ba2da3222
+- Commit: dashboard-report-latest-first: sort report blocks
+
+## [2026-06-01 07:40:01 PM] test/dashboard.test.js
+
+- Agent: @codex
+- Target: test/dashboard.test.js
+- Claim HEAD: bbb02e703963a8bd741d4ca179490b7d5972811f
+- Release HEAD: 0414e684b51fdbe5bb31c51de8fb187ba2da3222
+- Drift: yes
+- SHA: e0f43c95ed050a384ae426dbabbca05f43e825dc
+- Commit: dashboard-report-latest-first: test report ordering
+
+## [2026-06-01 07:40:05 PM] _NEXUS_QUEUE.md
+
+- Agent: @codex
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: bbb02e703963a8bd741d4ca179490b7d5972811f
+- Release HEAD: e0f43c95ed050a384ae426dbabbca05f43e825dc
+- Drift: yes
+- SHA: 5efe63797ea44c3249ba09135b1a0b1a520562fd
+- Commit: dashboard-report-latest-first: record queue metric
+

@@ -492,3 +492,16 @@
 - Commit: standup-doctor-format-fix: repair dated standup guidance
 - Source: release
 
+## dashboard-report-latest-first
+
+- Id: dashboard-report-latest-first
+- Title: Show Nexus Report dashboard entries latest first
+- Agent: @codex
+- Epic: Dashboard observability
+- Cost: small
+- Completed At: 2026-06-01T11:39:56.863Z
+- Files: src/commands/dashboard.js, test/dashboard.test.js, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+- SHA: 0414e684b51fdbe5bb31c51de8fb187ba2da3222
+- Commit: dashboard-report-latest-first: sort report blocks
+- Source: release
+
