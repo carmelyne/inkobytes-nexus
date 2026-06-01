@@ -654,6 +654,9 @@ h2 {
   font-size: 11px;
   color: var(--text-accent);
 }
+.feed-row-labeled .feed-title {
+  margin-top: 11px;
+}
 
 /* Terminal / Git Status */
 .terminal-section {
