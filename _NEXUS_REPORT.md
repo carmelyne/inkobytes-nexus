@@ -2072,3 +2072,63 @@ Structured release receipts.
 - SHA: df2488cc256672d857110ec24da17340811b9337
 - Commit: add nexus-short-video task to queue — scenes 1-5 + bridge built
 
+## [08:00:26] src/commands/init.js
+
+- Agent: @codex
+- Target: src/commands/init.js
+- Claim HEAD: e55b4c128d1f60806015a7322da8f9d9ef612ac9
+- Release HEAD: e55b4c128d1f60806015a7322da8f9d9ef612ac9
+- Drift: no
+- SHA: d0411b5c3eb9b84ce3d29f7ea6d9ab4485c1449e
+- Commit: memory-month-folder-boundary: clarify init memory ownership
+
+## [08:00:35] src/commands/doctor.js
+
+- Agent: @codex
+- Target: src/commands/doctor.js
+- Claim HEAD: e55b4c128d1f60806015a7322da8f9d9ef612ac9
+- Release HEAD: d0411b5c3eb9b84ce3d29f7ea6d9ab4485c1449e
+- Drift: yes
+- SHA: e4562236cab7b741cd87535327335d50e2b6c661
+- Commit: memory-month-folder-boundary: clarify doctor memory ownership
+
+## [08:00:39] test/init.test.js
+
+- Agent: @codex
+- Target: test/init.test.js
+- Claim HEAD: e55b4c128d1f60806015a7322da8f9d9ef612ac9
+- Release HEAD: e4562236cab7b741cd87535327335d50e2b6c661
+- Drift: yes
+- SHA: d1dcb197ba5161b56daa58ac448388470070c7fb
+- Commit: memory-month-folder-boundary: test init memory ownership
+
+## [08:00:42] test/doctor.test.js
+
+- Agent: @codex
+- Target: test/doctor.test.js
+- Claim HEAD: e55b4c128d1f60806015a7322da8f9d9ef612ac9
+- Release HEAD: d1dcb197ba5161b56daa58ac448388470070c7fb
+- Drift: yes
+- SHA: 293586afbf7451c0daa937de40e520cf2c923fd2
+- Commit: memory-month-folder-boundary: test doctor memory ownership
+
+## [08:00:45] _NEXUS_QUEUE.md
+
+- Agent: @codex
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: e55b4c128d1f60806015a7322da8f9d9ef612ac9
+- Release HEAD: 293586afbf7451c0daa937de40e520cf2c923fd2
+- Drift: yes
+- SHA: a8178b3c7845f3ecac679a22a4a3ea50b57a1598
+- Commit: memory-month-folder-boundary: queue protocol metric
+
+## [08:00:49] _NEXUS_LEDGER.md
+
+- Agent: @codex
+- Target: _NEXUS_LEDGER.md
+- Claim HEAD: d0411b5c3eb9b84ce3d29f7ea6d9ab4485c1449e
+- Release HEAD: a8178b3c7845f3ecac679a22a4a3ea50b57a1598
+- Drift: yes
+- SHA: 899247792fb7e5e827eba2edab1a64c7032c7c5d
+- Commit: memory-month-folder-boundary: record completed task
+
