@@ -1,15 +1,14 @@
 # @inkobytes/nexus
 
-Agent-team traffic control for AI coding agents sharing one local repository.
+Local coordination for AI coding agents sharing one Git repository.
 
-Nexus is local-first, Git-backed, Markdown-readable, and built for agent teams that need lane discipline without a server.
-Nexus coordinates small agent teams, or swarm, across separate CLI sessions.
+Nexus is a small CLI that gives multiple agent sessions a shared queue, file locks, release receipts, and a read-only dashboard. It is local-first, Git-backed, Markdown-readable, and does not require a server.
 
 ## Why Nexus Exists
 
 Claude Code, Codex CLI, Gemini CLI, and other agents can all work in the same repo, but they need a shared operating protocol. Without one, agents can collide on files, pollute each other's staging area, lose context, or ask the human to keep the whole work map in their head.
 
-Nexus keeps agents on one shared branch with one shared current state. Everyone sees the same files, queue, locks, and latest repo state; claims and scoped release give that shared room enough discipline to stay usable.
+Nexus keeps coordination in repo-local files. Everyone sees the same queue, locks, standup notes, and latest Git state. Claims and scoped releases give separate CLI sessions enough lane discipline to work in the same repo without a separate coordination service.
 
 Nexus gives the agent team a simple loop:
 
@@ -18,6 +17,24 @@ start -> claim -> work -> release -> next
 ```
 
 Git still stores the real commits. Nexus handles the agent coordination around those commits.
+
+## What Nexus Is And Is Not
+
+Nexus is:
+
+- a repo-local coordination layer for humans running one or more coding agents
+- a claim/release workflow that stages only the claimed path
+- a Markdown queue, standup, report log, and completed-task ledger
+- a local dashboard over those same files
+- protocol drills for testing known shared-repo failure modes
+
+Nexus is not:
+
+- an autonomous agent runtime
+- a replacement for Git, tests, review, or human judgment
+- a cloud orchestrator, daemon, database, or hosted service
+- a guarantee that agents cannot make bad edits
+- a benchmark or leaderboard for models
 
 ## Install
 
@@ -40,7 +57,11 @@ In a Git repo:
 ```bash
 nexus init
 nexus start
+nexus claim README.md @codex "try Nexus on one file"
+nexus release README.md "docs: try Nexus"
 ```
+
+`nexus start` is orientation only. The edit loop is `claim -> work -> release`.
 
 `nexus init` creates the Nexus coordination files:
 
@@ -75,6 +96,13 @@ Memory folders are month-based from the start, for example:
 .agy/memories/2026-May/
 .claude/memories/2026-May/
 .gemini/memories/2026-May/
+```
+
+If you only want to inspect an existing repo before changing anything, run:
+
+```bash
+nexus doctor
+nexus dashboard --serve
 ```
 
 ## Commands
@@ -223,7 +251,7 @@ Release a claimed path, commit it through Git, update the blackboard, and append
 nexus release src/lib/components/login/ "feat: login form"
 ```
 
-Nexus stages only the released path before committing, which helps avoid stowaway changes from other agents.
+Nexus stages only the released path before committing, which helps avoid unrelated changes from other agents.
 If Git's index is temporarily locked by another release, Nexus waits briefly and retries before failing with a clearer message.
 
 Each release appends a repo-local receipt to `_NEXUS_REPORT.md`. If the released path is listed on a completed queue task and the release message names that task id, Nexus also appends one deduplicated completed-task entry to `_NEXUS_LEDGER.md`.
@@ -341,6 +369,20 @@ Older Nexus experiments used shell helpers:
 ```
 
 `nexus doctor` reports these references. `nexus doctor --fix` updates checked protocol docs to the CLI form.
+
+## Privacy And Safety
+
+Nexus stores coordination state in plain files so humans can inspect it. That also means you should keep repo-local private context out of package and public Git payloads.
+
+Before publishing or making a repo public, run:
+
+```bash
+nexus doctor
+npm pack --dry-run
+git status --short
+```
+
+`nexus doctor` reports package privacy risks for local/private files such as `USER.md`, `DECISIONS.md`, `docs-priv/`, and agent-local state when package files would include them. `npm pack --dry-run` shows the exact files that would ship to npm.
 
 ## Design Notes
 
