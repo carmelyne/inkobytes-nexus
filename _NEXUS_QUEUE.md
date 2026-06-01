@@ -6,6 +6,19 @@
 
 ## Ready Queue
 
+- [x] TASK/Codex: Tighten README for first public release
+  - Id: readme-public-release-pass
+  - Epic: Open-source CLI release
+  - Status: Done
+  - Depends on: none
+  - Files: README.md, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+  - Affinity: docs, release, onboarding
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Make README less hype-prone before public release: clarify what Nexus is/is not, tighten quick start, and add privacy/safety checks before npm/GitHub publication.
+
 - [x] TASK/Codex: Clean npm publish metadata warnings
   - Id: npm-publish-metadata-cleanup
   - Epic: Open-source CLI release
