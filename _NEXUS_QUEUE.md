@@ -6,6 +6,19 @@
 
 ## Ready Queue
 
+- [x] TASK/Codex: Add labels to standup dashboard rows
+  - Id: standup-feed-labels
+  - Epic: Dashboard observability
+  - Status: Done
+  - Depends on: none
+  - Files: nexus-dashboard/index.html, nexus-dashboard/style.css, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+  - Affinity: dashboard, ux, comms
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Label Standup feed fields as Agent, Title, and Date so the dashboard is explicit about what each line means.
+
 - [x] TASK/Codex: Show latest dashboard feed items first
   - Id: dashboard-latest-first-feeds
   - Epic: Dashboard observability
