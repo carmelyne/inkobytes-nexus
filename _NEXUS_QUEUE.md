@@ -6,6 +6,19 @@
 
 ## Ready Queue
 
+- [x] TASK/Codex: Surface related drills in nexus next
+  - Id: next-related-drills
+  - Epic: Agent guardrails
+  - Status: Done
+  - Depends on: none
+  - Files: src/commands/next.js, test/next.test.js, README.md, drills/nexus-agent-protocol/README.md, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+  - Affinity: next, drills, protocol
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Let queue tasks optionally pin `Drills`, and have `nexus next` surface short related drill ids from manual pins or obvious task metadata so agents get preventive guidance without loading full drill files.
+
 - [x] TASK/Codex: Make queue presence dots follow active locks
   - Id: queue-presence-dot-active-locks
   - Epic: Dashboard observability
