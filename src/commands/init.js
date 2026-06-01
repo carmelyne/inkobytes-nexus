@@ -169,20 +169,20 @@ Before broad or destructive work, agents must restate:
 
 If any of those are missing or ambiguous and the task is broad, destructive, irreversible, security-sensitive, architecture-changing, or dependency-related, stop and ask before implementation.
 
-## 5. Recipe Router
+## 5. Drill Guidance
 
-Recipes are local situation handlers. If a situation matches, read the recipe before acting.
+Drills are preventive scenario guides for known agent failure modes. If a situation resembles a drill, use that drill to avoid the bad move before acting.
 
-| Situation | Recipe |
+| Situation | Drill |
 |---|---|
-| Blocked or unsafe to proceed | \`recipes/blocked.md\` |
-| Found a bug, mismatch, suspicious behavior, or defect | \`recipes/issue-found.md\` |
-| Removing a dependency, service, framework, vendor, or integration | \`recipes/removal-scope.md\` |
-| Task is broad, destructive, irreversible, security-sensitive, architecture-changing, or dependency-related | \`recipes/task-contract.md\` |
-| Touching persisted data, fixtures, uploads, app caches, migrations, or ambiguous data terms | \`recipes/data-mutation.md\` |
+| Blocked or unsafe to proceed | \`drills/nexus-agent-protocol/cases/blocked.yaml\` |
+| Found a bug, mismatch, suspicious behavior, or defect | \`drills/nexus-agent-protocol/cases/issue-found.yaml\` |
+| Removing a dependency, service, framework, vendor, or integration | \`drills/nexus-agent-protocol/cases/removal-scope.yaml\` |
+| Task is broad, destructive, irreversible, security-sensitive, architecture-changing, or dependency-related | \`drills/nexus-agent-protocol/cases/task-contract.yaml\` |
+| Touching persisted data, fixtures, uploads, app caches, migrations, or ambiguous data terms | \`drills/nexus-agent-protocol/cases/data-mutation-delete-rows.yaml\` |
 
-If no recipe matches, continue with the smallest safe change.
-If a referenced recipe file is missing, continue from this constitution and use the smallest safe change; ask first if the task is risky.
+If no drill matches, continue with the smallest safe change.
+If a referenced drill file is missing, continue from this constitution and use the smallest safe change; ask first if the task is risky.
 
 ## 6. Claim Granularity
 
@@ -394,10 +394,10 @@ This project uses Nexus for multi-agent coordination.
 - If another agent or tool may have touched the file since your last read, re-read it before editing.
 - If a claim appears stale, do not edit through it; run \`nexus status\` or \`nexus doctor\`, then clean only when ownership is clearly abandoned.
 
-### Recipes
+### Drills
 
-Recipe routing is defined in \`_NEXUS_CONSTITUTION.md\`.
-If the constitution routes this situation to a recipe, read that recipe before acting.
+Drill guidance is defined in \`_NEXUS_CONSTITUTION.md\`.
+If the situation resembles a drill, use that drill before acting.
 
 ### Delegated Work
 
