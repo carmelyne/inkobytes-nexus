@@ -609,7 +609,7 @@
         }
         return '<div class="feed-row feed-row-labeled">'
           + '<dd>'
-          + '<div class="feed-agent">' + escapeHtml(entry.type) + '</div>'
+          + '<div class="feed-agent"><span class="feed-agent-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8V4H8"></path><rect width="16" height="12" x="4" y="8" rx="2"></rect><path d="M2 14h2"></path><path d="M20 14h2"></path><path d="M15 13v2"></path><path d="M9 13v2"></path></svg></span><span>' + escapeHtml(formatAgentName(entry.type)) + '</span></div>'
           + (entry.meta ? '<div class="feed-meta">' + escapeHtml(entry.meta) + '</div>' : '')
           + (entry.warning ? '<div class="feed-warning">' + escapeHtml(entry.warning) + '</div>' : '')
           + '<div class="feed-title">' + escapeHtml(entry.title) + '</div>'
@@ -621,6 +621,9 @@
         if (seconds < 60) return seconds + 's';
         if (seconds < 3600) return Math.floor(seconds / 60) + 'm';
         return Math.floor(seconds / 3600) + 'h';
+      }
+      function formatAgentName(value) {
+        return String(value || '').replace(/^@/, '');
       }
       function escapeHtml(value) {
         return String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
