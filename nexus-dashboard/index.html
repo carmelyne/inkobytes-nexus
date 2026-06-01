@@ -611,6 +611,7 @@
           + '<dd>'
           + '<div class="feed-agent">' + escapeHtml(entry.type) + '</div>'
           + (entry.meta ? '<div class="feed-meta">' + escapeHtml(entry.meta) + '</div>' : '')
+          + (entry.warning ? '<div class="feed-warning">' + escapeHtml(entry.warning) + '</div>' : '')
           + '<div class="feed-title">' + escapeHtml(entry.title) + '</div>'
           + '</dd>'
           + '</div>';
