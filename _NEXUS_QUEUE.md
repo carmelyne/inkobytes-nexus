@@ -6,6 +6,19 @@
 
 ## Ready Queue
 
+- [x] TASK/Codex: Make CLI Docs TOC sticky
+  - Id: dashboard-docs-sticky-toc
+  - Epic: Dashboard observability
+  - Status: Done
+  - Depends on: dashboard-cli-docs-page
+  - Files: nexus-dashboard/style.css, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+  - Affinity: dashboard, docs, ux
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Keep the CLI Docs command table of contents pinned while the docs page scrolls, with its own overflow when the viewport is short.
+
 - [x] TASK/Codex: Show Nexus Report dashboard entries latest first
   - Id: dashboard-report-latest-first
   - Epic: Dashboard observability
