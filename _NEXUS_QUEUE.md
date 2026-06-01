@@ -6,6 +6,19 @@
 
 ## Ready Queue
 
+- [x] TASK/Codex: Add dated standup entry format
+  - Id: standup-dated-format
+  - Epic: Dashboard observability
+  - Status: Done
+  - Depends on: none
+  - Files: src/commands/init.js, src/commands/dashboard.js, test/dashboard.test.js, _NEXUS_STANDUP.md, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+  - Affinity: dashboard, protocol, comms
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Add a standard `YYYY-MM-DD HH:MM @agent [STATUS]: message` comms format so standup relevance is obvious. Dashboard keeps legacy `@agent:` lines readable while surfacing date/status metadata for new entries.
+
 - [x] TASK/Codex: Clarify memory month folder ownership
   - Id: memory-month-folder-boundary
   - Epic: Release hygiene
