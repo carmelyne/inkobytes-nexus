@@ -108,10 +108,10 @@ This project uses Nexus for multi-agent coordination.
 - If another agent or tool may have touched the file since your last read, re-read it before editing.
 - If a claim appears stale, do not edit through it; run \`nexus status\` or \`nexus doctor\`, then clean only when ownership is clearly abandoned.
 
-### Recipes
+### Drills
 
-Recipe routing is defined in \`_NEXUS_CONSTITUTION.md\`.
-If the constitution routes this situation to a recipe, read that recipe before acting.
+Drill guidance is defined in \`_NEXUS_CONSTITUTION.md\`.
+If the situation resembles a drill, use that drill before acting.
 
 ### Delegated Work
 
