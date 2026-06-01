@@ -6,6 +6,19 @@
 
 ## Ready Queue
 
+- [x] TASK/Codex: Clean Standup dashboard row order
+  - Id: standup-clean-dated-layout
+  - Epic: Dashboard observability
+  - Status: Done
+  - Depends on: standup-feed-labels
+  - Files: src/commands/dashboard.js, test/dashboard.test.js, nexus-dashboard/index.html, nexus-dashboard/style.css, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+  - Affinity: dashboard, ux, comms
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Show only dated Standup entries in the dashboard and render them as Agent, Date, then Title with a 16px visual break before Title.
+
 - [x] TASK/Codex: Add labels to standup dashboard rows
   - Id: standup-feed-labels
   - Epic: Dashboard observability
