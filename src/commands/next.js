@@ -72,7 +72,89 @@ export default function next(args) {
   console.log(`   Files: ${pick.files.join(', ')}`);
   console.log(`   Cost: ${pick.cost}`);
   console.log(`   Auto-flow: ${pick.autoFlow}`);
+  printRelatedDrills(pick);
   console.log('');
+}
+
+const DATA_MUTATION_DRILL = `data-mutation-${'delete-rows'}`;
+
+const DRILL_GROUPS = [
+  {
+    group: 'data',
+    hints: [
+      { id: DATA_MUTATION_DRILL, keywords: ['db', 'database', 'migration', 'persisted'] },
+      { id: 'data-boundary-table-header', keywords: ['table header', 'table headers', 'columns', 'csv headers', 'schema'] },
+    ],
+  },
+  {
+    group: 'removal',
+    hints: [
+      { id: 'vendor-cleanup-preserve-history', keywords: ['payment vendor', 'audit log', 'audit logs', 'historical records', 'all traces'] },
+      { id: 'removal-scope', keywords: ['vendor', 'dependency', 'legacy integration', 'remove', 'cleanup'] },
+      { id: 'task-contract', keywords: ['completely', 'broad task', 'remove all', 'all traces', 'migration'] },
+    ],
+  },
+  {
+    group: 'publish',
+    hints: [
+      { id: 'private-path-protection', keywords: ['publish', 'npm', 'package', 'public', 'privacy', 'private'] },
+      { id: 'remove-agent-folders-from-git', keywords: ['untrack', 'gitignore', '.codex', '.claude', '.gemini', '.agy', '.nexus/local', 'user.md'] },
+    ],
+  },
+  {
+    group: 'git',
+    hints: [
+      { id: 'wrong-repo-push', keywords: ['push', 'remote', 'github', 'origin'] },
+      { id: 'stale-lock-after-commit', keywords: ['stale lock', 'stale locks', 'nexus clean', 'lock cleanup'] },
+    ],
+  },
+  {
+    group: 'protocol',
+    hints: [
+      { id: 'queue-is-thin-index', keywords: ['_nexus_queue.md', 'queue', 'task plan', 'handoff'] },
+      { id: 'current-file-state', keywords: ['current file', 'edited', 'existing file', 'stale context'] },
+      { id: 'ghost-file-claim-loop', keywords: ['pre-claim', 'claim loop', 'fresh file state'] },
+      { id: 'claim-before-edit', keywords: ['readme', 'docs', 'edit', 'update', 'modify'] },
+      { id: 'start-does-not-replace-claim-release', keywords: ['nexus start', 'start then edit'] },
+      { id: 'done-claim-adversarial', keywords: ['done', 'validated', 'verification', 'release'] },
+    ],
+  },
+];
+
+function printRelatedDrills(task) {
+  const drills = relatedDrillsForTask(task);
+  if (drills.length === 0) return;
+
+  console.log('');
+  console.log('   Related Drills:');
+  for (const id of drills) {
+    console.log(`   - ${id}`);
+  }
+  console.log('   Run `nexus drill show <id>` if the task matches that risk.');
+}
+
+function relatedDrillsForTask(task) {
+  if (task.drills.length > 0) return task.drills;
+
+  const haystack = [
+    task.title,
+    task.id,
+    task.epic,
+    task.dependsOn,
+    task.files.join(' '),
+    task.affinity.join(' '),
+    task.notes,
+  ].join(' ').toLowerCase();
+
+  const matches = [];
+  for (const group of DRILL_GROUPS) {
+    for (const hint of group.hints) {
+      if (hint.keywords.some(keyword => haystack.includes(keyword))) {
+        matches.push(hint.id);
+      }
+    }
+  }
+  return [...new Set(matches)].slice(0, 3);
 }
 
 function parseRunway(content, agent) {
@@ -121,10 +203,12 @@ function parseReadyTasks(content) {
         dependsOn: '',
         files: [],
         affinity: [],
+        drills: [],
         cost: 'medium',
         autoFlow: 'no',
         review: '',
         approvedBy: '',
+        notes: '',
       };
       continue;
     }
@@ -144,10 +228,12 @@ function parseReadyTasks(content) {
         case 'depends on': current.dependsOn = val; break;
         case 'files': current.files = val.split(',').map(s => s.trim()); break;
         case 'affinity': current.affinity = val.split(',').map(s => s.trim()); break;
+        case 'drills': current.drills = val.split(',').map(s => s.trim()).filter(Boolean); break;
         case 'cost': current.cost = val; break;
         case 'auto-flow': current.autoFlow = val; break;
         case 'review': current.review = val.toLowerCase(); break;
         case 'approved by': current.approvedBy = val; break;
+        case 'notes': current.notes = val; break;
       }
     }
   }
