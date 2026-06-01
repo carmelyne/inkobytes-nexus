@@ -6,6 +6,20 @@
 
 ## Ready Queue
 
+- [ ] TASK/Codex: Draft drill-triggering database cleanup example
+  - Id: drill-trigger-queue-draft
+  - Epic: Release hygiene
+  - Status: Ready
+  - Depends on: none
+  - Files: docs/drill-trigger-queue-draft.md
+  - Affinity: database, migration, cleanup, drills
+  - Drills: data-mutation-delete-rows, task-contract, removal-scope
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Draft a tiny example queue artifact for a persisted database cleanup migration. It should make `nexus next @codex` surface Related Drills before any agent touches data or broad cleanup scope.
+
 - [x] TASK/Codex: Hard-fail invalid claim agent handles
   - Id: claim-agent-handle-required
   - Epic: Agent guardrails
