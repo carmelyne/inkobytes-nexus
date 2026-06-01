@@ -6,6 +6,19 @@
 
 ## Ready Queue
 
+- [x] TASK/Codex: Hard-fail invalid claim agent handles
+  - Id: claim-agent-handle-required
+  - Epic: Agent guardrails
+  - Status: Done
+  - Depends on: none
+  - Files: src/commands/claim.js, test/claim.test.js, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+  - Affinity: claim, guardrails, attribution
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Make `nexus claim <path> "intent"` fail before lock creation by requiring an explicit `@agent` handle and separate intent, preventing intent text from becoming report/commit attribution.
+
 - [x] TASK/Codex: Surface related drills in nexus next
   - Id: next-related-drills
   - Epic: Agent guardrails
