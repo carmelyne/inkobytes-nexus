@@ -1,21 +1,21 @@
 # Nexus Agent Protocol Drills
 
-Protocol drills are scenario playbooks for known agent failure modes.
+Drills are preventive scenario guides for known agent failure modes.
 
-They are not model benchmarks or leaderboards. A drill captures a situation where an agent may get blocked, confused, or tempted to do the wrong thing, then records the expected recovery path.
+Each drill captures a situation where an agent is likely to make a bad move, then records the expected behavior before the agent acts. Nexus can surface drill summaries near risky commands, queue work, or guardrail changes so agents get the right move in context without loading every drill.
 
-Use drills as guidance when a similar situation comes up again: known failure -> expected move -> safer next action. They are also useful after changing Nexus instructions, queue behavior, release behavior, safety guardrails, or `doctor --fix` updates to existing agent files, because you can rerun the same scenarios and check whether expected behavior still holds.
+Use drills when an agent is about to do work that resembles a known failure mode, or when changing Nexus instructions, queue behavior, release behavior, or safety guardrails and you need to confirm the same failure mode is still covered.
 
 ## Guardrails And Drills
 
 Guardrails are the operating rules agents must follow.
-Drills are the replayable scenarios that help agents practice and retest those guardrails under realistic pressure.
+Drills are the preventive scenarios that help agents recognize and avoid known bad moves before acting.
 
 When adding a new guardrail to the constitution or agent guides, add a drill when the failure mode is concrete enough to replay.
 
 ## When To Read Drills
 
-Read drills when you hit a similar failure shape, need a recovery path, or are doing protocol, guardrail, regression, or failure-mode work.
+Read drills when a task resembles a known failure shape, when Nexus surfaces a related drill, or when you are doing protocol, guardrail, regression, or failure-mode work.
 Normal app/code work should not load drills by default.
 
 Use drills when changing Nexus protocol files, generated agent guides, guardrails, existing-file repair behavior in `doctor --fix`, or core commands such as `drill`, `doctor`, `init`, `claim`, `release`, or `next`.
