@@ -310,3 +310,16 @@
 - Commit: dashboard-docs-release-cleanup: document claim flags
 - Source: release
 
+## memory-month-folder-boundary
+
+- Id: memory-month-folder-boundary
+- Title: Clarify memory month folder ownership
+- Agent: @codex
+- Epic: Release hygiene
+- Cost: small
+- Completed At: 2026-06-01T00:00:26.967Z
+- Files: src/commands/init.js, src/commands/doctor.js, test/init.test.js, test/doctor.test.js, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+- SHA: d0411b5c3eb9b84ce3d29f7ea6d9ab4485c1449e
+- Commit: memory-month-folder-boundary: clarify init memory ownership
+- Source: release
+
