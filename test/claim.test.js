@@ -39,6 +39,25 @@ function capture(fn) {
   return lines.join('\n');
 }
 
+function captureExit(fn) {
+  const originalError = console.error;
+  const originalExit = process.exit;
+  const lines = [];
+  console.error = (...args) => lines.push(args.join(' '));
+  process.exit = (code) => {
+    throw Object.assign(new Error(`process.exit ${code}`), { code });
+  };
+
+  try {
+    assert.throws(fn, /process\.exit 1/);
+  } finally {
+    console.error = originalError;
+    process.exit = originalExit;
+  }
+
+  return lines.join('\n');
+}
+
 test('claim warns cheaply when Nexus protocol files are missing', () => {
   inTempRepo((root) => {
     writeFileSync(join(root, 'file.txt'), 'hello\n', 'utf-8');
@@ -97,17 +116,33 @@ test('claim accepts agent and intent flags', () => {
   });
 });
 
-test('claim warns when agent intent or model metadata are missing', () => {
+test('claim rejects missing agent or intent before creating a lock', () => {
   inTempRepo((root) => {
     writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
     writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
     writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
     writeFileSync(join(root, 'file.txt'), 'hello\n', 'utf-8');
 
-    const output = capture(() => claim(['file.txt']));
+    const missingAgent = captureExit(() => claim(['file.txt']));
+    assert.match(missingAgent, /Missing or invalid claim agent/);
 
-    assert.match(output, /Claim has no agent handle/);
-    assert.match(output, /Claim has no intent/);
-    assert.match(output, /Claim has no model metadata/);
+    const missingIntent = captureExit(() => claim(['file.txt', '@codex']));
+    assert.match(missingIntent, /Missing claim intent/);
+    assert.equal(listLocks().length, 0);
+  });
+});
+
+test('claim rejects intent-looking positional agent values', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, 'file.txt'), 'hello\n', 'utf-8');
+
+    const output = captureExit(() => claim(['file.txt', 'document preventive drill framing']));
+
+    assert.match(output, /Missing or invalid claim agent/);
+    assert.match(output, /nexus claim <path> @codex "intent"/);
+    assert.equal(listLocks().length, 0);
   });
 });
