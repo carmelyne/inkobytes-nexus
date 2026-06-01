@@ -66,7 +66,7 @@ test('init creates managed agent guides that doctor accepts', () => {
     assert.match(codexGuide, /### Delegated Work/);
     assert.match(codexGuide, /Lead agents own the repo effects of their subagents/);
     assert.match(codexGuide, /Claim the full path scope before delegating shared-file work/);
-    assert.match(codexGuide, /Mention delegated work in release or standup notes/);
+    assert.match(codexGuide, /Mention delegated work in release or `nexus standup` notes/);
     assert.match(codexGuide, /### Git Write Safety/);
     assert.match(codexGuide, /Direct user instruction can override queue order/);
     assert.match(codexGuide, /announce `Standby` with what you are waiting for/);

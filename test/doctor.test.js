@@ -175,7 +175,7 @@ Keep this note.
     assert.match(next, /### Delegated Work/);
     assert.match(next, /Lead agents own the repo effects of their subagents/);
     assert.match(next, /Claim the full path scope before delegating shared-file work/);
-    assert.match(next, /Mention delegated work in release or standup notes/);
+    assert.match(next, /Mention delegated work in release or `nexus standup` notes/);
     assert.match(next, /Direct user instruction can override queue order/);
     assert.match(next, /announce `Standby` with what you are waiting for/);
     assert.match(next, /Agent instruction files are shared protocol files/);
