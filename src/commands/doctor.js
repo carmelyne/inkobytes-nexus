@@ -119,7 +119,7 @@ If the situation resembles a drill, use that drill before acting.
 - Claim the full path scope before delegating shared-file work.
 - Give subagents the claimed path, intent, non-goals, and boundaries.
 - Re-read affected files after subagent work before final edits, release, or current-state claims.
-- Mention delegated work in release or standup notes when it affected files, tests, or risk.
+- Mention delegated work in release or \`nexus standup\` notes when it affected files, tests, or risk.
 
 ### Git Write Safety
 

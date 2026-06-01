@@ -212,7 +212,7 @@ If a claim appears stale, do not edit through it. Run \`nexus status\` or \`nexu
    nexus release <path> "short commit message"
    \`\`\`
 
-6. Add a short completion note to standup if useful.
+6. Add a short completion note with \`nexus standup "YYYY-MM-DD HH:MM AM/PM @agent [STATUS]: message"\` if useful.
 7. Run \`nexus next @Agent\` or stand by.
 
 ## 8. Delegated Work
@@ -223,7 +223,7 @@ When a lead agent uses subagents, tools, or parallel workers, Nexus still treats
 - Tell subagents the claimed path, intent, non-goals, and boundaries before they start.
 - Subagents may help inspect, test, or draft changes, but they must not expand scope or touch unclaimed paths.
 - After subagent work, the lead must re-read affected files before final edits, release, or claims about current state.
-- The release or standup note must mention delegated work when it affected repo files, tests, or risk.
+- The release or \`nexus standup\` note must mention delegated work when it affected repo files, tests, or risk.
 
 Subagents can be an implementation detail; their repo effects cannot be invisible.
 
@@ -405,7 +405,7 @@ If the situation resembles a drill, use that drill before acting.
 - Claim the full path scope before delegating shared-file work.
 - Give subagents the claimed path, intent, non-goals, and boundaries.
 - Re-read affected files after subagent work before final edits, release, or current-state claims.
-- Mention delegated work in release or standup notes when it affected files, tests, or risk.
+- Mention delegated work in release or \`nexus standup\` notes when it affected files, tests, or risk.
 
 ### Git Write Safety
 
