@@ -6,6 +6,19 @@
 
 ## Ready Queue
 
+- [x] TASK/Codex: Carry Standup date guidance through doctor
+  - Id: standup-doctor-format-fix
+  - Epic: Dashboard observability
+  - Status: Done
+  - Depends on: standup-ampm-timestamps
+  - Files: src/commands/doctor.js, test/doctor.test.js, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+  - Affinity: doctor, standup, protocol
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Make `nexus doctor` report existing `_NEXUS_STANDUP.md` files that lack the standard dated AM/PM guidance, and make `doctor --fix` repair the guidance without removing standup entries.
+
 - [x] TASK/Codex: Reframe drills as agent playbooks
   - Id: drill-agent-playbook-copy
   - Epic: Open-source CLI release
