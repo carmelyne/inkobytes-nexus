@@ -6,6 +6,19 @@
 
 ## Ready Queue
 
+- [x] TASK/Codex: Reframe drills as agent playbooks
+  - Id: drill-agent-playbook-copy
+  - Epic: Open-source CLI release
+  - Status: Done
+  - Depends on: none
+  - Files: README.md, drills/nexus-agent-protocol/README.md, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+  - Affinity: docs, drills, agent-guidance
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Clarify that drills are scenario playbooks for blocked or confused agents first, and regression checks for protocol changes second.
+
 - [x] TASK/Codex: Warn on undated Standup messages
   - Id: standup-missing-date-warning
   - Epic: Dashboard observability
