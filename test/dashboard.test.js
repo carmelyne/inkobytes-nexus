@@ -51,6 +51,7 @@ test('dashboard snapshot summarizes Nexus repo state', () => {
       '  - Status: Ready',
       '  - Files: src/commands/dashboard.js',
       '@codex: Dashboard v1 started',
+      '2026-06-01 09:30 @codex [DONE]: Dashboard v1 shipped',
     ].join('\n'), 'utf-8');
     writeFileSync(join(root, '_NEXUS_REPORT.md'), [
       '## [12:00:00] docs/README.md',
@@ -90,6 +91,7 @@ test('dashboard snapshot summarizes Nexus repo state', () => {
     assert.deepEqual(snapshot.standup, [
       { type: 'Task', title: 'Build dashboard', meta: '@codex · Ready · src/commands/dashboard.js' },
       { type: '@codex', title: 'Dashboard v1 started', meta: '' },
+      { type: '@codex', title: 'Dashboard v1 shipped', meta: '2026-06-01 09:30 · DONE' },
     ]);
     assert.deepEqual(snapshot.releases, [
       { type: 'Commit', title: 'docs: placeholder', meta: '' },
