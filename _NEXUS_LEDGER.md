@@ -440,3 +440,29 @@
 - Commit: standup-clean-dated-layout: test dated standup feed
 - Source: release
 
+## standup-unlabeled-standard-layout
+
+- Id: standup-unlabeled-standard-layout
+- Title: Remove Standup dashboard labels
+- Agent: @codex
+- Epic: Dashboard observability
+- Cost: small
+- Completed At: 2026-06-01T07:29:45.347Z
+- Files: nexus-dashboard/index.html, nexus-dashboard/style.css, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+- SHA: 8f2dc7989429e2fb67ed0ad2863af39f9da9d61b
+- Commit: standup-unlabeled-standard-layout: queue dashboard metric
+- Source: release
+
+## standup-missing-date-warning
+
+- Id: standup-missing-date-warning
+- Title: Warn on undated Standup messages
+- Agent: @codex
+- Epic: Dashboard observability
+- Cost: small
+- Completed At: 2026-06-01T07:35:21.673Z
+- Files: src/commands/dashboard.js, test/dashboard.test.js, nexus-dashboard/index.html, nexus-dashboard/style.css, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+- SHA: ada1e4cf1768d67c05b4e07d5d95a6f3ac5a2334
+- Commit: standup-missing-date-warning: warn on legacy standup lines
+- Source: release
+
