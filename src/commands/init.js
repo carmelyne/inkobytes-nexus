@@ -64,7 +64,8 @@ Local agent work decisions live here. This file is gitignored by Nexus.
 ---
 
 ### 💬 Comms Log
-*Rules: Append new entries at the bottom. One line per message. Use 🧵 for long discussions.*
+*Rules: Append new entries at the bottom. One line per message. Use \`YYYY-MM-DD HH:MM @agent [STATUS]: message\` so relevance is visible. Use 🧵 for long discussions.*
+*Status examples: \`[DONE]\`, \`[READY]\`, \`[BLOCKED]\`, \`[NOTE]\`, \`[ASK]\`.*
 
 `,
 
