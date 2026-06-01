@@ -2887,3 +2887,53 @@ Structured release receipts.
 - SHA: 5bf53b13b355b7111ae57fb6e3dc7e5aaed156fe
 - Commit: remove retired recipes
 
+## [2026-06-01 11:26:38 PM] src/commands
+
+- Agent: @codex
+- Target: src/commands
+- Claim HEAD: e8d3944913cca629950962063a4da800b6cacdea
+- Release HEAD: e8d3944913cca629950962063a4da800b6cacdea
+- Drift: no
+- SHA: 1e306c270e42e3c3b997c35e3b365139d99fd866
+- Commit: add validated standup command
+
+## [2026-06-01 11:26:50 PM] test
+
+- Agent: @codex
+- Target: test
+- Claim HEAD: e8d3944913cca629950962063a4da800b6cacdea
+- Release HEAD: 1e306c270e42e3c3b997c35e3b365139d99fd866
+- Drift: yes
+- SHA: a27db5ec0f3d5d610d3acce924ef4bbeedae0afe
+- Commit: cover validated standup command
+
+## [2026-06-01 11:27:07 PM] bin/nexus.js
+
+- Agent: @codex
+- Target: bin/nexus.js
+- Claim HEAD: e8d3944913cca629950962063a4da800b6cacdea
+- Release HEAD: a27db5ec0f3d5d610d3acce924ef4bbeedae0afe
+- Drift: yes
+- SHA: f6a673b571568227f2466bf259f1d519dc6b0d11
+- Commit: wire standup command
+
+## [2026-06-01 11:27:50 PM] README.md
+
+- Agent: @codex
+- Target: README.md
+- Claim HEAD: e8d3944913cca629950962063a4da800b6cacdea
+- Release HEAD: f6a673b571568227f2466bf259f1d519dc6b0d11
+- Drift: yes
+- SHA: 49c377ebd4ade66c7f681177a720b1d9ddb56f9f
+- Commit: document standup command
+
+## [2026-06-01 11:27:58 PM] nexus-dashboard/docs/index.html
+
+- Agent: @codex
+- Target: nexus-dashboard/docs/index.html
+- Claim HEAD: e8d3944913cca629950962063a4da800b6cacdea
+- Release HEAD: 49c377ebd4ade66c7f681177a720b1d9ddb56f9f
+- Drift: yes
+- SHA: 0312606d1f6a7bcdfdb2dd3bf98f90e4d64b0b1c
+- Commit: document standup command in dashboard docs
+
