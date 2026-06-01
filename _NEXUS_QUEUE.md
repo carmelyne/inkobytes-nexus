@@ -6,6 +6,19 @@
 
 ## Ready Queue
 
+- [x] TASK/Codex: Remove Standup dashboard labels
+  - Id: standup-unlabeled-standard-layout
+  - Epic: Dashboard observability
+  - Status: Done
+  - Depends on: standup-clean-dated-layout
+  - Files: nexus-dashboard/index.html, nexus-dashboard/style.css, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+  - Affinity: dashboard, ux, comms
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Remove visible Standup field labels while keeping the dashboard restricted to standard dated standup entries.
+
 - [x] TASK/Codex: Clean Standup dashboard row order
   - Id: standup-clean-dated-layout
   - Epic: Dashboard observability
