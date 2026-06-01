@@ -440,11 +440,14 @@
 
       function updateAgentStatus(data) {
         const now = Math.floor(Date.now() / 1000);
+        const activeLockAgents = new Set((data.locks || [])
+          .filter(lock => !lock.stale)
+          .map(lock => normalizeAgent(lock.agent)));
         document.querySelectorAll('[data-next-agent]').forEach(btn => {
           const agent = normalizeAgent(btn.dataset.nextAgent);
           const presence = data.presence && data.presence[agent];
           
-          let online = false;
+          let online = activeLockAgents.has(agent);
           let idle = false;
           
           if (presence) {
