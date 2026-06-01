@@ -6,6 +6,58 @@
 
 ## Ready Queue
 
+- [x] TASK/Codex: Show latest dashboard feed items first
+  - Id: dashboard-latest-first-feeds
+  - Epic: Dashboard observability
+  - Status: Done
+  - Depends on: none
+  - Files: src/commands/dashboard.js, test/dashboard.test.js, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+  - Affinity: dashboard, status, comms
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Show newest Standup and Recent releases entries first in the dashboard snapshot/feed while keeping the source files append-friendly.
+
+- [x] TASK/Codex: Add date and AM/PM to report receipts
+  - Id: report-dated-ampm-receipts
+  - Epic: Dashboard observability
+  - Status: Done
+  - Depends on: none
+  - Files: src/commands/release.js, test/release.test.js, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+  - Affinity: release, reporting, comms
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Change future `_NEXUS_REPORT.md` receipt headers from time-only `[HH:MM:SS]` to full local timestamps like `[YYYY-MM-DD HH:MM:SS AM/PM]` so release relevance is obvious.
+
+- [x] TASK/Codex: Add AM/PM to standup timestamps
+  - Id: standup-ampm-timestamps
+  - Epic: Dashboard observability
+  - Status: Done
+  - Depends on: standup-dated-format
+  - Files: _NEXUS_STANDUP.md, src/commands/init.js, src/commands/dashboard.js, test/dashboard.test.js, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+  - Affinity: dashboard, protocol, comms
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Make standup timestamps human-readable by changing the standard format to `YYYY-MM-DD HH:MM AM/PM @agent [STATUS]: message`. Dashboard keeps old 24-hour dated lines compatible while showing AM/PM when present.
+
+- [x] TASK/Codex: Rewrite README opening in plain language
+  - Id: readme-plain-language-opening
+  - Epic: Open-source CLI release
+  - Status: Done
+  - Depends on: none
+  - Files: README.md, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+  - Affinity: docs, release, positioning
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Replace vague or over-defensive README positioning with plain-language copy that explains concurrent agents stepping on each other, local traffic rules, and the actual claim/release loop.
+
 - [x] TASK/Codex: Tighten README for first public release
   - Id: readme-public-release-pass
   - Epic: Open-source CLI release
@@ -43,7 +95,7 @@
   - Auto-flow: yes
   - Review: approved
   - Approved by: human
-  - Notes: Add a standard `YYYY-MM-DD HH:MM @agent [STATUS]: message` comms format so standup relevance is obvious. Dashboard keeps legacy `@agent:` lines readable while surfacing date/status metadata for new entries.
+  - Notes: Add a standard dated comms format so standup relevance is obvious. Dashboard keeps legacy `@agent:` lines readable while surfacing date/status metadata for new entries.
 
 - [x] TASK/Codex: Clarify memory month folder ownership
   - Id: memory-month-folder-boundary
