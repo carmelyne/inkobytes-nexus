@@ -51,7 +51,7 @@ test('release appends structured report entry', () => {
     release(['file.txt', 'test release report']);
 
     const report = readFileSync(join(root, '_NEXUS_REPORT.md'), 'utf-8');
-    assert.match(report, /## \[\d\d:\d\d:\d\d\] file\.txt/);
+    assert.match(report, /## \[\d{4}-\d\d-\d\d \d\d:\d\d:\d\d (AM|PM)\] file\.txt/);
     assert.match(report, /- Agent: @codex/);
     assert.match(report, /- Target: file\.txt/);
     assert.match(report, /- Claim HEAD: [0-9a-f]{40}/);
