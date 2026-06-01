@@ -2382,3 +2382,33 @@ Structured release receipts.
 - SHA: b7a74a1e150ab3f704bd37438e2883b54c00535c
 - Commit: dashboard-latest-first-feeds: queue dashboard ordering metric
 
+## [2026-06-01 03:15:40 PM] _NEXUS_QUEUE.md
+
+- Agent: @codex
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: 7a8717960372b40bad75841fea51b5b168090a81
+- Release HEAD: 7a8717960372b40bad75841fea51b5b168090a81
+- Drift: no
+- SHA: 9ec0a520579db946b176ede78ddc4f04d3efb893
+- Commit: standup-feed-labels: queue dashboard label metric
+
+## [2026-06-01 03:15:41 PM] nexus-dashboard/index.html
+
+- Agent: @codex
+- Target: nexus-dashboard/index.html
+- Claim HEAD: 7a8717960372b40bad75841fea51b5b168090a81
+- Release HEAD: 7a8717960372b40bad75841fea51b5b168090a81
+- Drift: no
+- SHA: 61cf9192a260e09a61a6ae9dd5e47a6034f63208
+- Commit: standup-feed-labels: label standup fields
+
+## [2026-06-01 03:15:41 PM] nexus-dashboard/style.css
+
+- Agent: @codex
+- Target: nexus-dashboard/style.css
+- Claim HEAD: 7a8717960372b40bad75841fea51b5b168090a81
+- Release HEAD: 7a8717960372b40bad75841fea51b5b168090a81
+- Drift: no
+- SHA: 3cedd74866584d5e065685057207abfa174dc3f0
+- Commit: standup-feed-labels: style standup labels
+

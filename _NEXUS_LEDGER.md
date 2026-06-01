@@ -414,3 +414,16 @@
 - Commit: report-dated-ampm-receipts: format report receipt timestamps
 - Source: release
 
+## standup-feed-labels
+
+- Id: standup-feed-labels
+- Title: Add labels to standup dashboard rows
+- Agent: @codex
+- Epic: Dashboard observability
+- Cost: small
+- Completed At: 2026-06-01T07:15:40.558Z
+- Files: nexus-dashboard/index.html, nexus-dashboard/style.css, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+- SHA: 9ec0a520579db946b176ede78ddc4f04d3efb893
+- Commit: standup-feed-labels: queue dashboard label metric
+- Source: release
+
