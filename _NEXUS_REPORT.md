@@ -2692,3 +2692,23 @@ Structured release receipts.
 - SHA: 9a0980416898dc069265ba7605583da974321a55
 - Commit: standup-agent-icon-label: record queue metric
 
+## [2026-06-01 08:15:44 PM] nexus-dashboard/index.html
+
+- Agent: @codex
+- Target: nexus-dashboard/index.html
+- Claim HEAD: 3518e2b3883cf8bcc994208ed98270947585c7cc
+- Release HEAD: 3518e2b3883cf8bcc994208ed98270947585c7cc
+- Drift: no
+- SHA: 71ebf9d4ff7e371ed4748b47c8a18363ca539fc9
+- Commit: queue-presence-dot-active-locks: use active locks
+
+## [2026-06-01 08:15:49 PM] _NEXUS_QUEUE.md
+
+- Agent: @codex
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: 3518e2b3883cf8bcc994208ed98270947585c7cc
+- Release HEAD: 71ebf9d4ff7e371ed4748b47c8a18363ca539fc9
+- Drift: yes
+- SHA: 9e4da734377cada528df21ea608b01345f0e7215
+- Commit: queue-presence-dot-active-locks: record queue metric
+

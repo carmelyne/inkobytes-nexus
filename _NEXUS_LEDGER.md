@@ -531,3 +531,16 @@
 - Commit: standup-agent-icon-label: render bot icon
 - Source: release
 
+## queue-presence-dot-active-locks
+
+- Id: queue-presence-dot-active-locks
+- Title: Make queue presence dots follow active locks
+- Agent: @codex
+- Epic: Dashboard observability
+- Cost: small
+- Completed At: 2026-06-01T12:15:44.130Z
+- Files: nexus-dashboard/index.html, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+- SHA: 71ebf9d4ff7e371ed4748b47c8a18363ca539fc9
+- Commit: queue-presence-dot-active-locks: use active locks
+- Source: release
+
