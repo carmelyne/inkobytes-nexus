@@ -607,7 +607,19 @@
         if (entry.type === 'Commit') {
           return '<div class="feed-row"><dd><div class="feed-title"><span class="feed-icon"><svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><line x1="3" x2="9" y1="12" y2="12"></line><line x1="15" x2="21" y1="12" y2="12"></line></svg></span>' + escapeHtml(entry.title) + '</div></dd></div>';
         }
-        return '<div class="feed-row"><dt>' + escapeHtml(entry.type) + '</dt><dd><div class="feed-title">' + escapeHtml(entry.title) + '</div>' + (entry.meta ? '<div class="feed-meta">' + escapeHtml(entry.meta) + '</div>' : '') + '</dd></div>';
+        return '<div class="feed-row feed-row-labeled">'
+          + '<dd>'
+          + labeledFeedLine('Agent', entry.type, 'feed-agent')
+          + labeledFeedLine('Title', entry.title, 'feed-title')
+          + (entry.meta ? labeledFeedLine('Date', entry.meta, 'feed-meta') : '')
+          + '</dd>'
+          + '</div>';
+      }
+      function labeledFeedLine(label, value, className) {
+        return '<div class="feed-field ' + className + '">'
+          + '<span class="feed-label">' + label + '</span>'
+          + '<span class="feed-value">' + escapeHtml(value) + '</span>'
+          + '</div>';
       }
       function formatAge(seconds) {
         if (seconds === null || seconds === undefined) return 'unknown';
