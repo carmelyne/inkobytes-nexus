@@ -59,9 +59,9 @@ test('init creates managed agent guides that doctor accepts', () => {
     assert.match(codexGuide, /atomic lock-and-read boundary/);
     assert.match(codexGuide, /read a shared file before claiming it, treat that read as stale after claim succeeds/);
     assert.match(codexGuide, /claim appears stale/);
-    assert.match(codexGuide, /### Recipes/);
-    assert.match(codexGuide, /Recipe routing is defined in `_NEXUS_CONSTITUTION\.md`/);
-    assert.match(codexGuide, /If the constitution routes this situation to a recipe, read that recipe before acting/);
+    assert.match(codexGuide, /### Drills/);
+    assert.match(codexGuide, /Drill guidance is defined in `_NEXUS_CONSTITUTION\.md`/);
+    assert.match(codexGuide, /If the situation resembles a drill, use that drill before acting/);
     assert.doesNotMatch(codexGuide, /recipes\/task-contract\.md/);
     assert.match(codexGuide, /### Delegated Work/);
     assert.match(codexGuide, /Lead agents own the repo effects of their subagents/);
@@ -87,10 +87,12 @@ test('init creates managed agent guides that doctor accepts', () => {
     assert.match(codexGuide, /Read `USER\.md` if present/);
     assert.doesNotMatch(codexGuide, /Pong/);
     assert.match(agyGuide, /\.agy\/CONTINUITY\.md/);
-    assert.match(constitution, /## 5\. Recipe Router/);
+    assert.match(constitution, /## 5\. Drill Guidance/);
     assert.match(constitution, /## 8\. Delegated Work/);
     assert.match(constitution, /Subagents can be an implementation detail; their repo effects cannot be invisible/);
     assert.match(constitution, /Do not use standup as the permanent decision ledger/);
     assert.match(constitution, /Blocked or unsafe to proceed[\s\S]*Found a bug[\s\S]*Removing a dependency[\s\S]*Task is broad[\s\S]*Touching persisted data/);
+    assert.match(constitution, /drills\/nexus-agent-protocol\/cases\/blocked\.yaml/);
+    assert.match(constitution, /drills\/nexus-agent-protocol\/cases\/issue-found\.yaml/);
   });
 });
