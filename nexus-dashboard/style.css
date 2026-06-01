@@ -633,10 +633,26 @@ h2 {
   gap: 5px;
 }
 .feed-agent {
-  font-family: var(--font-mono);
-  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
   color: var(--text-accent);
   overflow-wrap: anywhere;
+}
+.feed-agent-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  background: rgba(14, 165, 233, 0.1);
+}
+.feed-agent-icon .icon {
+  width: 12px;
+  height: 12px;
 }
 .feed-warning {
   color: var(--status-warn);
