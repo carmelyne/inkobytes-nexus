@@ -25,7 +25,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/inkobytes/nexus.git"
+    "url": "git+https://github.com/carmelyne/inkobytes-nexus.git"
   },
   "engines": {
     "node": ">=18"
