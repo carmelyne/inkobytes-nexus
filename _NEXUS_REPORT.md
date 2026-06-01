@@ -2572,3 +2572,33 @@ Structured release receipts.
 - SHA: 57f8b6bbddaf47ea17e5f20e79130ebc78800e18
 - Commit: drill-agent-playbook-copy: document drill guidance role
 
+## [2026-06-01 04:24:06 PM] src/commands/doctor.js
+
+- Agent: @codex
+- Target: src/commands/doctor.js
+- Claim HEAD: 16c52477c3a614c9a0fd1914b48ba067d651c2bf
+- Release HEAD: 16c52477c3a614c9a0fd1914b48ba067d651c2bf
+- Drift: no
+- SHA: 73f4e5c6aa3624a332cc792e08b723f4f3256853
+- Commit: standup-doctor-format-fix: repair dated standup guidance
+
+## [2026-06-01 04:24:09 PM] test/doctor.test.js
+
+- Agent: @codex
+- Target: test/doctor.test.js
+- Claim HEAD: 16c52477c3a614c9a0fd1914b48ba067d651c2bf
+- Release HEAD: 73f4e5c6aa3624a332cc792e08b723f4f3256853
+- Drift: yes
+- SHA: def2e78ee569323be08ceacbf499c3d27d4a3787
+- Commit: standup-doctor-format-fix: cover doctor standup repair
+
+## [2026-06-01 04:24:13 PM] _NEXUS_QUEUE.md
+
+- Agent: @codex
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: 16c52477c3a614c9a0fd1914b48ba067d651c2bf
+- Release HEAD: def2e78ee569323be08ceacbf499c3d27d4a3787
+- Drift: yes
+- SHA: 3b9ecf48d0686ad0d02a7128b2b1f358f0c7fa02
+- Commit: standup-doctor-format-fix: record queue metric
+

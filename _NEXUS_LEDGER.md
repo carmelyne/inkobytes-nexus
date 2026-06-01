@@ -479,3 +479,16 @@
 - Commit: drill-agent-playbook-copy: clarify drills as recovery playbooks
 - Source: release
 
+## standup-doctor-format-fix
+
+- Id: standup-doctor-format-fix
+- Title: Carry Standup date guidance through doctor
+- Agent: @codex
+- Epic: Dashboard observability
+- Cost: small
+- Completed At: 2026-06-01T08:24:06.262Z
+- Files: src/commands/doctor.js, test/doctor.test.js, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+- SHA: 73f4e5c6aa3624a332cc792e08b723f4f3256853
+- Commit: standup-doctor-format-fix: repair dated standup guidance
+- Source: release
+
