@@ -1,3 +1,4 @@
 - 🔒 **src/commands/start.js** - Locked by **@codex**: remove hardcoded Pong from startup guidance
 - 🔒 **skills/nexus/SKILL.md** - Locked by **@codex**: document USER.md in Nexus agent playbook
 - 🔒 **src/commands/start.js** - Locked by **@codex**: use shared agent scope metadata
+- 🔒 **_NEXUS.md** - Locked by **@codex**: clear npm metadata locks
