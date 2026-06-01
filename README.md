@@ -262,7 +262,7 @@ Claims are hierarchy-aware:
 - a claimed directory blocks claims inside it
 - a claimed child file blocks a parent directory claim
 - stale locks older than the configured threshold are auto-broken
-- missing agent, intent, or model metadata is allowed but warned
+- missing agent or intent fails before lock creation; missing model metadata warns
 - missing core Nexus protocol files produce a short `nexus doctor` warning
 - fresh file state is printed so the agent starts from disk truth
 
@@ -278,6 +278,22 @@ Nexus stages only the released path before committing, which helps avoid unrelat
 If Git's index is temporarily locked by another release, Nexus waits briefly and retries before failing with a clearer message.
 
 Each release appends a repo-local receipt to `_NEXUS_REPORT.md`. If the released path is listed on a completed queue task and the release message names that task id, Nexus also appends one deduplicated completed-task entry to `_NEXUS_LEDGER.md`.
+
+### `nexus standup "<dated message>"`
+
+Append a validated standup line to `_NEXUS_STANDUP.md`.
+
+```bash
+nexus standup "2026-06-01 08:38 AM @codex [DONE]: Updated tests"
+```
+
+Standup messages must use this exact shape:
+
+```text
+YYYY-MM-DD HH:MM AM/PM @agent [STATUS]: message
+```
+
+Missing agent handles, bad date/time format, missing status, or empty messages fail before writing.
 
 ### `nexus next <agent>`
 
