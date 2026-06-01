@@ -4,7 +4,7 @@
   "description": "Multi-agent coordination CLI for coding agents sharing a local repository",
   "type": "module",
   "bin": {
-    "nexus": "./bin/nexus.js"
+    "nexus": "bin/nexus.js"
   },
   "scripts": {
     "test": "node --test test/**/*.test.js"
@@ -25,7 +25,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/inkobytes/nexus"
+    "url": "git+https://github.com/inkobytes/nexus.git"
   },
   "engines": {
     "node": ">=18"
