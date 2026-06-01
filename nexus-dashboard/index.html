@@ -609,16 +609,10 @@
         }
         return '<div class="feed-row feed-row-labeled">'
           + '<dd>'
-          + labeledFeedLine('Agent', entry.type, 'feed-agent')
-          + (entry.meta ? labeledFeedLine('Date', entry.meta, 'feed-meta') : '')
-          + labeledFeedLine('Title', entry.title, 'feed-title')
+          + '<div class="feed-agent">' + escapeHtml(entry.type) + '</div>'
+          + (entry.meta ? '<div class="feed-meta">' + escapeHtml(entry.meta) + '</div>' : '')
+          + '<div class="feed-title">' + escapeHtml(entry.title) + '</div>'
           + '</dd>'
-          + '</div>';
-      }
-      function labeledFeedLine(label, value, className) {
-        return '<div class="feed-field ' + className + '">'
-          + '<span class="feed-label">' + label + '</span>'
-          + '<span class="feed-value">' + escapeHtml(value) + '</span>'
           + '</div>';
       }
       function formatAge(seconds) {
