@@ -544,3 +544,15 @@
 - Commit: queue-presence-dot-active-locks: use active locks
 - Source: release
 
+## next-related-drills
+
+- Id: next-related-drills
+- Title: Surface related drills in nexus next
+- Agent: @codex
+- Epic: Agent guardrails
+- Cost: small
+- Completed At: 2026-06-01T13:09:41.280Z
+- Files: src/commands/next.js, test/next.test.js, README.md, drills/nexus-agent-protocol/README.md, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+- SHA: 9a9211955f10e81638b18a4ba8ef804a90c697ef
+- Commit: next-related-drills: surface related drill ids
+- Source: release
