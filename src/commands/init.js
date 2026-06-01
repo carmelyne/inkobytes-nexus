@@ -438,6 +438,8 @@ They are exempt from Nexus claim/release unless the user says otherwise.
 - If the index has entries, read the newest \`${scaffold.memoryDir}/YYYY-Month/YYYY-MM-DD-HHMM-topic.md\` entry.
 - Durable architecture and protocol decisions belong in \`DECISIONS.md\`; mention them in \`_NEXUS_STANDUP.md\` only when active agents need to coordinate around them.
 - Memory entries are session handoffs.
+- When writing your own memory entry, create the current month folder under \`${scaffold.memoryDir}\` if it is missing.
+- Do not create or repair other agents' memory folders manually; use \`nexus doctor --fix\` for broad scaffold repair.
 - On session end, pause, or checkpoint request:
   1. Run \`nexus checkout @${scaffold.aliases[0]}\` to clear your presence heartbeat.
   2. Create one new memory file: \`${scaffold.memoryDir}/YYYY-Month/YYYY-MM-DD-HHMM-topic.md\`.
