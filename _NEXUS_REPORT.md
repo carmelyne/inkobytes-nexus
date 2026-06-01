@@ -2302,3 +2302,83 @@ Structured release receipts.
 - SHA: fc1829150ed0dc5e05a0b7c6076ca942980bb9db
 - Commit: readme-public-release-pass: clear lock board
 
+## [2026-06-01 02:58:50 PM] _NEXUS_STANDUP.md
+
+- Agent: @codex
+- Target: _NEXUS_STANDUP.md
+- Claim HEAD: ebe728a8a71d30eea32c211e949ef5b00109c28f
+- Release HEAD: ebe728a8a71d30eea32c211e949ef5b00109c28f
+- Drift: no
+- SHA: 178a0cdf604eec6b886c2afb2aae9720ae18e345
+- Commit: standup-ampm-timestamps: update standup format
+
+## [2026-06-01 02:58:51 PM] src/commands/dashboard.js
+
+- Agent: @codex
+- Target: src/commands/dashboard.js
+- Claim HEAD: ebe728a8a71d30eea32c211e949ef5b00109c28f
+- Release HEAD: 178a0cdf604eec6b886c2afb2aae9720ae18e345
+- Drift: yes
+- SHA: 32ab8d1dae2bbb3d5172cab694149c039b258b5d
+- Commit: dashboard-latest-first-feeds: show newest dashboard feeds first
+
+## [2026-06-01 02:58:52 PM] README.md
+
+- Agent: @codex
+- Target: README.md
+- Claim HEAD: ebe728a8a71d30eea32c211e949ef5b00109c28f
+- Release HEAD: ebe728a8a71d30eea32c211e949ef5b00109c28f
+- Drift: no
+- SHA: 87ee9ff25fbf75edc4dd86fef8e0160e8d3fe14f
+- Commit: readme-plain-language-opening: rewrite README opening
+
+## [2026-06-01 02:58:52 PM] src/commands/init.js
+
+- Agent: @codex
+- Target: src/commands/init.js
+- Claim HEAD: ebe728a8a71d30eea32c211e949ef5b00109c28f
+- Release HEAD: ebe728a8a71d30eea32c211e949ef5b00109c28f
+- Drift: no
+- SHA: 74d1ac05480c3b57335e8b96db03fa3201fb83cb
+- Commit: standup-ampm-timestamps: scaffold AM PM standup format
+
+## [2026-06-01 02:59:02 PM] test/dashboard.test.js
+
+- Agent: @codex
+- Target: test/dashboard.test.js
+- Claim HEAD: ebe728a8a71d30eea32c211e949ef5b00109c28f
+- Release HEAD: 74d1ac05480c3b57335e8b96db03fa3201fb83cb
+- Drift: yes
+- SHA: 2bba68befc845e3740432b83ef6844cd46cb4516
+- Commit: dashboard-latest-first-feeds: test newest dashboard feed order
+
+## [2026-06-01 02:59:07 PM] src/commands/release.js
+
+- Agent: @codex
+- Target: src/commands/release.js
+- Claim HEAD: ebe728a8a71d30eea32c211e949ef5b00109c28f
+- Release HEAD: 2bba68befc845e3740432b83ef6844cd46cb4516
+- Drift: yes
+- SHA: 293131fe3d05aa3b6bd25a8bddcac59391a9e265
+- Commit: report-dated-ampm-receipts: format report receipt timestamps
+
+## [2026-06-01 02:59:11 PM] test/release.test.js
+
+- Agent: @codex
+- Target: test/release.test.js
+- Claim HEAD: ebe728a8a71d30eea32c211e949ef5b00109c28f
+- Release HEAD: 293131fe3d05aa3b6bd25a8bddcac59391a9e265
+- Drift: yes
+- SHA: a3fe71c3a5c3bb6c04e1a68ec886f59b1f67b7ff
+- Commit: report-dated-ampm-receipts: test dated report timestamps
+
+## [2026-06-01 02:59:14 PM] _NEXUS_QUEUE.md
+
+- Agent: @codex
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: ebe728a8a71d30eea32c211e949ef5b00109c28f
+- Release HEAD: a3fe71c3a5c3bb6c04e1a68ec886f59b1f67b7ff
+- Drift: yes
+- SHA: b7a74a1e150ab3f704bd37438e2883b54c00535c
+- Commit: dashboard-latest-first-feeds: queue dashboard ordering metric
+

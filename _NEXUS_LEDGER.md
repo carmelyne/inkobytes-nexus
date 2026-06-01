@@ -362,3 +362,55 @@
 - Commit: readme-public-release-pass: clarify public positioning
 - Source: release
 
+## standup-ampm-timestamps
+
+- Id: standup-ampm-timestamps
+- Title: Add AM/PM to standup timestamps
+- Agent: @codex
+- Epic: Dashboard observability
+- Cost: small
+- Completed At: 2026-06-01T06:58:50.958Z
+- Files: _NEXUS_STANDUP.md, src/commands/init.js, src/commands/dashboard.js, test/dashboard.test.js, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+- SHA: 178a0cdf604eec6b886c2afb2aae9720ae18e345
+- Commit: standup-ampm-timestamps: update standup format
+- Source: release
+
+## dashboard-latest-first-feeds
+
+- Id: dashboard-latest-first-feeds
+- Title: Show latest dashboard feed items first
+- Agent: @codex
+- Epic: Dashboard observability
+- Cost: small
+- Completed At: 2026-06-01T06:58:51.066Z
+- Files: src/commands/dashboard.js, test/dashboard.test.js, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+- SHA: 32ab8d1dae2bbb3d5172cab694149c039b258b5d
+- Commit: dashboard-latest-first-feeds: show newest dashboard feeds first
+- Source: release
+
+## readme-plain-language-opening
+
+- Id: readme-plain-language-opening
+- Title: Rewrite README opening in plain language
+- Agent: @codex
+- Epic: Open-source CLI release
+- Cost: small
+- Completed At: 2026-06-01T06:58:52.008Z
+- Files: README.md, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+- SHA: 87ee9ff25fbf75edc4dd86fef8e0160e8d3fe14f
+- Commit: readme-plain-language-opening: rewrite README opening
+- Source: release
+
+## report-dated-ampm-receipts
+
+- Id: report-dated-ampm-receipts
+- Title: Add date and AM/PM to report receipts
+- Agent: @codex
+- Epic: Dashboard observability
+- Cost: small
+- Completed At: 2026-06-01T06:59:07.655Z
+- Files: src/commands/release.js, test/release.test.js, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+- SHA: 293131fe3d05aa3b6bd25a8bddcac59391a9e265
+- Commit: report-dated-ampm-receipts: format report receipt timestamps
+- Source: release
+
