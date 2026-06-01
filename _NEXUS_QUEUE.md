@@ -6,6 +6,19 @@
 
 ## Ready Queue
 
+- [x] TASK/Codex: Clarify memory month folder ownership
+  - Id: memory-month-folder-boundary
+  - Epic: Release hygiene
+  - Status: Done
+  - Depends on: none
+  - Files: src/commands/init.js, src/commands/doctor.js, test/init.test.js, test/doctor.test.js, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+  - Affinity: protocol, memory, safety
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Clarify that agents may create only their own current-month memory folder when writing handoff memory; broad cross-agent scaffold repair remains a `nexus doctor --fix` action.
+
 - [ ] TASK/@claude: Build NexusShort — pure motion graphics short-form video
   - Id: nexus-short-video
   - Epic: Content & documentation
