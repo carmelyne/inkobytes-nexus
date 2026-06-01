@@ -349,3 +349,16 @@
 - Commit: npm-publish-metadata-cleanup: normalize package metadata
 - Source: release
 
+## readme-public-release-pass
+
+- Id: readme-public-release-pass
+- Title: Tighten README for first public release
+- Agent: @codex
+- Epic: Open-source CLI release
+- Cost: small
+- Completed At: 2026-06-01T05:54:23.027Z
+- Files: README.md, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+- SHA: ffc7e2cb5871948917db6f4bd91d049cd0143f87
+- Commit: readme-public-release-pass: clarify public positioning
+- Source: release
+
