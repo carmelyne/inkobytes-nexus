@@ -60,7 +60,7 @@ export default function release(args) {
   }
 
   // Append to report
-  const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false });
+  const timestamp = formatReportTimestamp(new Date());
   const reportLine = `## [${timestamp}] ${target}
 
 - Agent: ${lock?.agent || 'unknown'}
@@ -92,4 +92,16 @@ export default function release(args) {
 
 function shortSha(sha) {
   return sha === 'unknown' ? sha : sha.slice(0, 7);
+}
+
+function formatReportTimestamp(date) {
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  const rawHour = date.getHours();
+  const hour = rawHour % 12 || 12;
+  const minute = String(date.getMinutes()).padStart(2, '0');
+  const second = String(date.getSeconds()).padStart(2, '0');
+  const period = rawHour < 12 ? 'AM' : 'PM';
+  return `${yyyy}-${mm}-${dd} ${String(hour).padStart(2, '0')}:${minute}:${second} ${period}`;
 }
