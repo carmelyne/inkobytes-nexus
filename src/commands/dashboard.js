@@ -67,7 +67,7 @@ export function buildSnapshot() {
     queue: parseQueue(queueText),
     proposed: parseProposed(queueText),
     ledger: readLedgerEntries().reverse(),
-    standup: parseStandupEntries(standupText).filter(entry => /^\d{4}-\d{2}-\d{2}/.test(entry.meta)).slice(-8).reverse(),
+    standup: parseStandupEntries(standupText).filter(entry => entry.type.startsWith('@')).slice(-8).reverse(),
     releases: parseReleaseEntries(reportText).slice(-16).reverse(),
     report: reportText,
   };
@@ -313,7 +313,12 @@ function parseStandupEntries(content) {
 
     const agent = line.match(/^(@[^:]+):\s*(.+)$/);
     if (agent) {
-      entries.push({ type: agent[1], title: agent[2], meta: '' });
+      entries.push({
+        type: agent[1],
+        title: agent[2],
+        meta: '',
+        warning: 'Missing date/time. Use YYYY-MM-DD HH:MM AM/PM @agent [STATUS]: message',
+      });
       continue;
     }
 
