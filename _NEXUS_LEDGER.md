@@ -553,6 +553,6 @@
 - Cost: small
 - Completed At: 2026-06-01T13:09:41.280Z
 - Files: src/commands/next.js, test/next.test.js, README.md, drills/nexus-agent-protocol/README.md, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
-- SHA: 9a9211955f10e81638b18a4ba8ef804a90c697ef
+- SHA: 9b41f15c3f0ad8c0a127df12f5f9c6f74dd54c95
 - Commit: next-related-drills: surface related drill ids
 - Source: release

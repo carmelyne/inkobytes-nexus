@@ -2715,59 +2715,65 @@ Structured release receipts.
 ## [2026-06-01 09:09:41 PM] src/commands/next.js
 
 - Agent: @codex
+- Claim Intent: surface preventive drill summaries in next
 - Target: src/commands/next.js
 - Claim HEAD: 6dec6addfdcc778131df4578d92a3a9bbda25af7
 - Release HEAD: 6dec6addfdcc778131df4578d92a3a9bbda25af7
 - Drift: no
-- SHA: 9a9211955f10e81638b18a4ba8ef804a90c697ef
+- SHA: 9b41f15c3f0ad8c0a127df12f5f9c6f74dd54c95
 - Commit: next-related-drills: surface related drill ids
 
 ## [2026-06-01 09:09:46 PM] test/next.test.js
 
 - Agent: @codex
+- Claim Intent: test next related drills
 - Target: test/next.test.js
 - Claim HEAD: 6dec6addfdcc778131df4578d92a3a9bbda25af7
-- Release HEAD: 9a9211955f10e81638b18a4ba8ef804a90c697ef
+- Release HEAD: 9b41f15c3f0ad8c0a127df12f5f9c6f74dd54c95
 - Drift: yes
-- SHA: 2cd51cc84a85de30a8eb720c7cc2590ab1a75908
+- SHA: 4d41ba60db0cac6589d07676fc783697a33efe47
 - Commit: next-related-drills: cover manual and automatic hints
 
 ## [2026-06-01 09:10:11 PM] src/commands/next.js
 
 - Agent: @codex
+- Claim Intent: remove related drills cap
 - Target: src/commands/next.js
-- Claim HEAD: 2cd51cc84a85de30a8eb720c7cc2590ab1a75908
-- Release HEAD: 2cd51cc84a85de30a8eb720c7cc2590ab1a75908
+- Claim HEAD: 4d41ba60db0cac6589d07676fc783697a33efe47
+- Release HEAD: 4d41ba60db0cac6589d07676fc783697a33efe47
 - Drift: no
-- SHA: 8e5d4428b12338a73b38583d1cfa1fe9d65928e5
+- SHA: 972337355e6e2600f94c435db2e8cfe475ed194c
 - Commit: next-related-drills: show all matched drill ids
 
 ## [2026-06-01 09:10:16 PM] README.md
 
 - Agent: @codex
+- Claim Intent: document preventive drills and next related drills
 - Target: README.md
 - Claim HEAD: 6dec6addfdcc778131df4578d92a3a9bbda25af7
-- Release HEAD: 8e5d4428b12338a73b38583d1cfa1fe9d65928e5
+- Release HEAD: 972337355e6e2600f94c435db2e8cfe475ed194c
 - Drift: yes
-- SHA: d214a53291e4633d6c7554438db6b567bdc48223
+- SHA: 4a85ee610a250eeb033acf179425f12bad25f029
 - Commit: next-related-drills: document preventive drill routing
 
 ## [2026-06-01 09:10:20 PM] drills/nexus-agent-protocol/README.md
 
 - Agent: @codex
+- Claim Intent: document preventive drill framing
 - Target: drills/nexus-agent-protocol/README.md
 - Claim HEAD: 6dec6addfdcc778131df4578d92a3a9bbda25af7
-- Release HEAD: d214a53291e4633d6c7554438db6b567bdc48223
+- Release HEAD: 4a85ee610a250eeb033acf179425f12bad25f029
 - Drift: yes
-- SHA: e9db3f951d36fda42601e9c267158e0b1f992080
+- SHA: 258f2bef57bca35d3a4ad2842e2a75605a83081d
 - Commit: next-related-drills: frame drills as preventive guides
 
 ## [2026-06-01 09:10:25 PM] _NEXUS_QUEUE.md
 
 - Agent: @codex
+- Claim Intent: queue metric for next drill summaries
 - Target: _NEXUS_QUEUE.md
 - Claim HEAD: 6dec6addfdcc778131df4578d92a3a9bbda25af7
-- Release HEAD: e9db3f951d36fda42601e9c267158e0b1f992080
+- Release HEAD: 258f2bef57bca35d3a4ad2842e2a75605a83081d
 - Drift: yes
-- SHA: 07bc28512fcb40a0af7457fa353de88d59c5fee5
+- SHA: 6fc1e89365d7859d694c5a9e9fc18095509a5a26
 - Commit: next-related-drills: record queue metric
