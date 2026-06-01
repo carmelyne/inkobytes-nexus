@@ -90,6 +90,12 @@ test('dashboard snapshot summarizes Nexus repo state', () => {
     assert.equal(snapshot.locks[0].thinking, 'medium');
     assert.deepEqual(snapshot.standup, [
       { type: '@codex', title: 'Dashboard v1 shipped', meta: '2026-06-01 09:30 AM · DONE' },
+      {
+        type: '@codex',
+        title: 'Dashboard v1 started',
+        meta: '',
+        warning: 'Missing date/time. Use YYYY-MM-DD HH:MM AM/PM @agent [STATUS]: message',
+      },
     ]);
     assert.deepEqual(snapshot.releases, [
       { type: 'Commit', title: 'feat: dashboard', meta: '' },
