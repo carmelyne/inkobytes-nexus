@@ -610,8 +610,8 @@
         return '<div class="feed-row feed-row-labeled">'
           + '<dd>'
           + labeledFeedLine('Agent', entry.type, 'feed-agent')
-          + labeledFeedLine('Title', entry.title, 'feed-title')
           + (entry.meta ? labeledFeedLine('Date', entry.meta, 'feed-meta') : '')
+          + labeledFeedLine('Title', entry.title, 'feed-title')
           + '</dd>'
           + '</div>';
       }
