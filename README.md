@@ -222,7 +222,11 @@ nexus drill run wrong-repo-push --input judge-results.json
 nexus drill report
 ```
 
-Drills are scenario-based behavior checks for known agent failure modes. They are not model benchmarks or leaderboards. Use them when changing Nexus instructions, queue behavior, release behavior, or safety guardrails: known failure -> drill -> retest.
+Drills are scenario playbooks for known agent failure modes. They are not model benchmarks or leaderboards.
+
+A drill captures a situation where an agent may get blocked, confused, or tempted to do the wrong thing, then records the expected recovery path. Use drills as guidance when a similar situation comes up again: known failure -> expected move -> safer next action.
+
+Drills are also useful after changing Nexus instructions, queue behavior, release behavior, safety guardrails, or `doctor --fix` updates to existing agent files, because you can rerun the same scenarios and check whether the expected behavior still holds.
 
 `run` writes artifacts under `.nexus/drill-runs/<timestamp>/`. When given judge input, Nexus validates and normalizes each result into `pass`, `fail`, or `needs_review`; any matched `fail_if` condition overrides expected behavior. Unknown drill ids, invalid statuses, malformed match arrays, and out-of-range confidence values fail loudly. Missing results in a suite run are recorded as `needs_review`. `report` reads the latest run artifacts and summarizes outcomes without rerunning drills.
 
