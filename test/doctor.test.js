@@ -53,6 +53,8 @@ test('doctor --fix creates agent scaffolds and protocol blocks', () => {
     assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /### Git Write Safety/);
     assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /Never infer from similar folder names or cached context/);
     assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /untrack them; do not delete local folders/);
+    assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /create the current month folder under `.codex\/memories` if it is missing/);
+    assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /Do not create or repair other agents' memory folders manually/);
     assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /Read `USER\.md` if present/);
     assert.doesNotMatch(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /Pong/);
     assert.match(readFileSync(join(root, '.codex', 'CONTINUITY.md'), 'utf-8'), /# CONTINUITY/);
@@ -157,6 +159,8 @@ Keep this note.
     assert.match(next, /DECISIONS\.md/);
     assert.match(next, /mention them in `_NEXUS_STANDUP\.md` only when active agents need to coordinate around them/);
     assert.match(next, /Memory entries are session handoffs/);
+    assert.match(next, /create the current month folder under `.codex\/memories` if it is missing/);
+    assert.match(next, /Do not create or repair other agents' memory folders manually/);
     assert.match(next, /# YYYY-MM-DD-HHMM - <topic>/);
     assert.match(next, /## Local Notes\n\nKeep this note\./);
   });
@@ -238,6 +242,7 @@ test('doctor --fix refreshes stale managed instructions when template changes', 
     const next = readFileSync(entrypointPath, 'utf-8');
     assert.match(next, /Use `nexus next @Agent` for the next safe queue task\./);
     assert.match(next, /cached model memory/);
+    assert.match(next, /Do not create or repair other agents' memory folders manually/);
     assert.doesNotMatch(next, /Use `nexus next @Agent` for queue work\./);
   });
 });
