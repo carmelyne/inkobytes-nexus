@@ -505,3 +505,16 @@
 - Commit: dashboard-report-latest-first: sort report blocks
 - Source: release
 
+## dashboard-docs-sticky-toc
+
+- Id: dashboard-docs-sticky-toc
+- Title: Make CLI Docs TOC sticky
+- Agent: @codex
+- Epic: Dashboard observability
+- Cost: small
+- Completed At: 2026-06-01T11:43:50.190Z
+- Files: nexus-dashboard/style.css, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+- SHA: 5f93087398bbb7000f5970b03f6548a3f100e052
+- Commit: dashboard-docs-sticky-toc: pin docs toc
+- Source: release
+

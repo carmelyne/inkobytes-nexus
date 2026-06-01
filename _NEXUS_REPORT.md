@@ -2632,3 +2632,33 @@ Structured release receipts.
 - SHA: 5efe63797ea44c3249ba09135b1a0b1a520562fd
 - Commit: dashboard-report-latest-first: record queue metric
 
+## [2026-06-01 07:43:50 PM] nexus-dashboard/style.css
+
+- Agent: @codex
+- Target: nexus-dashboard/style.css
+- Claim HEAD: 6bd0681d2064087e7325243a931dbe0c9fb5cc7d
+- Release HEAD: 6bd0681d2064087e7325243a931dbe0c9fb5cc7d
+- Drift: no
+- SHA: 5f93087398bbb7000f5970b03f6548a3f100e052
+- Commit: dashboard-docs-sticky-toc: pin docs toc
+
+## [2026-06-01 07:43:54 PM] _NEXUS_QUEUE.md
+
+- Agent: @codex
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: 6bd0681d2064087e7325243a931dbe0c9fb5cc7d
+- Release HEAD: 5f93087398bbb7000f5970b03f6548a3f100e052
+- Drift: yes
+- SHA: 44b4fd431bd8cb5bd1382e5e859c3e0d06f03fbf
+- Commit: dashboard-docs-sticky-toc: record queue metric
+
+## [2026-06-01 07:44:03 PM] nexus-dashboard/docs/index.html
+
+- Agent: @codex
+- Target: nexus-dashboard/docs/index.html
+- Claim HEAD: 6bd0681d2064087e7325243a931dbe0c9fb5cc7d
+- Release HEAD: 44b4fd431bd8cb5bd1382e5e859c3e0d06f03fbf
+- Drift: yes
+- SHA: unknown
+- Commit: dashboard-docs-sticky-toc: clear docs lock
+
