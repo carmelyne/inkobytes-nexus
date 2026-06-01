@@ -323,3 +323,16 @@
 - Commit: memory-month-folder-boundary: clarify init memory ownership
 - Source: release
 
+## standup-dated-format
+
+- Id: standup-dated-format
+- Title: Add dated standup entry format
+- Agent: @codex
+- Epic: Dashboard observability
+- Cost: small
+- Completed At: 2026-06-01T00:38:41.429Z
+- Files: src/commands/init.js, src/commands/dashboard.js, test/dashboard.test.js, _NEXUS_STANDUP.md, _NEXUS_QUEUE.md, _NEXUS_LEDGER.md
+- SHA: a31cef550c1f4b70f561824781d9ec821c08a4ee
+- Commit: standup-dated-format: parse dated standup entries
+- Source: release
+
