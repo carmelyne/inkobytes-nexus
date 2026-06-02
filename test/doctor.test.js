@@ -178,6 +178,8 @@ Keep this note.
     assert.match(next, /Mention delegated work in release or `nexus standup` notes/);
     assert.match(next, /Direct user instruction can override queue order/);
     assert.match(next, /announce `Standby` with what you are waiting for/);
+    assert.match(next, /agent-native and file-native, not feature-native/);
+    assert.match(next, /Do not hold claims while waiting to bundle related files into one feature commit/);
     assert.match(next, /Agent instruction files are shared protocol files/);
     assert.match(next, /assigned work zones/);
     assert.match(next, /nexus doctor` is cheap, local, and idempotent/);
