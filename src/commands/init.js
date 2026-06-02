@@ -379,6 +379,8 @@ This project uses Nexus for multi-agent coordination.
 ### Nexus Rules
 
 - Claim before editing shared project files: \`nexus claim <path> @Agent "intent"\`.
+- Nexus is agent-native and file-native, not feature-native: commit and release by file as soon as the file reaches a coherent checkpoint.
+- Do not hold claims while waiting to bundle related files into one feature commit; that blocks other agents who may need the file next.
 - Release finished work through Nexus: \`nexus release <path> "commit message"\`.
 - Use \`nexus next @Agent\` for the next safe queue task.
 - Do not free-roam into unassigned or \`Auto-flow: no\` work without user approval.
