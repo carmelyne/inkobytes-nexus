@@ -7,6 +7,8 @@ import { listLocks } from '../lib/lockManager.js';
 import { getConfig } from '../lib/config.js';
 import { spawnSync } from 'child_process';
 
+const FILE_FLOW_WARNING = 'Stale claim. Commit this file now.';
+
 export default function status(args) {
   const config = getConfig();
   const locks = listLocks();
@@ -36,6 +38,9 @@ export default function status(args) {
     const staleTag = stale ? ' ⚠️  STALE' : '';
     console.log(`  🔒 ${lock.target}`);
     console.log(`     Agent: ${agent} | Age: ${ageStr}${staleTag}`);
+    if (stale) {
+      console.log(`     Warning: ${FILE_FLOW_WARNING}`);
+    }
   }
 
   console.log('');
