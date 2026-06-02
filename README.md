@@ -67,6 +67,23 @@ npx @inkobytes/nexus help
 
 Requires Node.js 18 or newer.
 
+## What's New In 1.0.1
+
+- Colorized `nexus help` output for easier scanning in the terminal
+- Built-in `nexus completion zsh` support for shell completions
+
+See [CHANGELOG.md](./CHANGELOG.md) for the release summary.
+
+## Shell Experience
+
+For better typed-command ergonomics in `zsh`, load Nexus completions:
+
+```bash
+source <(nexus completion zsh)
+```
+
+If you want typed commands themselves to colorize while you type in iTerm, pair that with `zsh-syntax-highlighting`. Nexus provides the completions and colorized CLI output; the live input-line highlighting is handled by your shell.
+
 ## Quick Start
 
 In a Git repo:
@@ -197,6 +214,17 @@ nexus dashboard --serve --port 13787
 ```
 
 The dashboard prints both `127.0.0.1` and local-network URLs when available, then shows repo health, active locks, queue items, recent standup lines, recent release notes, and dirty git files. It uses local files as the source of truth and updates the page through server-sent events. The default port is `13787`; if that port is already in use, Nexus tries `13788`, `13789`, and so on. Passing `--port` uses that exact port.
+
+### `nexus completion zsh`
+
+Print a zsh completion script for Nexus.
+
+```bash
+nexus completion zsh
+source <(nexus completion zsh)
+```
+
+This gives `zsh` tab-completion for commands like `claim`, `release`, `doctor`, `drill`, and common agent handles such as `@codex` and `@claude`.
 
 ### `nexus ledger [--json]`
 

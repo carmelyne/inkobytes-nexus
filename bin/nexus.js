@@ -5,6 +5,7 @@ import { argv, exit } from 'process';
 const COMMANDS = {
   init: () => import('../src/commands/init.js'),
   doctor: () => import('../src/commands/doctor.js'),
+  completion: () => import('../src/commands/completion.js'),
   checkin: () => import('../src/commands/checkin.js'),
   checkout: () => import('../src/commands/checkout.js'),
   claim: () => import('../src/commands/claim.js'),
@@ -24,7 +25,8 @@ const COMMANDS = {
   help: () => import('../src/commands/help.js'),
 };
 
-const VERSION = '1.0.0';
+const VERSION = '1.0.1';
+const COLORS = createColors();
 
 const args = argv.slice(2);
 const command = args[0];
@@ -40,8 +42,8 @@ if (command === '--version' || command === '-v') {
 }
 
 if (!COMMANDS[command]) {
-  console.error(`Unknown command: ${command}`);
-  console.error(`Run "nexus help" for available commands.`);
+  console.error(COLORS.red(`Unknown command: ${command}`));
+  console.error(`Run ${COLORS.cyan('nexus help')} for available commands.`);
   exit(1);
 }
 
@@ -54,55 +56,98 @@ try {
 }
 
 function printHelp() {
-  console.log(`
-@inkobytes/nexus v${VERSION}
-Multi-agent coordination for shared repositories.
+  const commands = [
+    ['init', 'Scaffold Nexus files into current repo'],
+    ['doctor [--fix] [--json]', 'Check or repair agent protocol files'],
+    ['completion zsh', 'Print zsh completion script for nexus'],
+    ['checkin <agent>', 'Signal agent presence (heartbeat)'],
+    ['checkout [--all] <agent>', 'Signal session end or cleanup'],
+    ['claim <path> <agent> "<intent>"', 'Lock a file or directory'],
+    ['release <path> "<commit msg>"', 'Unlock, auto-commit, and log'],
+    ['standup "<dated message>"', 'Append a validated standup line'],
+    ['status', 'Show current blackboard state'],
+    ['clean [--stale | <path>]', 'Prune locks (surgical, stale, or nuke)'],
+    ['next <agent>', 'Suggest next safe task from queue'],
+    ['start [--agent @handle]', 'Orient an agent entering this repo'],
+    ['dashboard --serve [--port <port>]', 'Serve live local Nexus dashboard'],
+    ['metrics [--json]', 'Summarize commits, releases, and queue cost'],
+    ['ledger [--json|backfill]', 'Show or backfill completed task ledger'],
+    ['chmod [--list] [--init]', 'Show or set promptCHMOD permissions'],
+    ['db <backup|list|restore|schedule>', 'Database backup and recovery'],
+    ['drill <list|show|run|report>', 'Inspect or run protocol drills'],
+    ['soul [--file <path>] [--status | --remove]', 'Manage local soul overlay in agent files'],
+    ['help', 'Show this help'],
+  ];
 
-Usage: nexus <command> [options]
+  const examples = [
+    'nexus init',
+    'nexus doctor --fix',
+    'nexus doctor --json',
+    'nexus completion zsh',
+    'nexus start',
+    'nexus dashboard --serve',
+    'nexus metrics --json',
+    'nexus ledger backfill',
+    'nexus drill show wrong-repo-push',
+    'nexus claim src/lib/components/login/ @claude "Building login UI"',
+    'nexus release src/lib/components/login/ "feat: login form component"',
+    'nexus standup "2026-06-01 08:38 AM @codex [DONE]: Updated tests"',
+    'nexus clean --stale',
+    'nexus next @claude',
+  ];
 
-Commands:
-  init                              Scaffold Nexus files into current repo
-  doctor [--fix] [--json]           Check or repair agent protocol files
-  checkin <agent>                   Signal agent presence (heartbeat)
-  checkout [--all] <agent>          Signal session end or cleanup
-  claim <path> <agent> "<intent>"   Lock a file or directory
-                                    Also accepts --agent and --intent
-  release <path> "<commit msg>"     Unlock, auto-commit, and log
-  standup "<dated message>"          Append a validated standup line
-  status                            Show current blackboard state
-  clean [--stale | <path>]          Prune locks (surgical, stale, or nuke)
-  next <agent>                      Suggest next safe task from queue
-  start [--agent @handle]           Orient an agent entering this repo
-  dashboard --serve [--port <port>]  Serve live local Nexus dashboard
-  metrics [--json]                   Summarize commits, releases, and queue cost
-  ledger [--json|backfill]           Show or backfill completed task ledger
-  chmod [--list] [--init]            Show or set promptCHMOD permissions
-  db <backup|list|restore|schedule>  Database backup and recovery
-  drill <list|show|run|report>       Inspect or run protocol drills
-  soul [--file <path>] [--status | --remove]
-                                    Manage local soul overlay in agent files
-  help                              Show this help
+  const width = Math.max(...commands.map(([left]) => left.length)) + 2;
+  const lines = [
+    '',
+    COLORS.bold(COLORS.cyan(`@inkobytes/nexus v${VERSION}`)),
+    COLORS.dim('Multi-agent coordination for shared repositories.'),
+    '',
+    COLORS.bold('Usage'),
+    `  ${COLORS.cyan('nexus')} ${COLORS.yellow('<command>')} ${COLORS.dim('[options]')}`,
+    '',
+    COLORS.bold('Commands'),
+    ...commands.map(([left, right]) => `  ${COLORS.cyan(left.padEnd(width))}${COLORS.dim(right)}`),
+    '',
+    COLORS.bold('Examples'),
+    ...examples.map((example) => `  ${colorizeInline(example)}`),
+    '',
+    COLORS.dim('Tip: load zsh completions with `source <(nexus completion zsh)` and pair it with zsh-syntax-highlighting for typed command color.'),
+    '',
+  ];
 
-Examples:
-  nexus init
-  nexus doctor --fix
-  nexus doctor --json
-  nexus start
-  nexus dashboard --serve
-  nexus metrics
-  nexus metrics --json
-  nexus ledger
-  nexus ledger --json
-  nexus ledger backfill
-  nexus drill list
-  nexus drill show wrong-repo-push
-  nexus drill run wrong-repo-push
-  nexus drill report
-  nexus soul
-  nexus claim src/lib/components/login/ @claude "Building login UI"
-  nexus release src/lib/components/login/ "feat: login form component"
-  nexus standup "2026-06-01 08:38 AM @codex [DONE]: Updated tests"
-  nexus clean --stale
-  nexus next @claude
-`);
+  console.log(lines.join('\n'));
+}
+
+function colorizeInline(value) {
+  return String(value)
+    .split(/(\s+)/)
+    .map((part, index) => {
+      if (/^\s+$/.test(part)) return part;
+      if (index === 0 && part === 'nexus') return COLORS.cyan(part);
+      if (part.startsWith('--')) return COLORS.blue(part);
+      if (part.startsWith('@')) return COLORS.green(part);
+      if (part.startsWith('"') || part.endsWith('"')) return COLORS.yellow(part);
+      return part;
+    })
+    .join('');
+}
+
+function createColors() {
+  const enabled = supportsColor();
+  const wrap = (open, close) => (value) => enabled ? `\u001b[${open}m${value}\u001b[${close}m` : String(value);
+  return {
+    bold: wrap(1, 22),
+    dim: wrap(2, 22),
+    red: wrap(31, 39),
+    green: wrap(32, 39),
+    yellow: wrap(33, 39),
+    blue: wrap(34, 39),
+    cyan: wrap(36, 39),
+  };
+}
+
+function supportsColor() {
+  if (process.env.FORCE_COLOR && process.env.FORCE_COLOR !== '0') return true;
+  if ('NO_COLOR' in process.env) return false;
+  return Boolean(process.stdout && process.stdout.isTTY);
 }
