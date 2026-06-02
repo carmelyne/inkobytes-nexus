@@ -58,11 +58,11 @@ test('dashboard snapshot summarizes Nexus repo state', () => {
       '',
       'Structured release receipts.',
       '',
-      '## [12:00:00] docs/README.md',
+      '## [2026-05-31 12:00:00 PM] docs/README.md',
       '- Agent: @codex',
       '- Target: docs/README.md',
       '- Commit: docs: placeholder',
-      '## [12:01:00] src/commands/dashboard.js',
+      '## [2026-06-01 12:01:00 PM] src/commands/dashboard.js',
       '- Agent: @codex',
       '- Target: src/commands/dashboard.js',
       '- Commit: feat: dashboard',
@@ -105,7 +105,11 @@ test('dashboard snapshot summarizes Nexus repo state', () => {
       { type: 'Commit', title: 'feat: dashboard', meta: '' },
       { type: 'Commit', title: 'docs: placeholder', meta: '' },
     ]);
-    assert.ok(snapshot.report.indexOf('## [12:01:00] src/commands/dashboard.js') < snapshot.report.indexOf('## [12:00:00] docs/README.md'));
+    assert.equal(snapshot.reportIntro, '# Nexus Report\n\nStructured release receipts.');
+    assert.equal(snapshot.reportBlocks[0].target, 'src/commands/dashboard.js');
+    assert.equal(snapshot.reportBlocks[0].monthKey, '2026-06');
+    assert.equal(snapshot.reportBlocks[1].monthLabel, 'May 2026');
+    assert.ok(snapshot.report.indexOf('## [2026-06-01 12:01:00 PM] src/commands/dashboard.js') < snapshot.report.indexOf('## [2026-05-31 12:00:00 PM] docs/README.md'));
     assert.match(snapshot.report, /^# Nexus Report\n\nStructured release receipts\./);
     assert.equal(snapshot.ledger[0].id, 'dashboard-v1');
     assert.equal(snapshot.ledger[0].epic, 'Dashboard observability');

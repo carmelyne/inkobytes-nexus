@@ -50,115 +50,97 @@
         <div class="docs-layout">
           <section class="docs-main">
             <h2><span data-icon="file-text"></span>Commands</h2>
-            <div class="command-list">
-              <article class="command-card" id="checkin">
-                <h3><code>nexus checkin &lt;agent&gt;</code></h3>
-                <p>Writes an agent heartbeat so the dashboard can show online, idle, or offline presence.</p>
-              </article>
-              <article class="command-card" id="checkout">
-                <h3><code>nexus checkout [--all] &lt;agent&gt;</code></h3>
-                <p>Marks an agent session as ended, or clears all presence records during emergency cleanup.</p>
-              </article>
-              <article class="command-card" id="chmod">
-                <h3><code>nexus chmod [--list] [--init]</code></h3>
-                <p>Shows or initializes promptCHMOD permissions for agent-safe file access conventions.</p>
-              </article>
-              <article class="command-card" id="claim">
-                <h3><code>nexus claim &lt;path&gt; &lt;agent&gt; "&lt;intent&gt;"</code></h3>
-                <p>Locks a file or directory before edits so other agents can see ownership and intent. Also accepts <code>--agent &lt;agent&gt;</code> and <code>--intent "&lt;intent&gt;"</code>. Warns when agent, intent, or model metadata is missing.</p>
-              </article>
-              <article class="command-card" id="clean">
-                <h3><code>nexus clean [--stale | &lt;path&gt;]</code></h3>
-                <p>Prunes locks surgically, by stale age, or by explicit target when cleanup is needed.</p>
-              </article>
-              <article class="command-card" id="dashboard">
-                <h3><code>nexus dashboard --serve [--port &lt;port&gt;]</code></h3>
-                <p>Serves the local dashboard with claims, queue state, metrics, ledger history, and report views.</p>
-              </article>
-              <article class="command-card" id="db">
-                <h3><code>nexus db &lt;backup|list|restore|schedule&gt;</code></h3>
-                <p>Runs database backup and recovery helpers for repo-local protection workflows.</p>
-              </article>
-              <article class="command-card" id="doctor">
-                <h3><code>nexus doctor [--fix] [--json]</code></h3>
-                <p>Checks protocol files, private-path safety, and repo health; can repair known protocol drift.</p>
-              </article>
-              <article class="command-card" id="drill">
-                <h3><code>nexus drill &lt;list|show|run|report&gt;</code></h3>
-                <p>Inspects or runs protocol drills and summarizes the latest drill results.</p>
-              </article>
-              <article class="command-card" id="help">
-                <h3><code>nexus help</code></h3>
-                <p>Prints the CLI command list, examples, and usage syntax.</p>
-              </article>
-              <article class="command-card" id="init">
-                <h3><code>nexus init</code></h3>
-                <p>Scaffolds Nexus coordination files into the current repository.</p>
-              </article>
-              <article class="command-card" id="ledger">
-                <h3><code>nexus ledger [--json|backfill]</code></h3>
-                <p>Shows or backfills the completed-task ledger that powers dashboard history and charts.</p>
-              </article>
-              <article class="command-card" id="metrics">
-                <h3><code>nexus metrics [--json]</code></h3>
-                <p>Summarizes commits, release activity, queue cost, and agent attribution.</p>
-              </article>
-              <article class="command-card" id="next">
-                <h3><code>nexus next &lt;agent&gt;</code></h3>
-                <p>Suggests the next safe ready task for an agent from the queue.</p>
-              </article>
-              <article class="command-card" id="release">
-                <h3><code>nexus release &lt;path&gt; "&lt;commit msg&gt;"</code></h3>
-                <p>Releases a claim, stages and commits the target, and appends a Nexus report receipt.</p>
-              </article>
-              <article class="command-card" id="soul">
-                <h3><code>nexus soul [--file &lt;path&gt;] [--status | --remove]</code></h3>
-                <p>Manages local soul overlays in agent files without making them part of public docs.</p>
-              </article>
-              <article class="command-card" id="standup">
-                <h3><code>nexus standup "YYYY-MM-DD HH:MM AM/PM @agent [STATUS]: message"</code></h3>
-                <p>Appends a standup line only after validating the agent handle, date/time, status, and message.</p>
-              </article>
-              <article class="command-card" id="start">
-                <h3><code>nexus start [--agent @handle]</code></h3>
-                <p>Orients an entering agent with repo facts, scoped memory paths, locks, and current status.</p>
-              </article>
-              <article class="command-card" id="status">
-                <h3><code>nexus status</code></h3>
-                <p>Shows the current Nexus blackboard state, active locks, and coordination context.</p>
-              </article>
-            </div>
+            <div id="command-list" class="command-list"></div>
           </section>
 
           <aside class="docs-toc" aria-label="Command table of contents">
             <h2><span data-icon="list-checks"></span>Commands</h2>
-            <nav>
-              <a href="#checkin">checkin</a>
-              <a href="#checkout">checkout</a>
-              <a href="#chmod">chmod</a>
-              <a href="#claim">claim</a>
-              <a href="#clean">clean</a>
-              <a href="#dashboard">dashboard</a>
-              <a href="#db">db</a>
-              <a href="#doctor">doctor</a>
-              <a href="#drill">drill</a>
-              <a href="#help">help</a>
-              <a href="#init">init</a>
-              <a href="#ledger">ledger</a>
-              <a href="#metrics">metrics</a>
-              <a href="#next">next</a>
-              <a href="#release">release</a>
-              <a href="#soul">soul</a>
-              <a href="#standup">standup</a>
-              <a href="#start">start</a>
-              <a href="#status">status</a>
-            </nav>
+            <nav id="docs-toc-nav"></nav>
           </aside>
         </div>
       </main>
     </div>
 
     <script>
+      const COMMANDS = [
+        { id: 'checkin', name: 'checkin', syntax: 'nexus checkin <agent>', summary: 'Writes an agent heartbeat so the dashboard can show online, idle, or offline presence.', example: 'nexus checkin @codex', tags: ['presence', 'heartbeat'] },
+        { id: 'checkout', name: 'checkout', syntax: 'nexus checkout [--all] <agent>', summary: 'Marks an agent session as ended, or clears all presence records during emergency cleanup.', example: 'nexus checkout @codex', tags: ['presence', 'cleanup'] },
+        { id: 'chmod', name: 'chmod', syntax: 'nexus chmod [--list] [--init]', summary: 'Shows or initializes promptCHMOD permissions for agent-safe file access conventions.', example: 'nexus chmod --list', tags: ['permissions', 'setup'] },
+        { id: 'completion', name: 'completion', syntax: 'nexus completion zsh', summary: 'Prints a zsh completion script so Nexus commands and agent handles tab-complete in your shell.', example: 'source <(nexus completion zsh)', tags: ['shell', 'completion'] },
+        { id: 'claim', name: 'claim', syntax: 'nexus claim <path> <agent> "<intent>"', summary: 'Locks a file or directory before edits so other agents can see ownership and intent. Also accepts --agent and --intent.', example: 'nexus claim src/commands/dashboard.js @codex "Polish report chart UI"', tags: ['lock', 'ownership', 'before editing'] },
+        { id: 'clean', name: 'clean', syntax: 'nexus clean [--stale | <path>]', summary: 'Prunes locks surgically, by stale age, or by explicit target when cleanup is needed.', example: 'nexus clean --stale', tags: ['locks', 'cleanup'] },
+        { id: 'dashboard', name: 'dashboard', syntax: 'nexus dashboard --serve [--port <port>]', summary: 'Serves the local dashboard with claims, queue state, metrics, ledger history, and report views.', example: 'nexus dashboard --serve --port 13787', tags: ['dashboard', 'local UI'] },
+        { id: 'db', name: 'db', syntax: 'nexus db <backup|list|restore|schedule>', summary: 'Runs database backup and recovery helpers for repo-local protection workflows.', example: 'nexus db backup', tags: ['database', 'safety'] },
+        { id: 'doctor', name: 'doctor', syntax: 'nexus doctor [--fix] [--json]', summary: 'Checks protocol files, private-path safety, and repo health; can repair known protocol drift.', example: 'nexus doctor --fix', tags: ['health', 'repair'] },
+        { id: 'drill', name: 'drill', syntax: 'nexus drill <list|show|run|report>', summary: 'Inspects or runs protocol drills and summarizes the latest drill results.', example: 'nexus drill show wrong-repo-push', tags: ['guidance', 'playbooks'] },
+        { id: 'help', name: 'help', syntax: 'nexus help', summary: 'Prints the CLI command list, examples, and usage syntax.', example: 'nexus help', tags: ['reference'] },
+        { id: 'init', name: 'init', syntax: 'nexus init', summary: 'Scaffolds Nexus coordination files into the current repository.', example: 'nexus init', tags: ['setup'] },
+        { id: 'ledger', name: 'ledger', syntax: 'nexus ledger [--json|backfill]', summary: 'Shows or backfills the completed-task ledger that powers dashboard history and charts.', example: 'nexus ledger backfill', tags: ['history', 'analytics'] },
+        { id: 'metrics', name: 'metrics', syntax: 'nexus metrics [--json]', summary: 'Summarizes commits, release activity, queue cost, and agent attribution.', example: 'nexus metrics --json', tags: ['metrics', 'reporting'] },
+        { id: 'next', name: 'next', syntax: 'nexus next <agent>', summary: 'Suggests the next safe ready task for an agent from the queue.', example: 'nexus next @codex', tags: ['queue', 'routing'] },
+        { id: 'release', name: 'release', syntax: 'nexus release <path> "<commit msg>"', summary: 'Releases a claim, stages and commits the target, and appends a Nexus report receipt.', example: 'nexus release src/commands/dashboard.js "feat: improve docs command cards"', tags: ['release', 'commit'] },
+        { id: 'soul', name: 'soul', syntax: 'nexus soul [--file <path>] [--status | --remove]', summary: 'Manages local soul overlays in agent files without making them part of public docs.', example: 'nexus soul --status', tags: ['local-only', 'agent files'] },
+        { id: 'standup', name: 'standup', syntax: 'nexus standup "YYYY-MM-DD HH:MM AM/PM @agent [STATUS]: message"', summary: 'Appends a standup line only after validating the agent handle, date/time, status, and message.', example: 'nexus standup "2026-06-01 08:38 AM @codex [DONE]: Updated tests"', tags: ['comms', 'validated format'] },
+        { id: 'start', name: 'start', syntax: 'nexus start [--agent @handle]', summary: 'Orients an entering agent with repo facts, scoped memory paths, locks, and current status.', example: 'nexus start --agent @codex', tags: ['onboarding', 'context'] },
+        { id: 'status', name: 'status', syntax: 'nexus status', summary: 'Shows the current Nexus blackboard state, active locks, and coordination context.', example: 'nexus status', tags: ['snapshot'] },
+      ];
+
+      function renderDocs() {
+        document.getElementById('command-list').innerHTML = COMMANDS.map(renderCommandCard).join('');
+        document.getElementById('docs-toc-nav').innerHTML = COMMANDS.map((command) =>
+          '<a href="#' + command.id + '">' + command.name + '</a>'
+        ).join('');
+      }
+
+      function renderCommandCard(command) {
+        return '<article class="command-card" id="' + command.id + '">'
+          + '<div class="command-card-top">'
+          + '<div class="command-name">' + escapeHtml(command.name) + '</div>'
+          + '<div class="command-tags">' + command.tags.map(renderTag).join('') + '</div>'
+          + '</div>'
+          + '<h3>' + renderCommandSyntax(command.syntax) + '</h3>'
+          + '<p>' + escapeHtml(command.summary) + '</p>'
+          + '<div class="command-example-label">Example</div>'
+          + '<pre class="command-example"><code>' + renderCommandSyntax(command.example) + '</code></pre>'
+          + '</article>';
+      }
+
+      function renderTag(tag) {
+        return '<span class="command-tag">' + escapeHtml(tag) + '</span>';
+      }
+
+      function renderCommandSyntax(value) {
+        const pattern = /(".*?"|--[a-z-]+|@[a-z0-9_-]+|<[^>]+>|\[[^\]]+\]|\bnexus\b)/gi;
+        let html = '';
+        let cursor = 0;
+        const source = String(value || '');
+
+        for (const match of source.matchAll(pattern)) {
+          const token = match[0];
+          const index = match.index || 0;
+          if (index > cursor) html += escapeHtml(source.slice(cursor, index));
+          html += wrapCommandToken(token);
+          cursor = index + token.length;
+        }
+
+        if (cursor < source.length) html += escapeHtml(source.slice(cursor));
+        return html;
+      }
+
+      function wrapCommandToken(token) {
+        const escaped = escapeHtml(token);
+        if (token === 'nexus') return '<span class="token-cli">' + escaped + '</span>';
+        if (token.startsWith('--')) return '<span class="token-flag">' + escaped + '</span>';
+        if (token.startsWith('@')) return '<span class="token-agent">' + escaped + '</span>';
+        if (token.startsWith('"')) return '<span class="token-string">' + escaped + '</span>';
+        if (token.startsWith('<') || token.startsWith('[')) return '<span class="token-arg">' + escaped + '</span>';
+        return escaped;
+      }
+
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+      }
+
       function renderIcons() {
         const icons = {
           activity: '<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>',
@@ -177,6 +159,7 @@
           node.innerHTML = '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">' + (icons[name] || '') + '</svg>';
         });
       }
+      renderDocs();
       renderIcons();
     </script>
   </body>

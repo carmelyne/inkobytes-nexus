@@ -54,6 +54,7 @@ export function buildSnapshot() {
   const queueText = readText(config.queue);
   const standupText = readText(config.standup);
   const reportText = readText(config.report);
+  const parsedReport = parseReportBlocks(reportText);
   const git = getGitStatus(config.root);
 
   return {
@@ -69,6 +70,8 @@ export function buildSnapshot() {
     ledger: readLedgerEntries().reverse(),
     standup: parseStandupEntries(standupText).filter(entry => entry.type.startsWith('@')).slice(-8).reverse(),
     releases: parseReleaseEntries(reportText).slice(-16).reverse(),
+    reportIntro: parsedReport.intro,
+    reportBlocks: parsedReport.blocks,
     report: sortReportBlocksLatestFirst(reportText),
   };
 }
@@ -244,7 +247,7 @@ function parseTasks(content) {
         agent: task[2].trim(),
         title: task[3].trim(),
         id: '', epic: '', status: '', depends: '',
-        files: '', cost: '', autoFlow: '', notes: '',
+        files: '', drills: '', cost: '', autoFlow: '', notes: '',
         review: '', approvedBy: '',
       };
       continue;
@@ -258,6 +261,7 @@ function parseTasks(content) {
     if (key === 'status') current.status = field[2];
     if (key === 'depends on') current.depends = field[2];
     if (key === 'files') current.files = field[2];
+    if (key === 'drills') current.drills = field[2];
     if (key === 'cost') current.cost = field[2];
     if (key === 'auto-flow') current.autoFlow = field[2];
     if (key === 'notes') current.notes = field[2];
@@ -361,6 +365,70 @@ function hasReleaseDetailValue(detail) {
   const colon = detail.indexOf(':');
   if (colon === -1) return detail.trim().length > 0;
   return detail.slice(colon + 1).trim().length > 0;
+}
+
+function parseReportBlocks(content) {
+  const trimmed = content.trim();
+  if (!trimmed) return { intro: '', blocks: [] };
+
+  const firstBlock = trimmed.search(/^## \[/m);
+  if (firstBlock === -1) return { intro: trimmed, blocks: [] };
+
+  const intro = trimmed.slice(0, firstBlock).trimEnd();
+  const blocks = trimmed
+    .slice(firstBlock)
+    .split(/\n(?=## \[)/)
+    .map((block) => block.trimEnd())
+    .filter(Boolean)
+    .reverse()
+    .map((block, index) => {
+      const lines = block.split('\n');
+      const heading = lines[0]?.match(/^## \[([^\]]+)\]\s*(.*)$/);
+      const timestamp = heading?.[1]?.trim() || '';
+      const target = heading?.[2]?.trim() || lines[0]?.replace(/^##\s*/, '') || '';
+      const details = lines.slice(1).join('\n').trim();
+      const parsed = parseReportTimestamp(timestamp);
+      const monthKey = parsed
+        ? `${parsed.getFullYear()}-${String(parsed.getMonth() + 1).padStart(2, '0')}`
+        : '';
+
+      return {
+        id: `report-${index}`,
+        timestamp,
+        target,
+        details,
+        raw: block,
+        monthKey,
+        monthLabel: parsed ? formatReportMonth(parsed) : 'Undated',
+      };
+    });
+
+  return { intro, blocks };
+}
+
+function parseReportTimestamp(value) {
+  const match = String(value || '').match(
+    /^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?(?:\s?(AM|PM|am|pm))?)?$/
+  );
+  if (!match) return null;
+
+  const year = Number.parseInt(match[1], 10);
+  const month = Number.parseInt(match[2], 10) - 1;
+  const day = Number.parseInt(match[3], 10);
+  let hour = Number.parseInt(match[4] || '0', 10);
+  const minute = Number.parseInt(match[5] || '0', 10);
+  const second = Number.parseInt(match[6] || '0', 10);
+  const meridiem = (match[7] || '').toUpperCase();
+
+  if (meridiem === 'PM' && hour < 12) hour += 12;
+  if (meridiem === 'AM' && hour === 12) hour = 0;
+
+  const date = new Date(year, month, day, hour, minute, second);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function formatReportMonth(date) {
+  return date.toLocaleString('en-US', { month: 'long', year: 'numeric' });
 }
 
 function sortReportBlocksLatestFirst(content) {

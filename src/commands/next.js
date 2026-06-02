@@ -66,7 +66,7 @@ export default function next(args) {
   })).sort((a, b) => b.score - a.score);
 
   const pick = scored[0];
-  console.log(`\n🐝 NEXUS SUGGESTS for ${agent}:`);
+  console.log(`\nNEXUS SUGGESTS for ${agent}:`);
   console.log(`   Task: ${pick.id}`);
   console.log(`   Epic: ${pick.epic}`);
   console.log(`   Files: ${pick.files.join(', ')}`);

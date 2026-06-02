@@ -133,7 +133,9 @@
           </section>
           <section class="wide report-section" id="nexus-report">
             <h2><span data-icon="file-text"></span>Nexus Report</h2>
-            <pre id="report"></pre>
+            <div id="report-intro" class="report-intro"></div>
+            <div id="report-tabs" class="report-tabs"></div>
+            <div id="report-panel" class="report-panel"></div>
           </section>
         </div>
       </main>
@@ -141,9 +143,11 @@
     <script>
       let currentSnapshot = null;
       let queueView = { mode: 'queue', agent: null };
+      let reportView = '';
       let repoRoot = '';
       let lastQueueSig = '';
       let lastLocksSig = '';
+      let sectionObserver = null;
 
       function queueViewFromHash(hash) {
         const value = String(hash || '').replace(/^#/, '').toLowerCase();
@@ -199,6 +203,8 @@
             const subagentsTag = group.subagents > 0 ? '<span class="lock-group-subagents">+subagents (' + group.subagents + ')</span>' : '';
             const modelText = Array.from(group.modelLabels).join(', ');
             const modelTag = modelText ? '<span class="lock-group-model">' + escapeHtml(modelText) + '</span>' : '';
+            const agentName = escapeHtml(formatAgentName(agent));
+            const agentBadge = '<span class="lock-group-agent"><span class="lock-group-agent-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8V4H8"></path><rect width="16" height="12" x="4" y="8" rx="2"></rect><path d="M2 14h2"></path><path d="M20 14h2"></path><path d="M15 13v2"></path><path d="M9 13v2"></path></svg></span><span>' + agentName + '</span></span>';
             const files = group.locks.map(lock => {
               const href = 'vscode://file' + escapeHtml(repoRoot + '/' + lock.target);
               const intent = lock.intent ? '<div class="lock-meta"><span class="lock-intent">' + escapeHtml(lock.intent) + '</span></div>' : '';
@@ -215,7 +221,7 @@
             return '<details class="lock-group" open>'
               + '<summary class="lock-group-header">'
               + trustDot
-              + '<span class="lock-group-agent">' + escapeHtml(agent) + '</span>'
+              + agentBadge
               + modelTag
               + subagentsTag
               + '<span class="lock-group-count">' + group.locks.length + ' file' + (group.locks.length !== 1 ? 's' : '') + '</span>'
@@ -239,9 +245,7 @@
         renderAgentBars(chartTasks);
         fillFeed('standup', data.standup);
         fillFeed('releases', data.releases);
-        document.getElementById('report').textContent = data.report && data.report.trim()
-          ? data.report
-          : 'No Nexus report entries yet.';
+        renderReportSection(data);
         document.getElementById('git').innerHTML = data.dirtyFiles.length
           ? '<ul>' + data.dirtyFiles.map(line => {
             const xy = line.slice(0, 2);
@@ -254,6 +258,7 @@
               : label) + '</li>';
           }).join('') + '</ul>'
           : '<p class="muted">Working tree clean.</p>';
+        syncSidebarActive();
       }
 
       document.querySelectorAll('[data-queue-mode], [data-next-agent]').forEach((button) => {
@@ -268,6 +273,8 @@
       });
 
       window.addEventListener('hashchange', syncQueueViewFromHash);
+      window.addEventListener('hashchange', syncSidebarActive);
+      document.addEventListener('scroll', syncSidebarActive, { passive: true });
 
       function renderQueuePanel(data) {
         if (!data) return;
@@ -297,28 +304,65 @@
         const agentTasks = data.queue.filter(task =>
           !task.checked && normalizeAgent(task.agent) === normalizeAgent(queueView.agent)
         );
-        const autoYes = agentTasks.filter(t => t.autoFlow === 'yes' && t.status === 'Ready');
-        const autoNo = agentTasks.filter(t => t.autoFlow !== 'yes');
-
-        let html = '';
-        html += '<div class="queue-segment">';
-        html += '<div class="queue-segment-label queue-segment-yes"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 18V5"/><path d="M15 13a4.17 4.17 0 0 1-3-4 4.17 4.17 0 0 1-3 4"/><path d="M17.598 6.5A3 3 0 1 0 12 5a3 3 0 1 0-5.598 1.5"/><path d="M17.997 5.125a4 4 0 0 1 2.526 5.77"/><path d="M18 18a4 4 0 0 0 2-7.464"/><path d="M19.967 17.483A4 4 0 1 1 12 18a4 4 0 1 1-7.967-.517"/><path d="M6 18a4 4 0 0 1-2-7.464"/><path d="M6.003 5.125a4 4 0 0 0-2.526 5.77"/></svg>Ready to grab</div>';
-        html += autoYes.length ? autoYes.map(renderTask).join('') : '<p class="muted">No auto-flow tasks ready.</p>';
-        html += '</div>';
-        html += '<div class="queue-segment">';
-        html += '<div class="queue-segment-label queue-segment-no"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 16v-2a2 2 0 0 0-4 0v2"/><path d="M9.5 15H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><rect x="13" y="16" width="8" height="5" rx=".899"/></svg>Needs approval</div>';
-        html += autoNo.length ? autoNo.map(renderTask).join('') : '<p class="muted">Nothing waiting for approval.</p>';
-        html += '</div>';
-
-        document.getElementById('queue-panel').innerHTML = html;
+        const suggested = pickNextTask(agentTasks, queueView.agent);
+        document.getElementById('queue-panel').innerHTML = suggested
+          ? renderNextSuggestion(suggested, queueView.agent)
+          : '<p class="muted">📋 No safe auto-flow tasks available for ' + escapeHtml(queueView.agent) + '. Standby.</p>';
       }
 
       function pickNextTask(tasks, agent) {
         return tasks.find(task =>
           normalizeAgent(task.agent) === normalizeAgent(agent) &&
           task.status === 'Ready' &&
-          task.autoFlow === 'yes'
+          task.autoFlow === 'yes' &&
+          String(task.review || '').toLowerCase() === 'approved'
         );
+      }
+
+      const NEXT_DRILL_HINTS = [
+        { id: 'data-mutation-delete-rows', keywords: ['db', 'database', 'migration', 'persisted'] },
+        { id: 'task-contract', keywords: ['all traces', 'completely', 'broad', 'cleanup', 'migration'] },
+      ];
+
+      function relatedDrillsForTask(task) {
+        const pinned = String(task.drills || '')
+          .split(',')
+          .map((item) => item.trim())
+          .filter(Boolean);
+        if (pinned.length) return pinned;
+
+        const haystack = [
+          task.title,
+          task.id,
+          task.epic,
+          task.depends,
+          task.files,
+          task.notes,
+        ].join(' ').toLowerCase();
+        const matches = [];
+        for (const hint of NEXT_DRILL_HINTS) {
+          if (hint.keywords.some(keyword => haystack.includes(keyword))) matches.push(hint.id);
+        }
+        return [...new Set(matches)];
+      }
+
+      function renderNextSuggestion(task, agent) {
+        const lines = [
+          `NEXUS SUGGESTS for ${agent}:`,
+          `   Task: ${task.id || task.title || 'unknown'}`,
+          `   Epic: ${task.epic || 'unknown'}`,
+          `   Files: ${task.files || 'no files'}`,
+          `   Cost: ${task.cost || 'unknown'}`,
+          `   Auto-flow: ${task.autoFlow || 'no'}`,
+        ];
+        const drills = relatedDrillsForTask(task);
+        if (drills.length) {
+          lines.push('');
+          lines.push('   Related known failure-mode guidance from drills:');
+          for (const id of drills) lines.push(`   - ${id}`);
+          lines.push('   Run `nexus drill show <id>` if the task matches that risk.');
+        }
+        return `<article class="task"><pre>${escapeHtml(lines.join('\n'))}</pre></article>`;
       }
 
       function formatNotes(text) {
@@ -382,6 +426,8 @@
         const dateText = completedAt && !Number.isNaN(completedAt.getTime())
           ? completedAt.toLocaleString()
           : 'unknown time';
+        const agentName = formatAgentName(entry.agent || 'unknown');
+        const agentBadge = '<span class="ledger-agent"><span class="ledger-agent-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8V4H8"></path><rect width="16" height="12" x="4" y="8" rx="2"></rect><path d="M2 14h2"></path><path d="M20 14h2"></path><path d="M15 13v2"></path><path d="M9 13v2"></path></svg></span><span>' + escapeHtml(agentName) + '</span></span>';
         const files = Array.isArray(entry.files) ? entry.files : [];
         const fileText = files.length ? files.join(', ') : 'no files';
         const sha = entry.sha && entry.sha !== 'unknown' ? entry.sha.slice(0, 7) : 'unknown';
@@ -397,7 +443,7 @@
           + '</div>'
           + '<div class="ledger-meta">'
           + '<span>' + escapeHtml(dateText) + '</span>'
-          + '<span>' + escapeHtml(entry.agent || 'unknown') + '</span>'
+          + agentBadge
           + '<span>' + escapeHtml(entry.epic || 'unknown epic') + '</span>'
           + '<span>' + escapeHtml(entry.cost || 'unknown cost') + '</span>'
           + '<span>' + escapeHtml(sha) + '</span>'
@@ -405,6 +451,128 @@
           + commitLine
           + '</div>'
           + '<div class="ledger-files"><span>Files</span><code>' + escapeHtml(fileText) + '</code></div>'
+          + '</article>';
+      }
+
+      function renderReportSection(data) {
+        const intro = formatReportIntro(data?.reportIntro);
+        const blocks = Array.isArray(data?.reportBlocks) ? data.reportBlocks : [];
+        const introEl = document.getElementById('report-intro');
+        const tabsEl = document.getElementById('report-tabs');
+        const panelEl = document.getElementById('report-panel');
+
+        introEl.textContent = intro;
+        introEl.hidden = !intro;
+
+        if (!blocks.length) {
+          tabsEl.innerHTML = '';
+          panelEl.innerHTML = '<p class="muted">No Nexus report entries yet.</p>';
+          return;
+        }
+
+        const monthGroups = getRecentReportMonthGroups(blocks, data?.generatedAt);
+        if (!monthGroups.length) {
+          tabsEl.innerHTML = '';
+          panelEl.innerHTML = '<p class="muted">No dated Nexus report entries yet.</p>';
+          return;
+        }
+
+        if (!monthGroups.some((group) => group.key === reportView)) {
+          reportView = monthGroups[0].key;
+        }
+
+        tabsEl.innerHTML = monthGroups.map((group) => renderReportTab(group)).join('');
+        tabsEl.querySelectorAll('[data-report-view]').forEach((button) => {
+          button.addEventListener('click', () => {
+            reportView = button.dataset.reportView || '';
+            renderReportSection(currentSnapshot);
+          });
+        });
+
+        const activeGroup = monthGroups.find((group) => group.key === reportView) || monthGroups[0];
+        panelEl.innerHTML = activeGroup ? renderReportMonthGroup(activeGroup) : '<p class="muted">No Nexus report entries in this month.</p>';
+      }
+
+      function formatReportIntro(value) {
+        return String(value || '')
+          .replace(/^#\s+[^\n]+\n*/m, '')
+          .trim();
+      }
+
+      function getRecentReportMonthGroups(blocks, generatedAt) {
+        const reference = new Date(generatedAt || Date.now());
+        const refMonthIndex = reference.getFullYear() * 12 + reference.getMonth();
+        const filtered = blocks.filter((block) => {
+          if (!block.monthKey) return false;
+          const parts = String(block.monthKey).split('-');
+          if (parts.length !== 2) return false;
+          const year = Number.parseInt(parts[0], 10);
+          const month = Number.parseInt(parts[1], 10) - 1;
+          if (!Number.isInteger(year) || !Number.isInteger(month)) return false;
+          const diff = refMonthIndex - (year * 12 + month);
+          return diff >= 0 && diff < 12;
+        });
+        const groups = [];
+        const seen = new Map();
+
+        for (const block of filtered) {
+          const key = block.monthKey || 'undated';
+          if (!seen.has(key)) {
+            const group = {
+              key,
+              label: block.monthLabel || 'Undated',
+              tabLabel: formatReportTabLabel(block.monthKey, generatedAt),
+              items: [],
+            };
+            seen.set(key, group);
+            groups.push(group);
+          }
+          seen.get(key).items.push(block);
+        }
+
+        return groups;
+      }
+
+      function formatReportTabLabel(monthKey, generatedAt) {
+        const parts = String(monthKey || '').split('-');
+        if (parts.length !== 2) return 'Undated';
+        const year = Number.parseInt(parts[0], 10);
+        const month = Number.parseInt(parts[1], 10) - 1;
+        if (!Number.isInteger(year) || !Number.isInteger(month)) return 'Undated';
+
+        const date = new Date(year, month, 1);
+        const reference = new Date(generatedAt || Date.now());
+        const sameYear = date.getFullYear() === reference.getFullYear();
+        return date.toLocaleString('en-US', sameYear
+          ? { month: 'short' }
+          : { month: 'short', year: 'numeric' });
+      }
+
+      function renderReportTab(group) {
+        const active = group.key === reportView ? ' active' : '';
+        return '<button type="button" class="tab-button' + active + '" data-report-view="' + escapeHtml(group.key) + '">'
+          + escapeHtml(group.tabLabel || group.label)
+          + '</button>';
+      }
+
+      function renderReportMonthGroup(group) {
+        return '<section class="report-month-group">'
+          + '<div class="report-month-heading">' + escapeHtml(group.label) + '</div>'
+          + '<div class="report-month-list">' + group.items.map(renderReportBlock).join('') + '</div>'
+          + '</section>';
+      }
+
+      function renderReportBlock(block) {
+        const details = block.details
+          ? '<pre class="report-entry-body">' + escapeHtml(block.details) + '</pre>'
+          : '';
+
+        return '<article class="report-entry">'
+          + '<div class="report-entry-head">'
+          + '<div class="report-entry-target">' + escapeHtml(block.target || 'Untitled report entry') + '</div>'
+          + '<div class="report-entry-time">' + escapeHtml(block.timestamp || 'Undated') + '</div>'
+          + '</div>'
+          + details
           + '</article>';
       }
 
@@ -436,6 +604,51 @@
 
       function normalizeAgent(agent) {
         return String(agent || '').replace(/^@/, '').toLowerCase();
+      }
+
+      function syncSidebarActive(preferredId) {
+        const links = Array.from(document.querySelectorAll('.sidebar .nav-link[href^="#"]'));
+        if (!links.length) return;
+
+        let activeId = preferredId || '';
+        if (!activeId) {
+          const hash = String(window.location.hash || '').replace(/^#/, '');
+          if (hash) activeId = hash;
+        }
+
+        if (!activeId) {
+          const sections = links
+            .map((link) => document.querySelector(link.getAttribute('href')))
+            .filter(Boolean);
+          const threshold = 160;
+          const current = sections.find((section) => {
+            const rect = section.getBoundingClientRect();
+            return rect.top <= threshold && rect.bottom > threshold;
+          });
+          activeId = current?.id || sections[0]?.id || '';
+        }
+
+        links.forEach((link) => {
+          const href = String(link.getAttribute('href') || '');
+          const id = href.replace(/^#/, '');
+          link.classList.toggle('active', id === activeId);
+        });
+      }
+
+      function initSectionObserver() {
+        const sections = Array.from(document.querySelectorAll('main section[id]'));
+        if (!sections.length || typeof IntersectionObserver === 'undefined') {
+          syncSidebarActive();
+          return;
+        }
+        if (sectionObserver) sectionObserver.disconnect();
+        sectionObserver = new IntersectionObserver((entries) => {
+          const visible = entries
+            .filter((entry) => entry.isIntersecting)
+            .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+          if (visible?.target?.id) syncSidebarActive(visible.target.id);
+        }, { rootMargin: '-18% 0px -58% 0px', threshold: [0.2, 0.35, 0.55] });
+        sections.forEach((section) => sectionObserver.observe(section));
       }
 
       function updateAgentStatus(data) {
@@ -500,12 +713,14 @@
           epics[epic].total++;
           if (task.checked) epics[epic].done++;
         }
-        el.innerHTML = '<div class="chart-list">' + Object.entries(epics).map(([epic, d]) => {
+        el.innerHTML = '<div class="chart-list">' + Object.entries(epics).map(([epic, d], index) => {
           const pct = d.total > 0 ? (d.done / d.total) * 100 : 0;
+          const share = queue.length > 0 ? (d.total / queue.length) * 100 : 0;
           return '<div class="chart-row">'
-            + '<div class="chart-row-header"><span class="chart-row-label">' + escapeHtml(epic) + '</span>'
+            + '<div class="chart-row-header"><span class="chart-row-label"><span class="chart-row-rank">0' + (index + 1) + '</span>' + escapeHtml(epic) + '</span>'
             + '<span class="chart-row-val">' + d.done + '/' + d.total + '</span></div>'
             + '<div class="chart-bar-track"><div class="chart-bar-fill clr-done" style="width:' + pct.toFixed(1) + '%"></div></div>'
+            + '<div class="chart-row-note">' + share.toFixed(0) + '% of tracked work</div>'
             + '</div>';
         }).join('') + '</div>';
       }
@@ -540,41 +755,52 @@
         }
         const total = Object.values(agents).reduce((a, b) => a + b, 0) || 1;
         const entries = Object.entries(agents).sort((a, b) => b[1] - a[1]);
+        const [leadAgent, leadCount] = entries[0];
+        const leadShare = ((leadCount / total) * 100).toFixed(0);
 
         // SVG pie chart
-        const cx = 50, cy = 50, r = 40;
+        const cx = 50, cy = 50, outerR = 46, innerR = 22;
         let angle = -Math.PI / 2;
         const slices = entries.length === 1
           ? (() => {
               const [a, n] = entries[0];
               const color = AGENT_COLORS[a] || '#6b7f74';
-              return '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="' + color + '"><title>@' + escapeHtml(a) + ': ' + n + ' tasks</title></circle>';
+              return '<circle cx="' + cx + '" cy="' + cy + '" r="' + outerR + '" fill="none" stroke="' + color + '" stroke-width="' + (outerR - innerR) + '" stroke-linecap="round"><title>@' + escapeHtml(a) + ': ' + n + ' tasks</title></circle>';
             })()
           : entries.map(([a, n]) => {
               const sweep = (n / total) * 2 * Math.PI;
-              const x1 = cx + r * Math.cos(angle);
-              const y1 = cy + r * Math.sin(angle);
+              const x1 = cx + outerR * Math.cos(angle);
+              const y1 = cy + outerR * Math.sin(angle);
               angle += sweep;
-              const x2 = cx + r * Math.cos(angle);
-              const y2 = cy + r * Math.sin(angle);
+              const x2 = cx + outerR * Math.cos(angle);
+              const y2 = cy + outerR * Math.sin(angle);
               const large = sweep > Math.PI ? 1 : 0;
               const color = AGENT_COLORS[a] || '#6b7f74';
               return '<path d="M' + cx + ',' + cy + ' L' + x1.toFixed(2) + ',' + y1.toFixed(2)
-                + ' A' + r + ',' + r + ' 0 ' + large + ',1 ' + x2.toFixed(2) + ',' + y2.toFixed(2)
-                + ' Z" fill="' + color + '" stroke="var(--panel)" stroke-width="1.5"><title>@' + escapeHtml(a) + ': ' + n + ' tasks</title></path>';
+                + ' A' + outerR + ',' + outerR + ' 0 ' + large + ',1 ' + x2.toFixed(2) + ',' + y2.toFixed(2)
+                + ' Z" fill="' + color + '" opacity="0.96"><title>@' + escapeHtml(a) + ': ' + n + ' tasks</title></path>';
             }).join('');
 
         const legend = entries.map(([a, n]) => {
           const color = AGENT_COLORS[a] || '#6b7f74';
-          return '<div class="agent-legend-item"><div class="agent-legend-dot" style="background:' + color + '"></div>@' + escapeHtml(a) + '<span class="chart-row-val">' + n + '</span></div>';
+          const pct = ((n / total) * 100).toFixed(0);
+          return '<div class="agent-legend-item"><div class="agent-legend-dot" style="background:' + color + '"></div><span class="agent-legend-name">@' + escapeHtml(a) + '</span><span class="agent-legend-share">' + pct + '%</span><span class="chart-row-val">' + n + '</span></div>';
         }).join('');
 
         const agentCount = entries.length;
         el.innerHTML = '<div class="pie-wrap">'
-          + '<svg class="pie-svg" viewBox="0 0 100 100"><g>' + slices + '</g></svg>'
+          + '<div class="pie-shell"><svg class="pie-svg" viewBox="0 0 100 100">'
+          + '<defs><filter id="pieGlow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.5" result="blur"></feGaussianBlur><feMerge><feMergeNode in="blur"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter></defs>'
+          + '<circle cx="' + cx + '" cy="' + cy + '" r="' + outerR + '" class="pie-bg"></circle>'
+          + '<g filter="url(#pieGlow)">' + slices + '</g>'
+          + '<circle cx="' + cx + '" cy="' + cy + '" r="' + innerR + '" class="pie-core"></circle>'
+          + '<text class="pie-total" x="' + cx + '" y="47">' + total + '</text>'
+          + '<text class="pie-sub" x="' + cx + '" y="60">tasks</text>'
+          + '</svg></div>'
           + '<div class="agent-legend">' + legend + '</div>'
           + '</div>'
-          + '<div class="pie-caption">' + total + ' task' + (total !== 1 ? 's' : '') + ' across ' + agentCount + ' agent' + (agentCount !== 1 ? 's' : '') + '</div>';
+          + '<div class="pie-caption"><strong>@' + escapeHtml(leadAgent) + '</strong> is carrying ' + leadShare + '% of tracked work. '
+          + total + ' task' + (total !== 1 ? 's' : '') + ' across ' + agentCount + ' agent' + (agentCount !== 1 ? 's' : '') + '.</div>';
       }
 
       function renderIcons() {
@@ -632,7 +858,9 @@
         return String(value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
       }
       renderIcons();
+      initSectionObserver();
       syncQueueViewFromHash();
+      syncSidebarActive();
       load();
       new EventSource('/events').addEventListener('update', load);
     </script>
