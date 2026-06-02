@@ -7,6 +7,7 @@ import { chdir, cwd } from 'process';
 import { spawnSync } from 'child_process';
 import status from '../src/commands/status.js';
 import { resetConfig } from '../src/lib/config.js';
+import { acquireLock } from '../src/lib/lockManager.js';
 
 function inTempRepo(fn) {
   const previous = cwd();
@@ -62,5 +63,23 @@ test('status reports generated-looking artifacts that need ownership', () => {
     assert.match(output, /nexus-dashboard copy/);
     assert.match(output, /screenshots/);
     assert.match(output, /Decide keep\/delete\/ignore, or claim and release intentionally/);
+  });
+});
+
+test('status warns when a claim has gone stale and needs file-level release', () => {
+  inTempRepo((root) => {
+    spawnSync('git', ['init'], { cwd: root, stdio: 'pipe' });
+    writeFileSync(join(root, '_NEXUS_BLACKBOARD.md'), '- 🔒 **file.txt** - Locked by **@codex**: short checkpoint\n', 'utf-8');
+    writeFileSync(join(root, 'file.txt'), 'hello\n', 'utf-8');
+
+    acquireLock('file.txt', '@codex', 'short checkpoint');
+    const lockDir = join(root, '.nexus', 'locks', 'file.txt.lock');
+    writeFileSync(join(lockDir, 'ts'), '1', 'utf-8');
+
+    const output = captureLogs(() => status([]));
+
+    assert.match(output, /file\.txt/);
+    assert.match(output, /STALE/);
+    assert.match(output, /Stale claim\. Commit this file now\./);
   });
 });
