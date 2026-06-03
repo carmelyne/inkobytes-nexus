@@ -10,23 +10,26 @@ Nexus CLI is the coordination engine. This skill is only the agent playbook.
 ## Loop
 
 1. Run `nexus start`; set `NEXUS_AGENT` for your CLI, or pass `--agent @agy|@claude|@codex|@gemini`. Start is orientation only, not permission to edit.
-2. Read `USER.md` if present for local user preferences.
-3. Read continuity and latest memory when present.
-4. Read `_NEXUS_QUEUE.md` and `_NEXUS_STANDUP.md`.
-5. Choose user-assigned work or `nexus next @Agent`; do not free-roam into `Auto-flow: no`.
-6. Claim exact shared files before reading/editing:
+2. Read `_NEXUS_CONSTITUTION.md`.
+3. Read `USER.md` if present for local user preferences.
+4. Read continuity and latest memory when present.
+5. Read `_NEXUS_QUEUE.md` and `_NEXUS_STANDUP.md`.
+6. Choose user-assigned work or `nexus next @Agent`; do not free-roam into `Auto-flow: no`.
+7. Claim exact shared files before reading/editing:
 
    ```bash
    nexus claim <path> @Agent "intent"
    ```
 
-7. Treat claim output as current file state. Ignore cached file memory when contents matter.
-8. Work only inside the claimed surface and run focused validation.
-9. If the user wants a commit, release through Nexus:
+8. Treat claim output as current file state. Ignore cached file memory when contents matter.
+9. Work only inside the claimed surface and run focused validation.
+10. Release each claimed tracked file through Nexus as soon as it reaches a coherent checkpoint:
 
    ```bash
    nexus release <path> "short commit message"
    ```
+
+11. Do not hold claims to bundle related work into a prettier feature commit. Nexus is agent-native and file-native: optimize for file availability, rollback safety, and agent throughput.
 
 ## Queue Items
 
@@ -42,12 +45,15 @@ When adding work to `_NEXUS_QUEUE.md`, keep tasks dashboard-parseable and immedi
   - Affinity: cli, docs, dashboard
   - Cost: small
   - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
   - Notes: One practical paragraph with scope, constraints, and definition of done.
 ```
 
 - `Files` should name the likely edit surface so other agents can spot conflicts before claiming.
 - `Depends on` should list hard blockers by `Id`; use `none` when the task is independent.
 - `Auto-flow: yes` means an agent can grab it after `nexus next`; use `no` when planning or human approval is needed.
+- Auto-flow work in `Ready Queue` should include `Review: approved` and `Approved by: human`, or `doctor` will flag it and `nexus next` may skip it.
 - `Notes` should carry dashboard-useful context, not a whole design doc.
 
 ## Guardrails
