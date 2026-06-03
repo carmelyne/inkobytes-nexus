@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.6 - 2026-06-03
+
+- Extended Nexus protocol drift checks so `nexus doctor` now covers the bundled `skills/nexus/SKILL.md`.
+- Kept Nexus repo docs aligned with the agent-native release model while scoping root `README.md` doctor repair to the actual `@inkobytes/nexus` product repo.
+- Added regression coverage for Nexus-product README repair and for avoiding root README mutation in ordinary consumer repos.
+
+## 1.0.5 - 2026-06-03
+
+- Reframed doctor-managed agent guides around agent-native, file-native release flow instead of human-oriented feature commit bundling.
+- Updated `nexus doctor --fix` and `nexus init` scaffolds to teach release-by-file at coherent checkpoints.
+- Added regression coverage so scaffold generation and repair keep the new agent-native wording stable.
+
 ## 1.0.4 - 2026-06-03
 
 - Collapsed large `nexus doctor` Git Privacy floods into grouped per-root summaries with sample paths.

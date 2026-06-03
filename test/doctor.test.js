@@ -86,6 +86,168 @@ test('doctor reports stale managed protocol blocks without supply-chain safety',
   });
 });
 
+test('doctor reports Nexus README and skill protocol drift in the Nexus product repo', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    mkdirSync(join(root, 'skills', 'nexus'), { recursive: true });
+    writeFileSync(join(root, 'package.json'), JSON.stringify({ name: '@inkobytes/nexus' }), 'utf-8');
+    writeFileSync(join(root, 'README.md'), [
+      '## Queue Format',
+      '',
+      '- [ ] TASK/Codex: Add doctor stale-lock category',
+      '  - Id: doctor-stale-locks',
+      '  - Epic: Release hygiene',
+      '  - Status: Ready',
+      '  - Depends on: none',
+      '  - Files: src/commands/doctor.js',
+      '  - Affinity: cli, diagnostics',
+      '  - Cost: small',
+      '  - Auto-flow: yes',
+      '  - Notes: Add a doctor section for stale locks with tests and clear fix guidance.',
+      '',
+      'The CLI is the coordination engine. The skill is the lean playbook for this flow: `start -> claim -> release`.',
+      '',
+    ].join('\n'), 'utf-8');
+    writeFileSync(join(root, 'skills', 'nexus', 'SKILL.md'), [
+      '## Loop',
+      '',
+      '1. Run `nexus start`; set `NEXUS_AGENT` for your CLI, or pass `--agent @agy|@claude|@codex|@gemini`. Start is orientation only, not permission to edit.',
+      '2. Read `USER.md` if present for local user preferences.',
+      '3. Read continuity and latest memory when present.',
+      '4. Read `_NEXUS_QUEUE.md` and `_NEXUS_STANDUP.md`.',
+      '5. Choose user-assigned work or `nexus next @Agent`; do not free-roam into `Auto-flow: no`.',
+      '6. Claim exact shared files before reading/editing:',
+      '',
+      '9. If the user wants a commit, release through Nexus:',
+      '',
+    ].join('\n'), 'utf-8');
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /Docs & Skills/);
+    assert.match(output, /README\.md is out of sync with current Nexus protocol wording/);
+    assert.match(output, /skills\/nexus\/SKILL\.md is out of sync with current Nexus protocol wording/);
+  });
+});
+
+test('doctor does not treat root README as doctor-managed outside the Nexus product repo', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    mkdirSync(join(root, 'skills', 'nexus'), { recursive: true });
+    writeFileSync(join(root, 'README.md'), 'project readme\n', 'utf-8');
+    writeFileSync(join(root, 'skills', 'nexus', 'SKILL.md'), [
+      '## Loop',
+      '',
+      '1. Run `nexus start`; set `NEXUS_AGENT` for your CLI, or pass `--agent @agy|@claude|@codex|@gemini`. Start is orientation only, not permission to edit.',
+      '2. Read `USER.md` if present for local user preferences.',
+      '3. Read continuity and latest memory when present.',
+      '4. Read `_NEXUS_QUEUE.md` and `_NEXUS_STANDUP.md`.',
+      '5. Choose user-assigned work or `nexus next @Agent`; do not free-roam into `Auto-flow: no`.',
+      '6. Claim exact shared files before reading/editing:',
+      '',
+      '9. If the user wants a commit, release through Nexus:',
+      '',
+    ].join('\n'), 'utf-8');
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.doesNotMatch(output, /README\.md is out of sync with current Nexus protocol wording/);
+    assert.match(output, /skills\/nexus\/SKILL\.md is out of sync with current Nexus protocol wording/);
+  });
+});
+
+test('doctor --fix repairs Nexus README and skill protocol drift in the Nexus product repo', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    mkdirSync(join(root, 'skills', 'nexus'), { recursive: true });
+    writeFileSync(join(root, 'package.json'), JSON.stringify({ name: '@inkobytes/nexus' }), 'utf-8');
+    writeFileSync(join(root, 'README.md'), [
+      '## Queue Format',
+      '',
+      '- [ ] TASK/Codex: Add doctor stale-lock category',
+      '  - Id: doctor-stale-locks',
+      '  - Epic: Release hygiene',
+      '  - Status: Ready',
+      '  - Depends on: none',
+      '  - Files: src/commands/doctor.js',
+      '  - Affinity: cli, diagnostics',
+      '  - Cost: small',
+      '  - Auto-flow: yes',
+      '  - Notes: Add a doctor section for stale locks with tests and clear fix guidance.',
+      '',
+      'The queue is the executable priority surface. Standup is for comms and human context.',
+      'Keep items dashboard-friendly: include `Id`, `Epic`, `Status`, `Depends on`, `Files`, `Affinity`, `Cost`, `Auto-flow`, and `Notes`. Use `Files` to expose conflict surfaces, `Depends on` for hard blockers, and `Auto-flow: no` when a task needs planning or human approval before an agent grabs it.',
+      '',
+      '## Agent Protocol',
+      '',
+      '1. Run `nexus start` when entering an existing repo; it does not replace claim/release.',
+      '2. Read `USER.md` when present.',
+      '3. Read continuity and latest memory when present.',
+      '4. Read `_NEXUS_QUEUE.md` before taking follow-on work.',
+      '5. Claim before touching shared project files.',
+      '6. Release when finished.',
+      '7. Use `nexus next @Agent` instead of free-roaming.',
+      '',
+      'Agent-local continuity and memory files are exempt from claim/release unless the human says otherwise.',
+      '',
+      'The CLI is the coordination engine. The skill is the lean playbook for this flow: `start -> claim -> release`.',
+      '',
+    ].join('\n'), 'utf-8');
+    writeFileSync(join(root, 'skills', 'nexus', 'SKILL.md'), [
+      '## Loop',
+      '',
+      '1. Run `nexus start`; set `NEXUS_AGENT` for your CLI, or pass `--agent @agy|@claude|@codex|@gemini`. Start is orientation only, not permission to edit.',
+      '2. Read `USER.md` if present for local user preferences.',
+      '3. Read continuity and latest memory when present.',
+      '4. Read `_NEXUS_QUEUE.md` and `_NEXUS_STANDUP.md`.',
+      '5. Choose user-assigned work or `nexus next @Agent`; do not free-roam into `Auto-flow: no`.',
+      '6. Claim exact shared files before reading/editing:',
+      '',
+      '7. Treat claim output as current file state. Ignore cached file memory when contents matter.',
+      '8. Work only inside the claimed surface and run focused validation.',
+      '9. If the user wants a commit, release through Nexus:',
+      '',
+      '- [ ] TASK/@agent: Short task title',
+      '  - Id: stable-kebab-id',
+      '  - Epic: Product area or safety theme',
+      '  - Status: Ready',
+      '  - Depends on: none',
+      '  - Files: path/one.js, path/two.md',
+      '  - Affinity: cli, docs, dashboard',
+      '  - Cost: small',
+      '  - Auto-flow: yes',
+      '  - Notes: One practical paragraph with scope, constraints, and definition of done.',
+      '',
+      '- `Auto-flow: yes` means an agent can grab it after `nexus next`; use `no` when planning or human approval is needed.',
+      '- `Notes` should carry dashboard-useful context, not a whole design doc.',
+      '',
+    ].join('\n'), 'utf-8');
+
+    captureLogs(() => doctor(['--fix']));
+
+    const readme = readFileSync(join(root, 'README.md'), 'utf-8');
+    const skill = readFileSync(join(root, 'skills', 'nexus', 'SKILL.md'), 'utf-8');
+
+    assert.match(readme, /Review: approved/);
+    assert.match(readme, /Approved by: human/);
+    assert.match(readme, /Read `_NEXUS_CONSTITUTION\.md`\./);
+    assert.match(readme, /Release each claimed tracked file as soon as it reaches a coherent checkpoint/);
+    assert.match(readme, /agent-native and file-native, not human-native/);
+    assert.match(readme, /start -> claim -> work -> release -> next/);
+    assert.match(skill, /Read `_NEXUS_CONSTITUTION\.md`\./);
+    assert.match(skill, /Release each claimed tracked file through Nexus as soon as it reaches a coherent checkpoint/);
+    assert.match(skill, /Review: approved/);
+    assert.match(skill, /Approved by: human/);
+    assert.match(skill, /doctor` will flag it and `nexus next` may skip it/);
+  });
+});
+
 test('doctor --fix repairs standup date guidance without removing entries', () => {
   inTempRepo((root) => {
     writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
@@ -178,8 +340,9 @@ Keep this note.
     assert.match(next, /Mention delegated work in release or `nexus standup` notes/);
     assert.match(next, /Direct user instruction can override queue order/);
     assert.match(next, /announce `Standby` with what you are waiting for/);
-    assert.match(next, /agent-native and file-native, not feature-native/);
-    assert.match(next, /Do not hold claims while waiting to bundle related files into one feature commit/);
+    assert.match(next, /agent-native and file-native, not human-native/);
+    assert.match(next, /Release each claimed file as soon as it reaches a coherent checkpoint/);
+    assert.match(next, /Never hold claims just to bundle a prettier feature commit/);
     assert.match(next, /Agent instruction files are shared protocol files/);
     assert.match(next, /assigned work zones/);
     assert.match(next, /nexus doctor` is cheap, local, and idempotent/);
