@@ -2,7 +2,7 @@
  * Config — resolve project root and Nexus paths
  */
 
-import { existsSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import { resolve, join } from 'path';
 import { cwd } from 'process';
 
@@ -14,6 +14,7 @@ export function getConfig(fromDir) {
   const root = fromDir || cwd();
   const lockDir = join(root, '.nexus', 'locks');
   const budgetFile = join(root, '.nexus', 'agent-budgets.json');
+  const localConfig = readLocalConfig(root);
 
   _config = {
     root,
@@ -28,6 +29,9 @@ export function getConfig(fromDir) {
     maxDumpFiles: 20,
     maxClaimAttempts: 10,
     claimRetryMs: 2000,
+    doctor: {
+      allowTrackedAgentTrees: Boolean(localConfig.doctor?.allowTrackedAgentTrees),
+    },
   };
 
   return _config;
@@ -35,4 +39,16 @@ export function getConfig(fromDir) {
 
 export function resetConfig() {
   _config = null;
+}
+
+function readLocalConfig(root) {
+  const path = join(root, '.nexus', 'config.json');
+  if (!existsSync(path)) return {};
+
+  try {
+    const parsed = JSON.parse(readFileSync(path, 'utf-8'));
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch {
+    return {};
+  }
 }
