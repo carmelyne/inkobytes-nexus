@@ -166,6 +166,8 @@ Doctor reports grouped issues:
 - missing Nexus files
 - package script exfiltration and install-hook risks
 - package privacy risks for local/private files
+- grouped Git Privacy summaries for tracked private/local trees, with shared agent dirs collapsed into one concise note
+- colorized action buckets so fixes and informational lock notes are easier to scan
 - stale nexus locks
 - missing agent instructions specifically for nexus
 - missing continuity and memory scaffolds
@@ -174,6 +176,18 @@ Doctor reports grouped issues:
 With `--fix`, Nexus creates safe missing scaffolds and updates managed protocol blocks in agent instruction files. It does not erase existing agent notes.
 
 With `--json`, Nexus prints the same health sections as structured JSON for tools such as Inkobytes reports.
+
+If a private repo intentionally tracks shared agent trees like `.claude/`, `.codex/`, or `.gemini/`, you can mark that as allowed in `.nexus/config.json`:
+
+```json
+{
+  "doctor": {
+    "allowTrackedAgentTrees": true
+  }
+}
+```
+
+With that setting, `nexus doctor` keeps the shared-agent-tree note as informational instead of repeating an untrack fix.
 
 Use `doctor` for audit or repair. Do not make it the normal first command for every agent session.
 
