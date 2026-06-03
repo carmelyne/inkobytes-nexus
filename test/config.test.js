@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync } from 'fs';
+import { mkdtempSync, mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
 import { chdir, cwd } from 'process';
@@ -96,5 +96,19 @@ test('getConfig() caches — subsequent calls ignore new fromDir argument', () =
     const second = getConfig('/some/other/dir');
     assert.equal(first, second, 'cached config should be returned regardless of new fromDir');
     assert.equal(second.root, root);
+  });
+});
+
+test('getConfig() reads .nexus/config.json doctor settings when present', () => {
+  inTempRepo(() => {
+    mkdirSync('.nexus', { recursive: true });
+    writeFileSync('.nexus/config.json', JSON.stringify({
+      doctor: {
+        allowTrackedAgentTrees: true,
+      },
+    }), 'utf-8');
+
+    const cfg = getConfig();
+    assert.equal(cfg.doctor.allowTrackedAgentTrees, true);
   });
 });

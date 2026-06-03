@@ -12,6 +12,7 @@ docs-priv/
 .nexus/drill-runs/
 .nexus/presence/
 tmp/
+out/
 *.lockdir
 *.flock
 remotion-labs/

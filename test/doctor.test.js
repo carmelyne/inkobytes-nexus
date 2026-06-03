@@ -178,6 +178,8 @@ Keep this note.
     assert.match(next, /Mention delegated work in release or `nexus standup` notes/);
     assert.match(next, /Direct user instruction can override queue order/);
     assert.match(next, /announce `Standby` with what you are waiting for/);
+    assert.match(next, /agent-native and file-native, not feature-native/);
+    assert.match(next, /Do not hold claims while waiting to bundle related files into one feature commit/);
     assert.match(next, /Agent instruction files are shared protocol files/);
     assert.match(next, /assigned work zones/);
     assert.match(next, /nexus doctor` is cheap, local, and idempotent/);
@@ -381,18 +383,81 @@ test('doctor reports tracked private agent state without deleting local files', 
     const output = captureLogs(() => doctor([]));
 
     assert.match(output, /Git Privacy/);
-    assert.match(output, /Git tracks private\/local path: \.antigravitycli\/AGENTS\.md/);
-    assert.match(output, /Git tracks private\/local path: \.codex\/AGENTS\.md/);
-    assert.match(output, /Git tracks private\/local path: \.claude\/CLAUDE\.md/);
-    assert.match(output, /Git tracks private\/local path: \.gemini\/GEMINI\.md/);
-    assert.match(output, /Git tracks private\/local path: \.agent-codex\/notes\.md/);
-    assert.match(output, /Git tracks private\/local path: \.agent-session-logs\/run\.log/);
-    assert.match(output, /Git tracks private\/local path: session-logs\/run\.log/);
-    assert.match(output, /Git tracks private\/local path: docs-priv\/private\.md/);
-    assert.match(output, /Git tracks private\/local path: scratch\/note\.md/);
+    assert.match(output, /Tracked shared agent trees detected: \.claude\/ \(1 files\), \.codex\/ \(1 files\), \.gemini\/ \(1 files\)/);
+    assert.match(output, /This can be normal in private repos that share agent protocols and memory in Git\./);
+    assert.match(output, /Git tracks private\/local path under \.antigravitycli\/ \(1 files\)/);
+    assert.match(output, /sample: \.antigravitycli\/AGENTS\.md/);
+    assert.doesNotMatch(output, /Git tracks private\/local path under \.codex\/ \(1 files\)/);
+    assert.doesNotMatch(output, /Git tracks private\/local path under \.claude\/ \(1 files\)/);
+    assert.doesNotMatch(output, /Git tracks private\/local path under \.gemini\/ \(1 files\)/);
+    assert.match(output, /Git tracks private\/local path under \.agent-session-logs\/ \(1 files\)/);
+    assert.match(output, /sample: \.agent-session-logs\/run\.log/);
+    assert.match(output, /Git tracks private\/local path under session-logs\/ \(1 files\)/);
+    assert.match(output, /sample: session-logs\/run\.log/);
+    assert.match(output, /Git tracks private\/local path under docs-priv\/ \(1 files\)/);
+    assert.match(output, /sample: docs-priv\/private\.md/);
+    assert.match(output, /Git tracks private\/local path under scratch\/ \(1 files\)/);
+    assert.match(output, /sample: scratch\/note\.md/);
+    assert.match(output, /Git tracks private\/local path under \.agent-\*\/ \(1 files\)/);
+    assert.match(output, /sample: \.agent-codex\/notes\.md/);
     assert.match(output, /Git tracks private\/local path: DECISIONS\.md/);
     assert.match(output, /Git tracks private\/local path: USER\.md/);
     assert.match(output, /git rm --cached -r -- <path>/);
+  });
+});
+
+test('doctor collapses tracked agent trees into readable summaries', () => {
+  inTempRepo((root) => {
+    spawnSync('git', ['init'], { cwd: root, stdio: 'pipe' });
+    spawnSync('git', ['config', 'user.email', 'test@example.com'], { cwd: root, stdio: 'pipe' });
+    spawnSync('git', ['config', 'user.name', 'Test Agent'], { cwd: root, stdio: 'pipe' });
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    mkdirSync(join(root, '.codex', 'memories', '2026-June'), { recursive: true });
+    writeFileSync(join(root, '.codex', 'AGENTS.md'), '# Codex\n', 'utf-8');
+    writeFileSync(join(root, '.codex', 'CONTINUITY.md'), '# Continuity\n', 'utf-8');
+    writeFileSync(join(root, '.codex', 'memories', 'INDEX.md'), '# Index\n', 'utf-8');
+    writeFileSync(join(root, '.codex', 'memories', '2026-June', 'one.md'), '# One\n', 'utf-8');
+    writeFileSync(join(root, '.codex', 'memories', '2026-June', 'two.md'), '# Two\n', 'utf-8');
+    writeFileSync(join(root, '.codex', 'notes.md'), '# Notes\n', 'utf-8');
+    spawnSync('git', ['add', '.codex'], { cwd: root, stdio: 'pipe' });
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /Tracked shared agent trees detected: \.codex\/ \(6 files\)/);
+    assert.match(output, /This can be normal in private repos that share agent protocols and memory in Git\./);
+    assert.doesNotMatch(output, /sample: \.codex\/CONTINUITY\.md/);
+    assert.doesNotMatch(output, /Git tracks private\/local path: \.codex\/memories\/2026-June\/one\.md/);
+  });
+});
+
+test('doctor treats tracked shared agent trees as informational when repo config allows them', () => {
+  inTempRepo((root) => {
+    spawnSync('git', ['init'], { cwd: root, stdio: 'pipe' });
+    spawnSync('git', ['config', 'user.email', 'test@example.com'], { cwd: root, stdio: 'pipe' });
+    spawnSync('git', ['config', 'user.name', 'Test Agent'], { cwd: root, stdio: 'pipe' });
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    mkdirSync(join(root, '.nexus'), { recursive: true });
+    writeFileSync(join(root, '.nexus', 'config.json'), JSON.stringify({
+      doctor: {
+        allowTrackedAgentTrees: true,
+      },
+    }), 'utf-8');
+    mkdirSync(join(root, '.codex', 'memories'), { recursive: true });
+    writeFileSync(join(root, '.codex', 'AGENTS.md'), '# Codex\n', 'utf-8');
+    writeFileSync(join(root, '.codex', 'CONTINUITY.md'), '# Continuity\n', 'utf-8');
+    writeFileSync(join(root, '.codex', 'memories', 'INDEX.md'), '# Index\n', 'utf-8');
+    spawnSync('git', ['add', '.codex'], { cwd: root, stdio: 'pipe' });
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /Review \/ informational/);
+    assert.match(output, /Tracked shared agent trees detected: \.codex\/ \(3 files\)/);
+    assert.match(output, /Allowed by `.nexus\/config\.json` because this repo intentionally versions shared agent trees\./);
+    assert.doesNotMatch(output, /If these agent trees are intentionally versioned in this repo, keep them/);
   });
 });
 
@@ -428,7 +493,76 @@ test('doctor reports active locks missing model metadata', () => {
 
     const output = captureLogs(() => doctor([]));
 
-    assert.match(output, /Active lock on file\.txt has no --model metadata/);
-    assert.match(output, /only the human operator can declare the real model/);
+    assert.match(output, /Fix the following/);
+    assert.match(output, /Review \/ informational/);
+    assert.match(output, /file: file\.txt/);
+    assert.match(output, /by: @codex/);
+    assert.match(output, /missing --model metadata/);
+    assert.match(output, /fix: use `nexus claim \.\.\. --model <name>` on future claims/);
+  });
+});
+
+test('doctor renders unverified locks in compact eye-scannable fields', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    mkdirSync(join(root, '.nexus', 'locks', 'teams.svelte.lock'), { recursive: true });
+    writeFileSync(join(root, '.nexus', 'locks', 'teams.svelte.lock', 'ts'), String(Math.floor(Date.now() / 1000)), 'utf-8');
+    writeFileSync(join(root, '.nexus', 'locks', 'teams.svelte.lock', 'agent'), '', 'utf-8');
+    writeFileSync(join(root, '.nexus', 'locks', 'teams.svelte.lock', 'intent'), 'test unverified', 'utf-8');
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /file: teams\.svelte/);
+    assert.match(output, /by: unknown/);
+    assert.match(output, /unverified claim \(trust: unverified\)/);
+    assert.match(output, /missing --model metadata/);
+    assert.match(output, /fix: set `NEXUS_AGENT=@handle` for local claims, or inspect the lock/);
+  });
+});
+
+test('doctor colorizes when forced', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+
+    const result = spawnSync('node', ['/Users/carmelyne/dev/nexus/bin/nexus.js', 'doctor'], {
+      cwd: root,
+      encoding: 'utf-8',
+      env: { ...process.env, FORCE_COLOR: '1' },
+    });
+
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /\u001b\[36m/);
+    assert.match(result.stdout, /Nexus doctor/);
+  });
+});
+
+test('doctor renders queue authorship warnings as compact task fields', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), [
+      '# Queue',
+      '',
+      '## Ready Queue',
+      '',
+      '- [ ] TASK/Codex: Runtime handoff polling',
+      '  - Id: codex-runtime-handoff-polling',
+      '  - Auto-flow: yes',
+      '',
+    ].join('\n'), 'utf-8');
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /Queue Authorship/);
+    assert.match(output, /task: codex-runtime-handoff-polling/);
+    assert.match(output, /auto-flow: yes in Ready Queue/);
+    assert.match(output, /needs: Review: approved/);
+    assert.match(output, /impact: nexus next will skip it/);
+    assert.match(output, /fix: add `Review: approved` and `Approved by: human`, or move it to `## Proposed Queue`/);
+    assert.doesNotMatch(output, /is auto-flow: yes in Ready Queue but missing Review: approved/);
   });
 });

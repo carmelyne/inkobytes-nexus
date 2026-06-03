@@ -70,6 +70,8 @@ test('init creates managed agent guides that doctor accepts', () => {
     assert.match(codexGuide, /### Git Write Safety/);
     assert.match(codexGuide, /Direct user instruction can override queue order/);
     assert.match(codexGuide, /announce `Standby` with what you are waiting for/);
+    assert.match(codexGuide, /agent-native and file-native, not feature-native/);
+    assert.match(codexGuide, /Do not hold claims while waiting to bundle related files into one feature commit/);
     assert.match(codexGuide, /Never infer from similar folder names or cached context/);
     assert.match(codexGuide, /untrack them; do not delete local folders/);
     assert.match(codexGuide, /Agent instruction files are shared protocol files/);
