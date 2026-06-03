@@ -389,11 +389,13 @@ Nexus reads tasks from `_NEXUS_QUEUE.md`:
   - Affinity: cli, diagnostics
   - Cost: small
   - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
   - Notes: Add a doctor section for stale locks with tests and clear fix guidance.
 ```
 
 The queue is the executable priority surface. Standup is for comms and human context.
-Keep items dashboard-friendly: include `Id`, `Epic`, `Status`, `Depends on`, `Files`, `Affinity`, `Cost`, `Auto-flow`, and `Notes`. Use `Files` to expose conflict surfaces, `Depends on` for hard blockers, and `Auto-flow: no` when a task needs planning or human approval before an agent grabs it.
+Keep items dashboard-friendly: include `Id`, `Epic`, `Status`, `Depends on`, `Files`, `Affinity`, `Cost`, `Auto-flow`, and `Notes`. Use `Files` to expose conflict surfaces, `Depends on` for hard blockers, and `Auto-flow: no` when a task needs planning or human approval before an agent grabs it. Auto-flow work in `Ready Queue` should also include `Review: approved` and `Approved by: human`, or `doctor` will flag it and `nexus next` may skip it.
 
 Add `Drills` when a task has known failure-mode guidance:
 
@@ -408,12 +410,13 @@ When `Drills` is absent, `nexus next` may surface obvious related drills from ta
 The agent rule of thumb:
 
 1. Run `nexus start` when entering an existing repo; it does not replace claim/release.
-2. Read `USER.md` when present.
-3. Read continuity and latest memory when present.
-4. Read `_NEXUS_QUEUE.md` before taking follow-on work.
-5. Claim before touching shared project files.
-6. Release when finished.
-7. Use `nexus next @Agent` instead of free-roaming.
+2. Read `_NEXUS_CONSTITUTION.md`.
+3. Read `USER.md` when present.
+4. Read continuity and latest memory when present.
+5. Read `_NEXUS_QUEUE.md` before taking follow-on work.
+6. Claim before touching shared project files.
+7. Release each claimed tracked file as soon as it reaches a coherent checkpoint.
+8. Use `nexus next @Agent` instead of free-roaming.
 
 Use model names as lock handles so ownership stays clear:
 
@@ -423,6 +426,8 @@ Use model names as lock handles so ownership stays clear:
 - `@agy`
 
 Agent-local continuity and memory files are exempt from claim/release unless the human says otherwise.
+
+Nexus is agent-native and file-native, not human-native: optimize for concurrency and rollback, not feature-commit aesthetics. Do not hold claims to bundle related work into prettier feature commits; that blocks other agents waiting on files.
 
 When a lead agent uses subagents, tools, or parallel workers, the lead still owns the repo effects. Claim the full path scope before delegating shared-file work, give subagents the claimed path and boundaries, re-read affected files before release, and mention delegated work when it changed files, tests, or risk.
 
@@ -445,7 +450,7 @@ Avoid introducing extra startup names in scripts or narration.
 
 Nexus ships an agent skill at `skills/nexus/SKILL.md`.
 
-The CLI is the coordination engine. The skill is the lean playbook for this flow: `start -> claim -> release`.
+The CLI is the coordination engine. The skill is the lean playbook for this flow: `start -> claim -> work -> release -> next`.
 
 ## Legacy Helper Transition
 
