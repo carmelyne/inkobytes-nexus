@@ -352,6 +352,7 @@ export default function doctor(args) {
   const sections = {
     'Nexus Files': [],
     'Agent Instructions': [],
+    'Docs & Skills': [],
     Security: [],
     'Package Privacy': [],
     'Git Privacy': [],
@@ -374,6 +375,8 @@ export default function doctor(args) {
   const nexusProtocolFiles = ['_NEXUS_CONSTITUTION.md', '_NEXUS_QUEUE.md', '_NEXUS_STANDUP.md'];
   const legacyCheckFiles = [
     ...nexusProtocolFiles,
+    'README.md',
+    'skills/nexus/SKILL.md',
     '.agy/AGENTS.md',
     '.codex/AGENTS.md',
     '.claude/CLAUDE.md',
@@ -510,6 +513,36 @@ export default function doctor(args) {
           fix: 'Run `nexus doctor --fix`.',
         });
       }
+    }
+  }
+
+  const protocolDocs = [
+    {
+      path: 'README.md',
+      label: 'README.md',
+      repair: repairReadmeProtocolDoc,
+    },
+    {
+      path: 'skills/nexus/SKILL.md',
+      label: 'skills/nexus/SKILL.md',
+      repair: repairNexusSkillDoc,
+    },
+  ];
+
+  for (const doc of protocolDocs) {
+    const path = join(root, doc.path);
+    if (!existsSync(path)) continue;
+    const existing = readFileSync(path, 'utf-8');
+    const next = doc.repair(existing);
+    if (next === existing) continue;
+    if (fix) {
+      writeFileSync(path, next, 'utf-8');
+      changes.push(`updated ${doc.label}`);
+    } else {
+      sections['Docs & Skills'].push({
+        issue: `${doc.label} is out of sync with current Nexus protocol wording`,
+        fix: 'Run `nexus doctor --fix`.',
+      });
     }
   }
 
@@ -945,6 +978,128 @@ function replaceLegacyHelperCommands(content) {
         .replaceAll('_nexus_next.sh', 'nexus next');
     })
     .join('\n');
+}
+
+function repairReadmeProtocolDoc(content) {
+  return content
+    .replace(
+      [
+        '- [ ] TASK/Codex: Add doctor stale-lock category',
+        '  - Id: doctor-stale-locks',
+        '  - Epic: Release hygiene',
+        '  - Status: Ready',
+        '  - Depends on: none',
+        '  - Files: src/commands/doctor.js',
+        '  - Affinity: cli, diagnostics',
+        '  - Cost: small',
+        '  - Auto-flow: yes',
+        '  - Notes: Add a doctor section for stale locks with tests and clear fix guidance.',
+      ].join('\n'),
+      [
+        '- [ ] TASK/Codex: Add doctor stale-lock category',
+        '  - Id: doctor-stale-locks',
+        '  - Epic: Release hygiene',
+        '  - Status: Ready',
+        '  - Depends on: none',
+        '  - Files: src/commands/doctor.js',
+        '  - Affinity: cli, diagnostics',
+        '  - Cost: small',
+        '  - Auto-flow: yes',
+        '  - Review: approved',
+        '  - Approved by: human',
+        '  - Notes: Add a doctor section for stale locks with tests and clear fix guidance.',
+      ].join('\n'),
+    )
+    .replace(
+      'Keep items dashboard-friendly: include `Id`, `Epic`, `Status`, `Depends on`, `Files`, `Affinity`, `Cost`, `Auto-flow`, and `Notes`. Use `Files` to expose conflict surfaces, `Depends on` for hard blockers, and `Auto-flow: no` when a task needs planning or human approval before an agent grabs it.',
+      'Keep items dashboard-friendly: include `Id`, `Epic`, `Status`, `Depends on`, `Files`, `Affinity`, `Cost`, `Auto-flow`, and `Notes`. Use `Files` to expose conflict surfaces, `Depends on` for hard blockers, and `Auto-flow: no` when a task needs planning or human approval before an agent grabs it. Auto-flow work in `Ready Queue` should also include `Review: approved` and `Approved by: human`, or `doctor` will flag it and `nexus next` may skip it.',
+    )
+    .replace(
+      [
+        '1. Run `nexus start` when entering an existing repo; it does not replace claim/release.',
+        '2. Read `USER.md` when present.',
+        '3. Read continuity and latest memory when present.',
+        '4. Read `_NEXUS_QUEUE.md` before taking follow-on work.',
+        '5. Claim before touching shared project files.',
+        '6. Release when finished.',
+        '7. Use `nexus next @Agent` instead of free-roaming.',
+      ].join('\n'),
+      [
+        '1. Run `nexus start` when entering an existing repo; it does not replace claim/release.',
+        '2. Read `_NEXUS_CONSTITUTION.md`.',
+        '3. Read `USER.md` when present.',
+        '4. Read continuity and latest memory when present.',
+        '5. Read `_NEXUS_QUEUE.md` before taking follow-on work.',
+        '6. Claim before touching shared project files.',
+        '7. Release each claimed tracked file as soon as it reaches a coherent checkpoint.',
+        '8. Use `nexus next @Agent` instead of free-roaming.',
+      ].join('\n'),
+    )
+    .replace(
+      'Agent-local continuity and memory files are exempt from claim/release unless the human says otherwise.',
+      'Agent-local continuity and memory files are exempt from claim/release unless the human says otherwise.\n\nNexus is agent-native and file-native, not human-native: optimize for concurrency and rollback, not feature-commit aesthetics. Do not hold claims to bundle related work into prettier feature commits; that blocks other agents waiting on files.',
+    )
+    .replace(
+      'The CLI is the coordination engine. The skill is the lean playbook for this flow: `start -> claim -> release`.',
+      'The CLI is the coordination engine. The skill is the lean playbook for this flow: `start -> claim -> work -> release -> next`.',
+    );
+}
+
+function repairNexusSkillDoc(content) {
+  return content
+    .replace(
+      [
+        '1. Run `nexus start`; set `NEXUS_AGENT` for your CLI, or pass `--agent @agy|@claude|@codex|@gemini`. Start is orientation only, not permission to edit.',
+        '2. Read `USER.md` if present for local user preferences.',
+        '3. Read continuity and latest memory when present.',
+        '4. Read `_NEXUS_QUEUE.md` and `_NEXUS_STANDUP.md`.',
+        '5. Choose user-assigned work or `nexus next @Agent`; do not free-roam into `Auto-flow: no`.',
+        '6. Claim exact shared files before reading/editing:',
+      ].join('\n'),
+      [
+        '1. Run `nexus start`; set `NEXUS_AGENT` for your CLI, or pass `--agent @agy|@claude|@codex|@gemini`. Start is orientation only, not permission to edit.',
+        '2. Read `_NEXUS_CONSTITUTION.md`.',
+        '3. Read `USER.md` if present for local user preferences.',
+        '4. Read continuity and latest memory when present.',
+        '5. Read `_NEXUS_QUEUE.md` and `_NEXUS_STANDUP.md`.',
+        '6. Choose user-assigned work or `nexus next @Agent`; do not free-roam into `Auto-flow: no`.',
+        '7. Claim exact shared files before reading/editing:',
+      ].join('\n'),
+    )
+    .replace(
+      [
+        '7. Treat claim output as current file state. Ignore cached file memory when contents matter.',
+        '8. Work only inside the claimed surface and run focused validation.',
+        '9. If the user wants a commit, release through Nexus:',
+      ].join('\n'),
+      [
+        '8. Treat claim output as current file state. Ignore cached file memory when contents matter.',
+        '9. Work only inside the claimed surface and run focused validation.',
+        '10. Release each claimed tracked file through Nexus as soon as it reaches a coherent checkpoint:',
+      ].join('\n'),
+    )
+    .replace(
+      '```\\n\\n## Queue Items',
+      '```\\n\\n11. Do not hold claims to bundle related work into a prettier feature commit. Nexus is agent-native and file-native: optimize for file availability, rollback safety, and agent throughput.\\n\\n## Queue Items',
+    )
+    .replace(
+      [
+        '  - Cost: small',
+        '  - Auto-flow: yes',
+        '  - Notes: One practical paragraph with scope, constraints, and definition of done.',
+      ].join('\n'),
+      [
+        '  - Cost: small',
+        '  - Auto-flow: yes',
+        '  - Review: approved',
+        '  - Approved by: human',
+        '  - Notes: One practical paragraph with scope, constraints, and definition of done.',
+      ].join('\n'),
+    )
+    .replace(
+      '- `Auto-flow: yes` means an agent can grab it after `nexus next`; use `no` when planning or human approval is needed.\n- `Notes` should carry dashboard-useful context, not a whole design doc.',
+      '- `Auto-flow: yes` means an agent can grab it after `nexus next`; use `no` when planning or human approval is needed.\n- Auto-flow work in `Ready Queue` should include `Review: approved` and `Approved by: human`, or `doctor` will flag it and `nexus next` may skip it.\n- `Notes` should carry dashboard-useful context, not a whole design doc.',
+    );
 }
 
 const SUSPICIOUS_SCRIPT_PATTERNS = [
