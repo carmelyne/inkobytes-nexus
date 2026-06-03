@@ -375,8 +375,6 @@ export default function doctor(args) {
   const nexusProtocolFiles = ['_NEXUS_CONSTITUTION.md', '_NEXUS_QUEUE.md', '_NEXUS_STANDUP.md'];
   const legacyCheckFiles = [
     ...nexusProtocolFiles,
-    'README.md',
-    'skills/nexus/SKILL.md',
     '.agy/AGENTS.md',
     '.codex/AGENTS.md',
     '.claude/CLAUDE.md',
@@ -516,18 +514,19 @@ export default function doctor(args) {
     }
   }
 
-  const protocolDocs = [
-    {
+  const protocolDocs = [];
+  if (isNexusProductRepo(root)) {
+    protocolDocs.push({
       path: 'README.md',
       label: 'README.md',
       repair: repairReadmeProtocolDoc,
-    },
-    {
-      path: 'skills/nexus/SKILL.md',
-      label: 'skills/nexus/SKILL.md',
-      repair: repairNexusSkillDoc,
-    },
-  ];
+    });
+  }
+  protocolDocs.push({
+    path: 'skills/nexus/SKILL.md',
+    label: 'skills/nexus/SKILL.md',
+    repair: repairNexusSkillDoc,
+  });
 
   for (const doc of protocolDocs) {
     const path = join(root, doc.path);
@@ -978,6 +977,18 @@ function replaceLegacyHelperCommands(content) {
         .replaceAll('_nexus_next.sh', 'nexus next');
     })
     .join('\n');
+}
+
+function isNexusProductRepo(root) {
+  const packagePath = join(root, 'package.json');
+  if (!existsSync(packagePath)) return false;
+
+  try {
+    const pkg = JSON.parse(readFileSync(packagePath, 'utf-8'));
+    return pkg?.name === '@inkobytes/nexus';
+  } catch {
+    return false;
+  }
 }
 
 function repairReadmeProtocolDoc(content) {
