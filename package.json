@@ -1,6 +1,6 @@
 {
   "name": "@inkobytes/nexus",
-  "version": "1.0.1",
+  "version": "1.0.4",
   "description": "Multi-agent coordination CLI for coding agents sharing a local repository",
   "type": "module",
   "bin": {
