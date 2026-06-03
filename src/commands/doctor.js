@@ -347,6 +347,7 @@ export default function doctor(args) {
   const fix = args.includes('--fix');
   const json = args.includes('--json');
   const root = cwd();
+  const colors = createColors();
   const sections = {
     'Nexus Files': [],
     'Agent Instructions': [],
@@ -365,8 +366,8 @@ export default function doctor(args) {
   const config = getConfig(root);
 
   if (!json) {
-    console.log(`Nexus doctor${fix ? ' --fix' : ''}`);
-    console.log(`Repo: ${root}\n`);
+    console.log(colors.bold(colors.cyan(`Nexus doctor${fix ? ' --fix' : ''}`)));
+    console.log(`${colors.dim('Repo:')} ${root}\n`);
   }
 
   const nexusProtocolFiles = ['_NEXUS_CONSTITUTION.md', '_NEXUS_QUEUE.md', '_NEXUS_STANDUP.md'];
@@ -412,7 +413,7 @@ export default function doctor(args) {
     sections['Package Privacy'].push(issue);
   }
 
-  for (const issue of scanGitPrivacy(root)) {
+  for (const issue of scanGitPrivacy(root, config)) {
     sections['Git Privacy'].push(issue);
   }
 
@@ -520,6 +521,13 @@ export default function doctor(args) {
       sections.Locks.push({
         issue: `Stale lock on ${lock.target} (${lock.age}s old)`,
         fix: 'Run `nexus clean --stale`.',
+        displayGroup: lock.target,
+        lockInfo: {
+          target: lock.target,
+          agent: lock.agent || '',
+          kind: 'stale',
+          age: `${lock.age}s old`,
+        },
       });
     }
   }
@@ -531,18 +539,38 @@ export default function doctor(args) {
         issue: `Active lock on ${lock.target} (${age})`,
         fix: 'No action if the agent is still working. Use `nexus status` to inspect.',
         ok: true,
+        displayGroup: lock.target,
+        lockInfo: {
+          target: lock.target,
+          agent: lock.agent || '',
+          kind: 'active',
+          age,
+        },
       });
       if (!lock.model) {
         sections.Locks.push({
           issue: `Active lock on ${lock.target} has no --model metadata`,
           fix: 'Use `nexus claim ... --model <name>` for future claims; only the human operator can declare the real model.',
           ok: true,
+          displayGroup: lock.target,
+          lockInfo: {
+            target: lock.target,
+            agent: lock.agent || '',
+            kind: 'missing_model',
+          },
         });
       }
       if (!lock.verified) {
         sections.Locks.push({
           issue: `Unverified claim on ${lock.target} by ${lock.agent} (trust: ${lock.trustSource}) — no CLAUDECODE or NEXUS_AGENT env detected at claim time`,
           fix: 'If this is a local/unverified model, set NEXUS_AGENT=@handle before claiming. If unexpected, inspect the lock.',
+          displayGroup: lock.target,
+          lockInfo: {
+            target: lock.target,
+            agent: lock.agent || '',
+            kind: 'unverified',
+            trustSource: lock.trustSource,
+          },
         });
       }
     }
@@ -611,8 +639,15 @@ export default function doctor(args) {
     if (unapproved.length) {
       for (const id of unapproved) {
         sections['Queue Authorship'].push({
-          issue: `Task "${id}" is auto-flow: yes in Ready Queue but missing Review: approved — nexus next will skip it`,
-          fix: 'Add "- Review: approved" and "- Approved by: human" to the task, or move it to ## Proposed Queue.',
+          issue: `Task "${id}" is missing Review: approved`,
+          fix: 'add `Review: approved` and `Approved by: human`, or move it to `## Proposed Queue`',
+          displayGroup: id,
+          queueInfo: {
+            taskId: id,
+            state: 'auto-flow: yes in Ready Queue',
+            needs: 'Review: approved',
+            impact: 'nexus next will skip it',
+          },
         });
       }
     } else {
@@ -658,35 +693,193 @@ export default function doctor(args) {
   }
 
   if (changes.length) {
-    console.log('Applied fixes:');
-    for (const change of changes) console.log(`  - ${change}`);
+    console.log(colors.bold(colors.green('Applied fixes')));
+    for (const change of changes) console.log(`  ${colors.green('-')} ${change}`);
     console.log('');
   }
 
   let problemCount = 0;
   for (const [title, entries] of Object.entries(sections)) {
-    console.log(`[${title}]`);
+    console.log(colors.bold(colors.cyan(`[${title}]`)));
     if (!entries.length) {
-      console.log('  OK');
+      console.log(`  ${colors.green('OK')}`);
       console.log('');
       continue;
     }
 
-    for (const entry of entries) {
-      const prefix = entry.ok ? '-' : '!';
-      console.log(`  ${prefix} ${entry.issue}`);
-      if (entry.fix) console.log(`    Fix: ${entry.fix}`);
-      if (!entry.ok) problemCount++;
-    }
+    const actionable = entries.filter((entry) => !entry.ok);
+    const informational = entries.filter((entry) => entry.ok);
+    problemCount += actionable.length;
+
+    if (actionable.length) renderEntryBucket('Fix the following', actionable, colors.yellow, colors.red, title, colors);
+    if (informational.length) renderEntryBucket('Review / informational', informational, colors.blue, colors.green, title, colors);
     console.log('');
   }
 
   if (problemCount) {
-    console.log('Some issues need attention. Safe scaffold fixes: `nexus doctor --fix`.');
+    console.log(colors.bold(colors.yellow('Some issues need attention.')));
+    console.log(colors.dim('Safe scaffold fixes: `nexus doctor --fix`.'));
     return;
   }
 
-  console.log('All checked Nexus categories are ready.');
+  console.log(colors.bold(colors.green('All checked Nexus categories are ready.')));
+}
+
+function renderEntryBucket(label, entries, headingColor, markerColor, sectionTitle, colors) {
+  console.log(`  ${headingColor(label)}`);
+  if (sectionTitle === 'Locks') {
+    renderLockEntries(entries, markerColor, colors);
+    return;
+  }
+  if (sectionTitle === 'Queue Authorship') {
+    renderQueueEntries(entries, markerColor, colors);
+    return;
+  }
+  const groups = groupEntriesForDisplay(entries, sectionTitle);
+  for (const group of groups) {
+    if (group.label) {
+      console.log(`    ${colors.bold(group.label)}`);
+    }
+    for (const entry of group.entries) {
+      const baseIndent = group.label ? '      ' : '    ';
+      const detailIndent = group.label ? '        ' : '      ';
+      const prefix = entry.ok ? '-' : '!';
+      console.log(`${baseIndent}${markerColor(prefix)} ${entry.issue}`);
+      if (entry.details) {
+        for (const detail of entry.details) {
+          console.log(`${detailIndent}${colors.dim(detail)}`);
+        }
+      }
+      if (entry.fix) {
+        console.log(`${detailIndent}${colors.bold('Fix:')} ${colors.dim(entry.fix)}`);
+      }
+    }
+  }
+}
+
+function renderLockEntries(entries, markerColor, colors) {
+  const groups = new Map();
+
+  for (const entry of entries) {
+    const target = entry.lockInfo?.target || entry.displayGroup || entry.issue;
+    if (!groups.has(target)) groups.set(target, []);
+    groups.get(target).push(entry);
+  }
+
+  for (const [target, lockEntries] of groups) {
+    const agent = lockEntries.find((entry) => entry.lockInfo?.agent)?.lockInfo?.agent || '';
+    console.log(`    ${colors.bold(`file: ${target}`)}`);
+    console.log(`      ${colors.dim(`by: ${agent || 'unknown'}`)}`);
+    for (const entry of lockEntries) {
+      const prefix = entry.ok ? '-' : '!';
+      const state = formatLockState(entry);
+      console.log(`      ${markerColor(prefix)} ${state}`);
+      if (entry.fix) {
+        console.log(`        ${colors.bold('fix:')} ${colors.dim(compactLockFix(entry))}`);
+      }
+    }
+  }
+}
+
+function renderQueueEntries(entries, markerColor, colors) {
+  const groups = new Map();
+
+  for (const entry of entries) {
+    const taskId = entry.queueInfo?.taskId || entry.displayGroup || entry.issue;
+    if (!groups.has(taskId)) groups.set(taskId, []);
+    groups.get(taskId).push(entry);
+  }
+
+  for (const [taskId, taskEntries] of groups) {
+    console.log(`    ${colors.bold(`task: ${taskId}`)}`);
+    for (const entry of taskEntries) {
+      const prefix = entry.ok ? '-' : '!';
+      const state = entry.queueInfo?.state || entry.issue;
+      const needs = entry.queueInfo?.needs;
+      const impact = entry.queueInfo?.impact;
+      console.log(`      ${markerColor(prefix)} ${state}`);
+      if (needs) {
+        console.log(`        ${colors.dim(`needs: ${needs}`)}`);
+      }
+      if (impact) {
+        console.log(`        ${colors.dim(`impact: ${impact}`)}`);
+      }
+      if (entry.fix) {
+        console.log(`        ${colors.bold('fix:')} ${colors.dim(entry.fix)}`);
+      }
+    }
+  }
+}
+
+function formatLockState(entry) {
+  const info = entry.lockInfo;
+  if (!info) return entry.issue;
+
+  switch (info.kind) {
+    case 'stale':
+      return `stale lock (${info.age})`;
+    case 'active':
+      return `active lock (${info.age})`;
+    case 'missing_model':
+      return 'missing --model metadata';
+    case 'unverified':
+      return `unverified claim (trust: ${info.trustSource || 'unknown'})`;
+    default:
+      return entry.issue;
+  }
+}
+
+function compactLockFix(entry) {
+  const info = entry.lockInfo;
+  if (!info) return entry.fix;
+
+  switch (info.kind) {
+    case 'stale':
+      return 'run `nexus clean --stale`';
+    case 'active':
+      return 'leave it if someone is working, or inspect with `nexus status`';
+    case 'missing_model':
+      return 'use `nexus claim ... --model <name>` on future claims';
+    case 'unverified':
+      return 'set `NEXUS_AGENT=@handle` for local claims, or inspect the lock';
+    default:
+      return entry.fix;
+  }
+}
+
+function groupEntriesForDisplay(entries, sectionTitle) {
+  const groups = [];
+  const grouped = new Map();
+
+  for (const entry of entries) {
+    const label = entry.displayGroup || inferDisplayGroup(entry.issue, sectionTitle);
+    if (!label) {
+      groups.push({ label: '', entries: [entry] });
+      continue;
+    }
+    if (!grouped.has(label)) {
+      const group = { label, entries: [] };
+      grouped.set(label, group);
+      groups.push(group);
+    }
+    grouped.get(label).entries.push(entry);
+  }
+
+  return groups;
+}
+
+function inferDisplayGroup(issue, sectionTitle) {
+  if (sectionTitle === 'Locks') {
+    const lockMatch = issue.match(/^(?:Stale lock on|Active lock on|Unverified claim on) ([^ ]+)/);
+    if (lockMatch) return lockMatch[1];
+  }
+
+  if (sectionTitle === 'Queue Authorship') {
+    const taskMatch = issue.match(/^Task "([^"]+)"/);
+    if (taskMatch) return taskMatch[1];
+  }
+
+  return '';
 }
 
 function extractReadyQueueSection(content) {
@@ -845,6 +1038,27 @@ const PRIVATE_GIT_PATHS = [
   'USER.md',
 ];
 
+const GIT_PRIVACY_COLLAPSE_ROOTS = [
+  '.agent-session-logs',
+  '.agent-*',
+  '.agy',
+  '.antigravitycli',
+  '.claude',
+  '.codex',
+  '.gemini',
+  '.nexus/local',
+  'docs-priv',
+  'scratch',
+  'session-logs',
+];
+
+const GIT_PRIVACY_AGENT_ROOTS = new Set([
+  '.agy',
+  '.claude',
+  '.codex',
+  '.gemini',
+]);
+
 function scanPackagePrivacy(root) {
   const packagePath = join(root, 'package.json');
   if (!existsSync(packagePath)) return [];
@@ -876,7 +1090,7 @@ function scanPackagePrivacy(root) {
   return issues;
 }
 
-function scanGitPrivacy(root) {
+function scanGitPrivacy(root, config) {
   const gitDir = join(root, '.git');
   if (!existsSync(gitDir)) return [];
 
@@ -888,10 +1102,106 @@ function scanGitPrivacy(root) {
   if (result.status !== 0) return [];
 
   const tracked = result.stdout.split('\n').filter(Boolean);
-  return tracked.map((file) => ({
-    issue: `Git tracks private/local path: ${file}`,
-    fix: 'Untrack it without deleting local files: `git rm --cached -r -- <path>`, then add an ignore rule.',
-  }));
+  return summarizeGitPrivacyIssues(tracked, config);
+}
+
+function summarizeGitPrivacyIssues(tracked, config) {
+  const grouped = new Map();
+  const singles = [];
+
+  for (const file of tracked) {
+    const root = gitPrivacyRoot(file);
+    if (!root) {
+      singles.push(file);
+      continue;
+    }
+    if (!grouped.has(root)) grouped.set(root, []);
+    grouped.get(root).push(file);
+  }
+
+  const issues = [];
+  const agentRootSummaries = [];
+
+  for (const file of singles.sort()) {
+    issues.push({
+      issue: `Git tracks private/local path: ${file}`,
+      fix: 'Untrack it without deleting local files: `git rm --cached -r -- <path>`, then add an ignore rule.',
+    });
+  }
+
+  for (const root of Array.from(grouped.keys()).sort()) {
+    const files = grouped.get(root).slice().sort(compareGitPrivacyFiles);
+    if (GIT_PRIVACY_AGENT_ROOTS.has(root)) {
+      agentRootSummaries.push(`${root}/ (${files.length} files)`);
+      continue;
+    }
+    const samples = files.slice(0, 5);
+    const hiddenCount = files.length - samples.length;
+    const noun = files.length === 1 ? 'path' : 'paths';
+    const issue = `Git tracks private/local ${noun} under ${root}/ (${files.length} files)`;
+    const fix = 'Review the sample paths below. If the tree is intentionally tracked in this repo, keep it. Otherwise untrack it without deleting local files: `git rm --cached -r -- <path>`, then add an ignore rule.';
+    const details = samples.map((file) => `sample: ${file}`);
+    if (hiddenCount > 0) {
+      details.push(`...and ${hiddenCount} more tracked paths`);
+    }
+    issues.push({ issue, fix, details });
+  }
+
+  if (agentRootSummaries.length) {
+    issues.unshift({
+      issue: `Tracked shared agent trees detected: ${agentRootSummaries.join(', ')}`,
+      fix: config.doctor.allowTrackedAgentTrees
+        ? undefined
+        : 'If these agent trees are intentionally versioned in this repo, keep them. Otherwise untrack them without deleting local files: `git rm --cached -r -- <path>`, then add an ignore rule.',
+      details: [
+        config.doctor.allowTrackedAgentTrees
+          ? 'Allowed by `.nexus/config.json` because this repo intentionally versions shared agent trees.'
+          : 'This can be normal in private repos that share agent protocols and memory in Git.',
+      ],
+      ok: config.doctor.allowTrackedAgentTrees,
+    });
+  }
+
+  return issues;
+}
+
+function gitPrivacyRoot(file) {
+  for (const root of GIT_PRIVACY_COLLAPSE_ROOTS) {
+    if (matchesPrivatePath(file, root)) {
+      return root.replace(/\/$/, '');
+    }
+  }
+  return '';
+}
+
+function compareGitPrivacyFiles(a, b) {
+  return gitPrivacyPriority(a) - gitPrivacyPriority(b) || a.localeCompare(b);
+}
+
+function gitPrivacyPriority(file) {
+  if (/\/(CONTINUITY\.md|memories\/)/.test(file)) return 0;
+  if (/\/(AGENTS\.md|CLAUDE\.md|GEMINI\.md)$/.test(file)) return 1;
+  return 2;
+}
+
+function createColors() {
+  const enabled = supportsColor();
+  const wrap = (open, close) => (value) => enabled ? `\u001b[${open}m${value}\u001b[${close}m` : String(value);
+  return {
+    bold: wrap(1, 22),
+    dim: wrap(2, 22),
+    red: wrap(31, 39),
+    green: wrap(32, 39),
+    yellow: wrap(33, 39),
+    blue: wrap(34, 39),
+    cyan: wrap(36, 39),
+  };
+}
+
+function supportsColor() {
+  if (process.env.FORCE_COLOR && process.env.FORCE_COLOR !== '0') return true;
+  if ('NO_COLOR' in process.env) return false;
+  return Boolean(process.stdout && process.stdout.isTTY);
 }
 
 function scanGeneratedArtifacts(root) {
