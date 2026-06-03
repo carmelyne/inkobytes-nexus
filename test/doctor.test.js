@@ -86,12 +86,13 @@ test('doctor reports stale managed protocol blocks without supply-chain safety',
   });
 });
 
-test('doctor reports README and Nexus skill protocol drift', () => {
+test('doctor reports Nexus README and skill protocol drift in the Nexus product repo', () => {
   inTempRepo((root) => {
     writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
     writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
     writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
     mkdirSync(join(root, 'skills', 'nexus'), { recursive: true });
+    writeFileSync(join(root, 'package.json'), JSON.stringify({ name: '@inkobytes/nexus' }), 'utf-8');
     writeFileSync(join(root, 'README.md'), [
       '## Queue Format',
       '',
@@ -131,12 +132,41 @@ test('doctor reports README and Nexus skill protocol drift', () => {
   });
 });
 
-test('doctor --fix repairs README and Nexus skill protocol drift', () => {
+test('doctor does not treat root README as doctor-managed outside the Nexus product repo', () => {
   inTempRepo((root) => {
     writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
     writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
     writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
     mkdirSync(join(root, 'skills', 'nexus'), { recursive: true });
+    writeFileSync(join(root, 'README.md'), 'project readme\n', 'utf-8');
+    writeFileSync(join(root, 'skills', 'nexus', 'SKILL.md'), [
+      '## Loop',
+      '',
+      '1. Run `nexus start`; set `NEXUS_AGENT` for your CLI, or pass `--agent @agy|@claude|@codex|@gemini`. Start is orientation only, not permission to edit.',
+      '2. Read `USER.md` if present for local user preferences.',
+      '3. Read continuity and latest memory when present.',
+      '4. Read `_NEXUS_QUEUE.md` and `_NEXUS_STANDUP.md`.',
+      '5. Choose user-assigned work or `nexus next @Agent`; do not free-roam into `Auto-flow: no`.',
+      '6. Claim exact shared files before reading/editing:',
+      '',
+      '9. If the user wants a commit, release through Nexus:',
+      '',
+    ].join('\n'), 'utf-8');
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.doesNotMatch(output, /README\.md is out of sync with current Nexus protocol wording/);
+    assert.match(output, /skills\/nexus\/SKILL\.md is out of sync with current Nexus protocol wording/);
+  });
+});
+
+test('doctor --fix repairs Nexus README and skill protocol drift in the Nexus product repo', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    mkdirSync(join(root, 'skills', 'nexus'), { recursive: true });
+    writeFileSync(join(root, 'package.json'), JSON.stringify({ name: '@inkobytes/nexus' }), 'utf-8');
     writeFileSync(join(root, 'README.md'), [
       '## Queue Format',
       '',
