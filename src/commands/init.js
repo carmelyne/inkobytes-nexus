@@ -377,7 +377,7 @@ This project uses Nexus for multi-agent coordination.
 3. Read \`_NEXUS_STANDUP.md\` for comms, decisions, and completion notes.
 4. Read \`USER.md\` if present for local human preferences.
 5. Read \`${scaffold.continuity}\` for current session state.
-6. Read \`${scaffold.memoryIndex}\` and the latest memory entry when resync is needed.
+6. Read \`${scaffold.memoryIndex}\` and the latest memory entry at session start, \`nexus start\`, or resume.
 
 ### Nexus Rules
 
@@ -454,7 +454,7 @@ They are exempt from Nexus claim/release unless the user says otherwise.
 
 ### Memory Flow
 
-- On session start, read \`${scaffold.memoryIndex}\`, then read the newest linked entry when resync is needed.
+- On session start, \`nexus start\`, or resume, read \`${scaffold.memoryIndex}\`, then read the newest linked entry.
 - Memory entries are session handoffs, not permanent system truth.
 - Durable architecture and protocol decisions belong in \`DECISIONS.md\`; mention them in \`_NEXUS_STANDUP.md\` only when active agents need to coordinate around them.
 - Write memory once per session, only when the user asks, or on session end, pause, or checkpoint request.
