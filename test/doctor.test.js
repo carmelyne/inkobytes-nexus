@@ -58,13 +58,14 @@ test('doctor --fix creates agent scaffolds and protocol blocks', () => {
     assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /untrack them; do not delete local folders/);
     assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /create the current month folder under `.codex\/memories` if it is missing/);
     assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /Do not create or repair other agents' memory folders manually/);
+    assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /Markdown link plus one-line outcome/);
     assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /Read `USER\.md` if present/);
     assert.doesNotMatch(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /Pong/);
     assert.match(readFileSync(join(root, '.codex', 'CONTINUITY.md'), 'utf-8'), /# CONTINUITY/);
     assert.match(readFileSync(join(root, 'DECISIONS.md'), 'utf-8'), /Local agent work decisions live here/);
     assert.match(readFileSync(join(root, '.gitignore'), 'utf-8'), /DECISIONS\.md/);
     assert.match(readFileSync(join(root, '.gitignore'), 'utf-8'), /docs-priv\//);
-    assert.match(readFileSync(join(root, '.codex', 'memories', 'INDEX.md'), 'utf-8'), /YYYY-Month/);
+    assert.match(readFileSync(join(root, '.codex', 'memories', 'INDEX.md'), 'utf-8'), /\[YYYY-MM-DD-HHMM-topic\]\(YYYY-Month\/YYYY-MM-DD-HHMM-topic\.md\) - one-line outcome/);
   });
 });
 
@@ -361,7 +362,7 @@ Keep this note.
     assert.match(next, /Memory entries are session handoffs/);
     assert.match(next, /create the current month folder under `.codex\/memories` if it is missing/);
     assert.match(next, /Do not create or repair other agents' memory folders manually/);
-    assert.match(next, /# YYYY-MM-DD-HHMM - <topic>/);
+    assert.match(next, /# YYYY-MM-DD - HH:MM - <topic>/);
     assert.match(next, /## Local Notes\n\nKeep this note\./);
   });
 });
