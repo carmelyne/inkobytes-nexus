@@ -133,6 +133,12 @@ Memory folders are month-based from the start, for example:
 .gemini/memories/2026-May/
 ```
 
+Memory indexes stay newest-first and link to entries with one-line outcomes:
+
+```md
+- [2026-06-09-1430-hook-protocol-fix](2026-June/2026-06-09-1430-hook-protocol-fix.md) - tightened hook claim guidance
+```
+
 If you only want to inspect an existing repo before changing anything, run:
 
 ```bash
