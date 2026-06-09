@@ -86,7 +86,7 @@ test('init creates managed agent guides that doctor accepts', () => {
     assert.match(codexGuide, /Memory entries are session handoffs/);
     assert.match(codexGuide, /create the current month folder under `.codex\/memories` if it is missing/);
     assert.match(codexGuide, /Do not create or repair other agents' memory folders manually/);
-    assert.match(codexGuide, /# YYYY-MM-DD-HHMM - <topic>/);
+    assert.match(codexGuide, /# YYYY-MM-DD - HH:MM - <topic>/);
     assert.match(codexGuide, /Read `USER\.md` if present/);
     assert.doesNotMatch(codexGuide, /Pong/);
     assert.match(agyGuide, /\.agy\/CONTINUITY\.md/);
