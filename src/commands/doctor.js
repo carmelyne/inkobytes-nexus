@@ -31,6 +31,9 @@ const START_MARKER = '<!-- NEXUS-AGENT-PROTOCOL:START -->';
 const END_MARKER = '<!-- NEXUS-AGENT-PROTOCOL:END -->';
 
 const CONTINUITY_TEMPLATE = `# CONTINUITY
+
+Compaction-safe session ledger. Read this first after context loss, restart, or fresh entry.
+
 Goal: Project setup
 State: Planning
 
@@ -154,6 +157,15 @@ If the situation resembles a drill, use that drill before acting.
 
 \`${agent.continuity}\` and \`${agent.memoryIndex}\` are agent-local handoff files.
 They are exempt from Nexus claim/release unless the user says otherwise.
+
+### Continuity Flow
+
+- Continuity is the compaction-safe session ledger.
+- On session start, read \`${agent.continuity}\` once and treat it as current state unless the user contradicts it.
+- Write continuity only on task switch, blocker, checkpoint request, or session end.
+- Replace the ledger instead of appending to it.
+- In task replies, use a one-line status summary instead of echoing the full ledger.
+- If the ledger is missing, stale, or lacks referenced context, ask once instead of guessing.
 
 ### Memory Flow
 
