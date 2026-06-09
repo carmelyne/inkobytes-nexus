@@ -60,12 +60,12 @@ Newest first, max 10 visible entries.
 
 Format:
 
-- YYYY-Month/YYYY-MM-DD-HHMM-topic.md - short session label
+- [YYYY-MM-DD-HHMM-topic](YYYY-Month/YYYY-MM-DD-HHMM-topic.md) - one-line outcome
 
 Entries live in month folders from the start, for example:
 
-- \`2026-January/2026-01-15-1030-project-setup.md\`
-- \`2026-February/2026-02-01-0900-debug-session.md\`
+- [2026-01-15-1030-project-setup](2026-January/2026-01-15-1030-project-setup.md) - initialized Nexus scaffolds
+- [2026-02-01-0900-debug-session](2026-February/2026-02-01-0900-debug-session.md) - isolated the failing hook path
 
 This keeps monthly review simple: ask an agent to read one month folder and summarize the Markdown files.
 
@@ -157,23 +157,23 @@ They are exempt from Nexus claim/release unless the user says otherwise.
 
 ### Memory Flow
 
-- On session start, read \`${agent.memoryIndex}\`.
-- If the index has entries, read the newest \`${agent.memoryDir}/YYYY-Month/YYYY-MM-DD-HHMM-topic.md\` entry.
+- On session start, read \`${agent.memoryIndex}\`, then read the newest linked entry when resync is needed.
+- Memory entries are session handoffs, not permanent system truth.
 - Durable architecture and protocol decisions belong in \`DECISIONS.md\`; mention them in \`_NEXUS_STANDUP.md\` only when active agents need to coordinate around them.
-- Memory entries are session handoffs.
+- Write memory once per session, only when the user asks, or on session end, pause, or checkpoint request.
 - When writing your own memory entry, create the current month folder under \`${agent.memoryDir}\` if it is missing.
 - Do not create or repair other agents' memory folders manually; use \`nexus doctor --fix\` for broad scaffold repair.
 - On session end, pause, or checkpoint request:
   1. Run \`nexus checkout @${agent.aliases[0]}\` to clear your presence heartbeat.
   2. Create one new memory file: \`${agent.memoryDir}/YYYY-Month/YYYY-MM-DD-HHMM-topic.md\`.
-- Add the newest file to the top of \`${agent.memoryIndex}\`.
+- Add the newest file to the top of \`${agent.memoryIndex}\` as a Markdown link plus one-line outcome.
 - Keep the index to the 10 newest visible entries.
 - For monthly review, read one month folder such as \`${agent.memoryDir}/2026-January/\` and summarize the Markdown files.
 
 Memory entry format:
 
 \`\`\`markdown
-# YYYY-MM-DD-HHMM - <topic>
+# YYYY-MM-DD - HH:MM - <topic>
 
 ## Session Summary
 - What we worked on: [<=50 words]
