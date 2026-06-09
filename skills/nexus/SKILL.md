@@ -7,6 +7,8 @@ description: Use in repos coordinated by the Nexus CLI, especially when _NEXUS_C
 
 Nexus CLI is the coordination engine. This skill is only the agent playbook.
 
+If the user, repo, or hook says Nexus is active, treat this skill as mandatory workflow. It is not optional advice.
+
 ## Loop
 
 1. Run `nexus start`; set `NEXUS_AGENT` for your CLI, or pass `--agent @agy|@claude|@codex|@gemini`. Start is orientation only, not permission to edit.
@@ -22,14 +24,15 @@ Nexus CLI is the coordination engine. This skill is only the agent playbook.
    ```
 
 8. Treat claim output as current file state. Ignore cached file memory when contents matter.
-9. Work only inside the claimed surface and run focused validation.
-10. Release each claimed tracked file through Nexus as soon as it reaches a coherent checkpoint:
+9. If a hook blocks access because a path is unclaimed, stop and claim that exact path. Do not work around the hook with another command, cached content, or manual git operation.
+10. Work only inside the claimed surface and run focused validation.
+11. Release each claimed tracked file through Nexus as soon as it reaches a coherent checkpoint:
 
    ```bash
    nexus release <path> "short commit message"
    ```
 
-11. Do not hold claims to bundle related work into a prettier feature commit. Nexus is agent-native and file-native: optimize for file availability, rollback safety, and agent throughput.
+12. Do not hold claims to bundle related work into a prettier feature commit. Nexus is agent-native and file-native: optimize for file availability, rollback safety, and agent throughput.
 
 ## Queue Items
 
