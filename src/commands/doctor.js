@@ -10,6 +10,7 @@ import { listLocks } from '../lib/lockManager.js';
 import { getConfig } from '../lib/config.js';
 import { AGENT_SCOPE_LIST } from '../lib/agentScopes.js';
 import { DEFAULT_MATRIX, loadPermissions, getChmodPath } from '../lib/permissions.js';
+import { HOOK_AGENT_CONFIGS, hookStatus } from './hooks.js';
 
 const MONTH_NAMES = [
   'January',
@@ -351,6 +352,7 @@ function repairStandupGuidance(content) {
 export default function doctor(args) {
   const fix = args.includes('--fix');
   const json = args.includes('--json');
+  const checkHooks = args.includes('--hooks');
   const root = cwd();
   const colors = createColors();
   const sections = {
@@ -365,6 +367,7 @@ export default function doctor(args) {
     Memories: [],
     Locks: [],
     'Generated Artifacts': [],
+    Hooks: [],
     promptCHMOD: [],
     'Queue Authorship': [],
   };
@@ -425,6 +428,26 @@ export default function doctor(args) {
 
   for (const issue of scanGeneratedArtifacts(root)) {
     sections['Generated Artifacts'].push(issue);
+  }
+
+  if (checkHooks) {
+    for (const agent of Object.keys(HOOK_AGENT_CONFIGS)) {
+      const status = hookStatus(agent);
+      if (status.status === 'current') {
+        sections.Hooks.push({
+          issue: `${agent} Nexus hook is installed`,
+          fix: 'No action needed.',
+          ok: true,
+        });
+        continue;
+      }
+
+      const fixHint = `Run \`nexus hooks install --agent ${agent}\`${status.status === 'foreign' ? ' after reviewing the existing hook, or add `--force` to replace it' : ''}.`;
+      sections.Hooks.push({
+        issue: `${agent} Nexus hook is ${status.status} at ${status.path}`,
+        fix: fixHint,
+      });
+    }
   }
 
   if (!ensureFile(join(root, 'DECISIONS.md'), LOCAL_DECISIONS_TEMPLATE, fix, changes)) {
