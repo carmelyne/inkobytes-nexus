@@ -60,6 +60,7 @@ test('doctor --fix creates agent scaffolds and protocol blocks', () => {
     assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /Do not create or repair other agents' memory folders manually/);
     assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /Markdown link plus one-line outcome/);
     assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /Continuity is the compaction-safe session ledger/);
+    assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /latest memory entry at session start, `nexus start`, or resume/);
     assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /Read `USER\.md` if present/);
     assert.doesNotMatch(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /Pong/);
     assert.match(readFileSync(join(root, '.codex', 'CONTINUITY.md'), 'utf-8'), /# CONTINUITY/);
@@ -247,6 +248,7 @@ test('doctor --fix repairs Nexus README and skill protocol drift in the Nexus pr
     assert.match(readme, /agent-native and file-native, not human-native/);
     assert.match(readme, /start -> claim -> work -> release -> next/);
     assert.match(skill, /Read `_NEXUS_CONSTITUTION\.md`\./);
+    assert.match(skill, /Read continuity and latest memory at session start, `nexus start`, or resume/);
     assert.match(skill, /not optional advice/);
     assert.match(skill, /Do not work around the hook/);
     assert.match(skill, /Release each claimed tracked file through Nexus as soon as it reaches a coherent checkpoint/);
@@ -366,6 +368,7 @@ Keep this note.
     assert.match(next, /Do not create or repair other agents' memory folders manually/);
     assert.match(next, /### Continuity Flow/);
     assert.match(next, /ask once instead of guessing/);
+    assert.match(next, /read `.codex\/memories\/INDEX\.md`, then read the newest linked entry/);
     assert.match(next, /# YYYY-MM-DD - HH:MM - <topic>/);
     assert.match(next, /## Local Notes\n\nKeep this note\./);
   });
