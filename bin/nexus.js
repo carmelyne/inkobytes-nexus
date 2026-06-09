@@ -20,12 +20,13 @@ const COMMANDS = {
   ledger: () => import('../src/commands/ledger.js'),
   drill: () => import('../src/commands/drill.js'),
   soul: () => import('../src/commands/soul.js'),
+  'install-skill': () => import('../src/commands/install-skill.js'),
   chmod: () => import('../src/commands/chmod.js'),
   db: () => import('../src/commands/db.js'),
   help: () => import('../src/commands/help.js'),
 };
 
-const VERSION = '1.0.1';
+const VERSION = '1.0.7';
 const COLORS = createColors();
 
 const args = argv.slice(2);
@@ -76,6 +77,7 @@ function printHelp() {
     ['db <backup|list|restore|schedule>', 'Database backup and recovery'],
     ['drill <list|show|run|report>', 'Inspect or run protocol drills'],
     ['soul [--file <path>] [--status | --remove]', 'Manage local soul overlay in agent files'],
+    ['install-skill [--target <path>] [--force]', 'Install bundled Nexus skill into ~/.agents/skills'],
     ['help', 'Show this help'],
   ];
 
@@ -89,6 +91,7 @@ function printHelp() {
     'nexus metrics --json',
     'nexus ledger backfill',
     'nexus drill show wrong-repo-push',
+    'nexus install-skill',
     'nexus claim src/lib/components/login/ @claude "Building login UI"',
     'nexus release src/lib/components/login/ "feat: login form component"',
     'nexus standup "2026-06-01 08:38 AM @codex [DONE]: Updated tests"',
