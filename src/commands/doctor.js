@@ -10,43 +10,19 @@ import { listLocks } from '../lib/lockManager.js';
 import { getConfig } from '../lib/config.js';
 import { AGENT_SCOPE_LIST } from '../lib/agentScopes.js';
 import { DEFAULT_MATRIX, loadPermissions, getChmodPath } from '../lib/permissions.js';
+import {
+  CONTINUITY_TEMPLATE,
+  END_MARKER,
+  MEMORY_INDEX_GUARDRAIL,
+  MEMORY_INDEX_TEMPLATE,
+  REQUIRED_CONTEXT_READ,
+  SKILL_CONTEXT_GUARDRAIL,
+  START_MARKER,
+  currentMemoryMonthFolder,
+  fullEntrypoint,
+  protocolBlock,
+} from '../lib/protocolText.js';
 import { HOOK_AGENT_CONFIGS, hookStatus } from './hooks.js';
-
-const MONTH_NAMES = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
-
-const START_MARKER = '<!-- NEXUS-AGENT-PROTOCOL:START -->';
-const END_MARKER = '<!-- NEXUS-AGENT-PROTOCOL:END -->';
-
-const CONTINUITY_TEMPLATE = `# CONTINUITY
-
-Compaction-safe session ledger. Read this first after context loss, restart, or fresh entry.
-
-Goal: Project setup
-State: Planning
-
-Now: Initial Nexus setup
-Next: Confirm first task
-Blockers: None
-Decisions:
-- Nexus manages swarm coordination
-- Continuity and memories are agent-local
-Files:
-- _NEXUS_QUEUE.md
-- _NEXUS_STANDUP.md
-`;
 
 const LOCAL_DECISIONS_TEMPLATE = `# Decisions
 
@@ -57,161 +33,6 @@ const LOCAL_GITIGNORE_LINES = ['DECISIONS.md', 'docs-priv/', '.nexus/presence/']
 const STANDUP_FORMAT_GUIDANCE = 'YYYY-MM-DD HH:MM AM/PM @agent [STATUS]: message';
 const STANDUP_RULES_LINE = `*Rules: Append new entries at the bottom. One line per message. Use \`${STANDUP_FORMAT_GUIDANCE}\` so relevance is visible. Use 🧵 for long discussions.*`;
 
-const MEMORY_INDEX_TEMPLATE = `# Memory Index
-
-Newest first, max 10 visible entries.
-
-Format:
-
-- [YYYY-MM-DD-HHMM-topic](YYYY-Month/YYYY-MM-DD-HHMM-topic.md) - one-line outcome
-
-Entries live in month folders from the start, for example:
-
-- [2026-01-15-1030-project-setup](2026-January/2026-01-15-1030-project-setup.md) - initialized Nexus scaffolds
-- [2026-02-01-0900-debug-session](2026-February/2026-02-01-0900-debug-session.md) - isolated the failing hook path
-
-This keeps monthly review simple: ask an agent to read one month folder and summarize the Markdown files.
-
-`;
-
-function currentMemoryMonthFolder(now = new Date()) {
-  return `${now.getFullYear()}-${MONTH_NAMES[now.getMonth()]}`;
-}
-
-function protocolBlock(agent) {
-  return `${START_MARKER}
-
-## Nexus Project Protocol
-
-This project uses Nexus for multi-agent coordination.
-
-### Start Here
-
-1. Read \`_NEXUS_CONSTITUTION.md\`.
-2. Read \`_NEXUS_QUEUE.md\` for executable priorities.
-3. Read \`_NEXUS_STANDUP.md\` for comms, decisions, and completion notes.
-4. Read \`USER.md\` if present for local human preferences.
-5. Read \`${agent.continuity}\` for current session state.
-6. Read \`${agent.memoryIndex}\` and the latest memory entry at session start, \`nexus start\`, or resume.
-
-### Nexus Rules
-
-- On compaction, resume, or a fresh Codex turn, treat this file and the Nexus protocol as active requirements, not optional guidance.
-- Claim before editing shared project files: \`nexus claim <path> @Agent "intent"\`.
-- If a hook blocks reading, editing, committing, or releasing because a path is unclaimed, stop and claim the exact path. Do not bypass the hook with another tool, shell trick, cached content, or manual git command.
-- Nexus is agent-native and file-native, not human-native: optimize for concurrency and rollback, not feature-commit aesthetics.
-- Release each claimed file as soon as it reaches a coherent checkpoint.
-- Never hold claims just to bundle a prettier feature commit; that blocks other agents.
-- Release finished work through Nexus: \`nexus release <path> "commit message"\`.
-- Use \`nexus next @Agent\` for the next safe queue task.
-- Do not free-roam into unassigned or \`Auto-flow: no\` work without user approval.
-- Direct user instruction can override queue order, but not claim/release, data, security, or approval gates.
-- If no safe task remains, announce \`Standby\` with what you are waiting for, then stop until user input, queue change, or explicit assignment.
-
-### Current File State
-
-- Treat previous chat context, cached model memory, and earlier reads as stale when file contents matter.
-- Unclaimed orientation reads are limited to Nexus protocol, queue, standup, human preference, continuity, and memory files named in Start Here.
-- Claim before reading implementation files, tests, docs, generated artifacts, or agent instruction files outside that orientation set.
-- Before claiming what a file says, making edits, or judging current state, read the file from disk with a fresh command.
-- Treat \`nexus claim\` as the atomic lock-and-read boundary and its output as fresh file state for the claimed path.
-- If you read a shared file before claiming it, treat that read as stale after claim succeeds.
-- If another agent or tool may have touched the file since your last read, re-read it before editing.
-- If a claim appears stale, do not edit through it; run \`nexus status\` or \`nexus doctor\`, then clean only when ownership is clearly abandoned.
-
-### Drills
-
-Drill guidance is defined in \`_NEXUS_CONSTITUTION.md\`.
-If the situation resembles a drill, use that drill before acting.
-
-### Delegated Work
-
-- Lead agents own the repo effects of their subagents, tools, and parallel workers.
-- Claim the full path scope before delegating shared-file work.
-- Give subagents the claimed path, intent, non-goals, and boundaries.
-- Re-read affected files after subagent work before final edits, release, or current-state claims.
-- Mention delegated work in release or \`nexus standup\` notes when it affected files, tests, or risk.
-
-### Git Write Safety
-
-- Before git writes, verify \`pwd\`, repo root, branch/status, and remotes.
-- Stop if they do not match the requested project.
-- Never infer from similar folder names or cached context.
-- Require explicit confirmation before push/force-push, main/master, remote changes, or deletes.
-- To remove private agent files from git, untrack them; do not delete local folders.
-- Agent instruction files are shared protocol files; normal edits require claim/release, while \`nexus doctor --fix\` may update managed protocol blocks after user approval.
-- Agents work inside assigned work zones. If a change crosses work-zone boundaries or alters a shared contract another zone may depend on, announce it in \`_NEXUS_STANDUP.md\` before release and ask if coordination is needed.
-
-### Supply-Chain Safety
-
-- Do not install third-party packages that have existed for less than 14 days.
-- Before adding a new dependency, verify the package creation date and the specific version publish date.
-- If the package or version is younger than 14 days, or either date cannot be verified, stop and ask the user.
-- Run \`nexus doctor\` before installs; review any Security findings before running package scripts.
-- \`nexus doctor\` is cheap, local, and idempotent.
-- If \`nexus doctor\` reports Security, Package Privacy, Git Privacy, or supply-chain findings, stop and report before fixing or installing.
-- Treat install hooks and scripts with network commands, webhooks, raw sockets, SSH, or secret-looking variables as human-review only.
-- Prefer built-in runtime APIs and existing project dependencies when they fit.
-
-### Agent-Local Files
-
-\`${agent.continuity}\` and \`${agent.memoryIndex}\` are agent-local handoff files.
-They are exempt from Nexus claim/release unless the user says otherwise.
-
-### Continuity Flow
-
-- Continuity is the compaction-safe session ledger.
-- On session start, read \`${agent.continuity}\` once and treat it as current state unless the user contradicts it.
-- Write continuity only on task switch, blocker, checkpoint request, or session end.
-- Replace the ledger instead of appending to it.
-- In task replies, use a one-line status summary instead of echoing the full ledger.
-- If the ledger is missing, stale, or lacks referenced context, ask once instead of guessing.
-
-### Memory Flow
-
-- On session start, \`nexus start\`, or resume, read \`${agent.memoryIndex}\`, then read the newest linked entry.
-- Memory entries are session handoffs, not permanent system truth.
-- Durable architecture and protocol decisions belong in \`DECISIONS.md\`; mention them in \`_NEXUS_STANDUP.md\` only when active agents need to coordinate around them.
-- Write memory once per session, only when the user asks, or on session end, pause, or checkpoint request.
-- When writing your own memory entry, create the current month folder under \`${agent.memoryDir}\` if it is missing.
-- Do not create or repair other agents' memory folders manually; use \`nexus doctor --fix\` for broad scaffold repair.
-- On session end, pause, or checkpoint request:
-  1. Run \`nexus checkout @${agent.aliases[0]}\` to clear your presence heartbeat.
-  2. Create one new memory file: \`${agent.memoryDir}/YYYY-Month/YYYY-MM-DD-HHMM-topic.md\`.
-- Add the newest file to the top of \`${agent.memoryIndex}\` as a Markdown link plus one-line outcome.
-- Keep the index to the 10 newest visible entries.
-- For monthly review, read one month folder such as \`${agent.memoryDir}/2026-January/\` and summarize the Markdown files.
-
-Memory entry format:
-
-\`\`\`markdown
-# YYYY-MM-DD - HH:MM - <topic>
-
-## Session Summary
-- What we worked on: [<=50 words]
-- What got done: [bullet list, max 5]
-- Where we stopped: [exact state, <=30 words]
-
-## Next Session Needs
-- Immediate next task: [<=20 words]
-- Blockers: [None, or list]
-- Open questions: [if any]
-
-## Context to Carry
-- Key decisions made: [max 3 bullets]
-- Files touched: [max 5 paths]
-- Gotchas/warnings: [anything next session should watch for]
-\`\`\`
-
-${END_MARKER}
-`;
-}
-
-function fullEntrypoint(agent) {
-  return `# ${agent.label} Agent Guide
-
-${protocolBlock(agent)}`;
-}
 
 function upsertProtocolBlock(content, block) {
   const cleanContent = removeUnmanagedProtocolBlock(content);
@@ -1031,7 +852,7 @@ function isNexusProductRepo(root) {
 }
 
 function repairReadmeProtocolDoc(content) {
-  return content
+  let next = content
     .replace(
       [
         '- [ ] TASK/Codex: Add doctor stale-lock category',
@@ -1061,10 +882,6 @@ function repairReadmeProtocolDoc(content) {
       ].join('\n'),
     )
     .replace(
-      'Keep items dashboard-friendly: include `Id`, `Epic`, `Status`, `Depends on`, `Files`, `Affinity`, `Cost`, `Auto-flow`, and `Notes`. Use `Files` to expose conflict surfaces, `Depends on` for hard blockers, and `Auto-flow: no` when a task needs planning or human approval before an agent grabs it.',
-      'Keep items dashboard-friendly: include `Id`, `Epic`, `Status`, `Depends on`, `Files`, `Affinity`, `Cost`, `Auto-flow`, and `Notes`. Use `Files` to expose conflict surfaces, `Depends on` for hard blockers, and `Auto-flow: no` when a task needs planning or human approval before an agent grabs it. Auto-flow work in `Ready Queue` should also include `Review: approved` and `Approved by: human`, or `doctor` will flag it and `nexus next` may skip it.',
-    )
-    .replace(
       [
         '1. Run `nexus start` when entering an existing repo; it does not replace claim/release.',
         '2. Read `USER.md` when present.',
@@ -1078,7 +895,7 @@ function repairReadmeProtocolDoc(content) {
         '1. Run `nexus start` when entering an existing repo; it does not replace claim/release.',
         '2. Read `_NEXUS_CONSTITUTION.md`.',
         '3. Read `USER.md` when present.',
-        '4. Read continuity and latest memory at session start, `nexus start`, or resume.',
+        `4. ${REQUIRED_CONTEXT_READ}`,
         '5. Read `_NEXUS_QUEUE.md` before taking follow-on work.',
         '6. Claim before touching shared project files.',
         '7. Release each claimed tracked file as soon as it reaches a coherent checkpoint.',
@@ -1086,13 +903,27 @@ function repairReadmeProtocolDoc(content) {
       ].join('\n'),
     )
     .replace(
-      'Agent-local continuity and memory files are exempt from claim/release unless the human says otherwise.',
-      'Agent-local continuity and memory files are exempt from claim/release unless the human says otherwise.\n\nNexus is agent-native and file-native, not human-native: optimize for concurrency and rollback, not feature-commit aesthetics. Do not hold claims to bundle related work into prettier feature commits; that blocks other agents waiting on files.',
-    )
-    .replace(
       'The CLI is the coordination engine. The skill is the lean playbook for this flow: `start -> claim -> release`.',
       'The CLI is the coordination engine. The skill is the lean playbook for this flow: `start -> claim -> work -> release -> next`.',
     );
+
+  const queueReviewReadme = 'Auto-flow work in `Ready Queue` should also include `Review: approved` and `Approved by: human`, or `doctor` will flag it and `nexus next` may skip it.';
+  if (!next.includes(queueReviewReadme)) {
+    next = next.replace(
+      'Keep items dashboard-friendly: include `Id`, `Epic`, `Status`, `Depends on`, `Files`, `Affinity`, `Cost`, `Auto-flow`, and `Notes`. Use `Files` to expose conflict surfaces, `Depends on` for hard blockers, and `Auto-flow: no` when a task needs planning or human approval before an agent grabs it.',
+      `Keep items dashboard-friendly: include \`Id\`, \`Epic\`, \`Status\`, \`Depends on\`, \`Files\`, \`Affinity\`, \`Cost\`, \`Auto-flow\`, and \`Notes\`. Use \`Files\` to expose conflict surfaces, \`Depends on\` for hard blockers, and \`Auto-flow: no\` when a task needs planning or human approval before an agent grabs it. ${queueReviewReadme}`,
+    );
+  }
+
+  const agentNativeReadme = 'Nexus is agent-native and file-native, not human-native: optimize for concurrency and rollback, not feature-commit aesthetics. Do not hold claims to bundle related work into prettier feature commits; that blocks other agents waiting on files.';
+  if (!next.includes(agentNativeReadme)) {
+    next = next.replace(
+      'Agent-local continuity and memory files are exempt from claim/release unless the human says otherwise.',
+      `Agent-local continuity and memory files are exempt from claim/release unless the human says otherwise.\n\n${agentNativeReadme}`,
+    );
+  }
+
+  return next;
 }
 
 function repairNexusSkillDoc(content) {
@@ -1155,7 +986,7 @@ function repairNexusSkillDoc(content) {
   if (!next.includes('Continuity is the compaction-safe session ledger; latest memory is required startup/resume context.')) {
     next = next.replace(
       '- Agent-local continuity and memory files are claim-exempt unless the user says otherwise.',
-      '- Agent-local continuity and memory files are claim-exempt unless the user says otherwise.\n- Continuity is the compaction-safe session ledger; latest memory is required startup/resume context.\n- Memory indexes use monthly folders and newest-first Markdown links with one-line outcomes.',
+      `- Agent-local continuity and memory files are claim-exempt unless the user says otherwise.\n- ${SKILL_CONTEXT_GUARDRAIL}\n- ${MEMORY_INDEX_GUARDRAIL}`,
     );
   }
 
@@ -1166,7 +997,7 @@ function repairNexusSkillDoc(content) {
 
   next = next.replace(
     '4. Read continuity and latest memory when present.',
-    '4. Read continuity and latest memory at session start, `nexus start`, or resume.',
+    `4. ${REQUIRED_CONTEXT_READ}`,
   );
 
   return next;
