@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.7 - 2026-06-06
+
+- Added `nexus install-skill` to install the bundled Nexus skill into `~/.agents/skills/nexus`.
+- Added `--target` and `--force` options for custom or refreshed skill installs, with a guard against broad overwrite targets.
+- Updated help, zsh completion, README docs, and regression coverage for the new skill installer command.
+
 ## 1.0.6 - 2026-06-03
 
 - Extended Nexus protocol drift checks so `nexus doctor` now covers the bundled `skills/nexus/SKILL.md`.
