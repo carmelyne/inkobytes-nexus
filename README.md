@@ -1,30 +1,28 @@
 # @inkobytes/nexus
 
-Run more than one AI coding agent in the same project without them stepping on each other.
+Shared awareness and traffic control for Codex, Claude, Gemini, and other SOTA coding agents working on the same branch.
 
-The hard part starts when they are working at the same time.
+Nexus helps multiple top-level coding agents share one local checkout without stepping on each other. It gives them local repo state they can all understand: who is working on what, why a file is locked, what was released, and what is safe to do next.
 
-Nexus gives the repo a simple traffic system:
+The loop is intentionally small:
 
 ```text
 start -> claim -> work -> release -> next
 ```
 
-Agents use Nexus to say:
+Nexus is intentionally boring:
 
-- "I am working on this file."
-- "This is why I claimed it."
-- "This task is done."
-- "These are the files I changed."
-- "Here is what the next agent should know."
-
-Everything stays local in the repo. No server. No database. No cloud dashboard. Just files, Git, and a small CLI.
-
-Nexus is focused on one specific problem: multiple AI coding agents working at the same time in one local checkout, with explicit file claims, queue state, release receipts, and handoff notes.
+- no daemon
+- no cloud service
+- no database
+- no branch choreography requirement
+- just files, Git, hooks, and a small CLI
 
 ## Why Nexus Exists
 
-If two agents touch the same files, things get messy fast:
+The hard part starts when powerful agents work at the same time.
+
+If Codex, Claude, Gemini, Cursor, or another coding agent touch the same branch without shared state:
 
 - one agent may overwrite another agent's work
 - one agent may commit files it did not mean to commit
@@ -34,14 +32,26 @@ If two agents touch the same files, things get messy fast:
 
 With Nexus, Git still stores the code history. Nexus tracks the operational state around Git: who claimed what, what task they are doing, what got released, and what another agent should read next.
 
+Nexus is not only traffic control. It gives agents shared situational awareness:
+
+- what each agent is working on, and why they claimed it
+- which files are locked right now
+- what the queue says is safe to pick up next
+- what was released, and by whom
+- what needs human attention
+
+Codex knows what Claude is doing. Claude knows why Gemini claimed that directory. Nobody works blind.
+
 ## What Nexus Is And Is Not
 
 Nexus is:
 
-- a way for agents to reserve files before editing them
+- shared awareness for multiple SOTA coding agents on one branch
+- file claims before shared reads and edits
+- local guard hooks that block unclaimed writes
 - a queue so agents know what is safe to pick up next
 - a release command that commits only the claimed path
-- a standup and report log humans can read
+- standup, report, and ledger files humans can read
 - a local dashboard over the same repo files
 - preventive drills for known multi-agent failure cases
 
@@ -67,11 +77,11 @@ npx @inkobytes/nexus help
 
 Requires Node.js 18 or newer.
 
-## What's New In 1.0.1
+## What's New In 1.0.8
 
-- Colorized `nexus help` output for easier scanning in the terminal
-- Built-in `nexus completion zsh` support for shell completions
-- Bundled `nexus install-skill` support for installing the Nexus agent skill into `~/.agents/skills`
+- Shared protocol wording keeps `nexus init`, `nexus doctor`, README repair, and tests aligned.
+- Generated agent guides now require continuity/latest-memory reads at session start, `nexus start`, or resume.
+- `nexus hooks install --agent all` installs Codex, Claude, and Gemini guard hooks in one pass.
 
 See [CHANGELOG.md](./CHANGELOG.md) for the release summary.
 
@@ -91,12 +101,15 @@ In a Git repo:
 
 ```bash
 nexus init
-nexus start
+nexus hooks install --agent all
+nexus start --agent @codex
 nexus claim README.md @codex "try Nexus on one file"
 nexus release README.md "docs: try Nexus"
 ```
 
 `nexus start` is orientation only. The edit loop is `claim -> work -> release`.
+
+Hooks are the enforcement layer. Without hooks, Nexus is a coordination protocol agents follow. With hooks, unclaimed writes are blocked and the agent gets the exact claim command to run.
 
 `nexus init` creates the Nexus coordination files:
 
@@ -519,14 +532,6 @@ git status --short
 `nexus doctor` reports package privacy risks for local/private files such as `USER.md`, `DECISIONS.md`, `docs-priv/`, and agent-local state when package files would include them. `npm pack --dry-run` shows the exact files that would ship to npm.
 
 ## Design Notes
-
-Nexus is intentionally boring:
-
-- no daemon
-- no cloud service
-- no database
-- no private hidden coordination channel
-- no branch choreography requirement
 
 The current storage substrate is Git. Future Nexit planning explores agent-native zones, inspection, publish, and recall, but Nexus keeps today's release path stable.
 
