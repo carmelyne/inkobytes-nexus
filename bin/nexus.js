@@ -27,7 +27,7 @@ const COMMANDS = {
   help: () => import('../src/commands/help.js'),
 };
 
-const VERSION = '1.0.7';
+const VERSION = '1.0.8';
 const COLORS = createColors();
 
 const args = argv.slice(2);
