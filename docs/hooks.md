@@ -10,6 +10,7 @@ Hooks are useful because agent instruction files can be forgotten after context 
 nexus hooks install --agent @codex
 nexus hooks install --agent @claude
 nexus hooks install --agent @gemini
+nexus hooks install --agent all
 ```
 
 Supported agents:
@@ -19,6 +20,8 @@ Supported agents:
 - `@gemini`
 
 Each installed hook bakes in the matching claim handle, so a Codex hook says `@codex`, a Claude hook says `@claude`, and a Gemini hook says `@gemini`.
+
+Use `--agent all` to install all default Codex, Claude, and Gemini hooks in one pass. `--target` is only available for a single agent because each agent has a different default file.
 
 ## Default Targets
 
@@ -89,4 +92,3 @@ Doctor reports whether each supported agent hook is:
 - `wrong-agent`
 
 Use `nexus hooks install --agent <handle>` to install or refresh a hook.
-
