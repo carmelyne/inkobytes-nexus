@@ -447,7 +447,7 @@ The agent rule of thumb:
 1. Run `nexus start` when entering an existing repo; it does not replace claim/release.
 2. Read `_NEXUS_CONSTITUTION.md`.
 3. Read `USER.md` when present.
-4. Read continuity and latest memory when present.
+4. Read continuity and latest memory at session start, `nexus start`, or resume.
 5. Read `_NEXUS_QUEUE.md` before taking follow-on work.
 6. Claim before touching shared project files.
 7. Release each claimed tracked file as soon as it reaches a coherent checkpoint.
