@@ -14,7 +14,7 @@ If the user, repo, or hook says Nexus is active, treat this skill as mandatory w
 1. Run `nexus start`; set `NEXUS_AGENT` for your CLI, or pass `--agent @agy|@claude|@codex|@gemini`. Start is orientation only, not permission to edit.
 2. Read `_NEXUS_CONSTITUTION.md`.
 3. Read `USER.md` if present for local user preferences.
-4. Read continuity and latest memory when present.
+4. Read continuity and latest memory at session start, `nexus start`, or resume.
 5. Read `_NEXUS_QUEUE.md` and `_NEXUS_STANDUP.md`.
 6. Choose user-assigned work or `nexus next @Agent`; do not free-roam into `Auto-flow: no`.
 7. Claim exact shared files before reading/editing:
@@ -65,6 +65,8 @@ When adding work to `_NEXUS_QUEUE.md`, keep tasks dashboard-parseable and immedi
 - Use `nexus doctor` for audit/repair, not as the normal startup command.
 - Use CLI/model names as lock handles: `@agy`, `@claude`, `@codex`, `@gemini`.
 - Agent-local continuity and memory files are claim-exempt unless the user says otherwise.
+- Continuity is the compaction-safe session ledger; latest memory is required startup/resume context.
+- Memory indexes use monthly folders and newest-first Markdown links with one-line outcomes.
 - When using subagents or parallel workers, the lead agent owns the repo effects: claim the full path scope, pass boundaries down, re-read affected files, and mention delegated work in release or standup notes.
 - Avoid parallel `nexus release`.
 - Do not install packages younger than 14 days; if age is unknown, ask.
