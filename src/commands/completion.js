@@ -54,6 +54,7 @@ commands=(
   'db:Database backup and recovery'
   'drill:Inspect or run protocol drills'
   'soul:Manage local soul overlay in agent files'
+  'install-skill:Install bundled Nexus skill into ~/.agents/skills'
   'help:Show command help'
 )
 
@@ -115,6 +116,9 @@ case $words[2] in
     ;;
   soul)
     _arguments '--file[Overlay file path]:path:_files' '--status[Show status]' '--remove[Remove overlay]'
+    ;;
+  install-skill)
+    _arguments '--target[Install target]:path:_files' '--force[Refresh existing installation]'
     ;;
   start)
     _arguments '--agent[Agent handle]:agent:(@agy @claude @codex @gemini)'
