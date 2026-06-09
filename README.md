@@ -71,6 +71,7 @@ Requires Node.js 18 or newer.
 
 - Colorized `nexus help` output for easier scanning in the terminal
 - Built-in `nexus completion zsh` support for shell completions
+- Bundled `nexus install-skill` support for installing the Nexus agent skill into `~/.agents/skills`
 
 See [CHANGELOG.md](./CHANGELOG.md) for the release summary.
 
@@ -239,6 +240,18 @@ source <(nexus completion zsh)
 ```
 
 This gives `zsh` tab-completion for commands like `claim`, `release`, `doctor`, `drill`, and common agent handles such as `@codex` and `@claude`.
+
+### `nexus install-skill [--target <path>] [--force]`
+
+Install the bundled Nexus agent skill into the shared agent skill directory.
+
+```bash
+nexus install-skill
+nexus install-skill --force
+nexus install-skill --target ~/.agents/skills/nexus
+```
+
+By default, Nexus copies `skills/nexus` from the published package into `~/.agents/skills/nexus`. Restart or refresh your agent session after installing so its skill registry can discover the new `nexus` skill.
 
 ### `nexus ledger [--json]`
 
