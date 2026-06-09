@@ -23,7 +23,7 @@ export const HOOK_AGENT_CONFIGS = {
 
 export const HOOK_FINGERPRINT = 'NEXUS_HOOK_TEMPLATE_V1';
 
-const COMMAND_USAGE = 'Usage: nexus hooks install --agent @codex|@claude|@gemini [--target <path>] [--force]';
+const COMMAND_USAGE = 'Usage: nexus hooks install --agent @codex|@claude|@gemini|all [--target <path>] [--force]';
 
 function parseArgs(args) {
   if (args[0] !== 'install') throw new Error(COMMAND_USAGE);
@@ -58,10 +58,12 @@ function parseArgs(args) {
     throw new Error(COMMAND_USAGE);
   }
 
-  if (!HOOK_AGENT_CONFIGS[agent]) throw new Error(COMMAND_USAGE);
+  const normalizedAgent = agent === '@all' ? 'all' : agent;
+  if (normalizedAgent === 'all' && target) throw new Error('Usage: nexus hooks install --agent all [--force]');
+  if (normalizedAgent !== 'all' && !HOOK_AGENT_CONFIGS[normalizedAgent]) throw new Error(COMMAND_USAGE);
   return {
-    agent,
-    target: target || HOOK_AGENT_CONFIGS[agent].defaultTarget,
+    agent: normalizedAgent,
+    target: normalizedAgent === 'all' ? '' : target || HOOK_AGENT_CONFIGS[normalizedAgent].defaultTarget,
     force,
   };
 }
@@ -268,6 +270,17 @@ if __name__ == '__main__':
 
 export default function hooks(args) {
   const { agent, target, force } = parseArgs(args);
+  if (agent === 'all') {
+    for (const handle of Object.keys(HOOK_AGENT_CONFIGS)) {
+      installHook(handle, HOOK_AGENT_CONFIGS[handle].defaultTarget, force);
+    }
+    return;
+  }
+
+  installHook(agent, target, force);
+}
+
+function installHook(agent, target, force) {
   const destination = expandHome(target);
   const current = hookStatus(agent, target);
 
@@ -290,4 +303,3 @@ export default function hooks(args) {
   console.log(`Installed Nexus ${HOOK_AGENT_CONFIGS[agent].label} hook to ${destination}`);
   console.log('Restart or refresh the agent session so the hook is loaded.');
 }
-
