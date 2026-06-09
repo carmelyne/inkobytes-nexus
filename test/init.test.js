@@ -87,6 +87,7 @@ test('init creates managed agent guides that doctor accepts', () => {
     assert.match(codexGuide, /Memory entries are session handoffs/);
     assert.match(codexGuide, /### Continuity Flow/);
     assert.match(codexGuide, /Continuity is the compaction-safe session ledger/);
+    assert.match(codexGuide, /latest memory entry at session start, `nexus start`, or resume/);
     assert.match(codexGuide, /create the current month folder under `.codex\/memories` if it is missing/);
     assert.match(codexGuide, /Do not create or repair other agents' memory folders manually/);
     assert.match(codexGuide, /# YYYY-MM-DD - HH:MM - <topic>/);
