@@ -325,12 +325,12 @@ Newest first, max 10 visible entries.
 
 Format:
 
-- YYYY-Month/YYYY-MM-DD-HHMM-topic.md - short session label
+- [YYYY-MM-DD-HHMM-topic](YYYY-Month/YYYY-MM-DD-HHMM-topic.md) - one-line outcome
 
 Entries live in month folders from the start, for example:
 
-- \`2026-January/2026-01-15-1030-project-setup.md\`
-- \`2026-February/2026-02-01-0900-debug-session.md\`
+- [2026-01-15-1030-project-setup](2026-January/2026-01-15-1030-project-setup.md) - initialized Nexus scaffolds
+- [2026-02-01-0900-debug-session](2026-February/2026-02-01-0900-debug-session.md) - isolated the failing hook path
 
 This keeps monthly review simple: ask an agent to read one month folder and summarize the Markdown files.
 
@@ -378,7 +378,9 @@ This project uses Nexus for multi-agent coordination.
 
 ### Nexus Rules
 
+- On compaction, resume, or a fresh Codex turn, treat this file and the Nexus protocol as active requirements, not optional guidance.
 - Claim before editing shared project files: \`nexus claim <path> @Agent "intent"\`.
+- If a hook blocks reading, editing, committing, or releasing because a path is unclaimed, stop and claim the exact path. Do not bypass the hook with another tool, shell trick, cached content, or manual git command.
 - Nexus is agent-native and file-native, not human-native: optimize for concurrency and rollback, not feature-commit aesthetics.
 - Release each claimed file as soon as it reaches a coherent checkpoint.
 - Never hold claims just to bundle a prettier feature commit; that blocks other agents.
@@ -391,6 +393,8 @@ This project uses Nexus for multi-agent coordination.
 ### Current File State
 
 - Treat previous chat context, cached model memory, and earlier reads as stale when file contents matter.
+- Unclaimed orientation reads are limited to Nexus protocol, queue, standup, human preference, continuity, and memory files named in Start Here.
+- Claim before reading implementation files, tests, docs, generated artifacts, or agent instruction files outside that orientation set.
 - Before claiming what a file says, making edits, or judging current state, read the file from disk with a fresh command.
 - Treat \`nexus claim\` as the atomic lock-and-read boundary and its output as fresh file state for the claimed path.
 - If you read a shared file before claiming it, treat that read as stale after claim succeeds.
@@ -438,23 +442,23 @@ They are exempt from Nexus claim/release unless the user says otherwise.
 
 ### Memory Flow
 
-- On session start, read \`${scaffold.memoryIndex}\`.
-- If the index has entries, read the newest \`${scaffold.memoryDir}/YYYY-Month/YYYY-MM-DD-HHMM-topic.md\` entry.
+- On session start, read \`${scaffold.memoryIndex}\`, then read the newest linked entry when resync is needed.
+- Memory entries are session handoffs, not permanent system truth.
 - Durable architecture and protocol decisions belong in \`DECISIONS.md\`; mention them in \`_NEXUS_STANDUP.md\` only when active agents need to coordinate around them.
-- Memory entries are session handoffs.
+- Write memory once per session, only when the user asks, or on session end, pause, or checkpoint request.
 - When writing your own memory entry, create the current month folder under \`${scaffold.memoryDir}\` if it is missing.
 - Do not create or repair other agents' memory folders manually; use \`nexus doctor --fix\` for broad scaffold repair.
 - On session end, pause, or checkpoint request:
   1. Run \`nexus checkout @${scaffold.aliases[0]}\` to clear your presence heartbeat.
   2. Create one new memory file: \`${scaffold.memoryDir}/YYYY-Month/YYYY-MM-DD-HHMM-topic.md\`.
-- Add the newest file to the top of \`${scaffold.memoryIndex}\`.
+- Add the newest file to the top of \`${scaffold.memoryIndex}\` as a Markdown link plus one-line outcome.
 - Keep the index to the 10 newest visible entries.
 - For monthly review, read one month folder such as \`${scaffold.memoryDir}/2026-January/\` and summarize the Markdown files.
 
 Memory entry format:
 
 \`\`\`markdown
-# YYYY-MM-DD-HHMM - <topic>
+# YYYY-MM-DD - HH:MM - <topic>
 
 ## Session Summary
 - What we worked on: [<=50 words]
