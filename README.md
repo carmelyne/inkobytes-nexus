@@ -259,7 +259,7 @@ nexus install-skill --target ~/.agents/skills/nexus
 
 By default, Nexus copies `skills/nexus` from the published package into `~/.agents/skills/nexus`. Restart or refresh your agent session after installing so its skill registry can discover the new `nexus` skill.
 
-### `nexus hooks install --agent @codex|@claude|@gemini [--target <path>] [--force]`
+### `nexus hooks install --agent @codex|@claude|@gemini|all [--target <path>] [--force]`
 
 Install an agent-specific local guard hook.
 
@@ -267,9 +267,12 @@ Install an agent-specific local guard hook.
 nexus hooks install --agent @codex
 nexus hooks install --agent @claude
 nexus hooks install --agent @gemini
+nexus hooks install --agent all
 ```
 
 Hooks block writes in Nexus repos until the exact target path is claimed, then give the agent a compact recovery command. Each hook uses the matching claim handle, so Codex sees `@codex`, Claude sees `@claude`, and Gemini sees `@gemini`.
+
+Use `--agent all` to install the default Codex, Claude, and Gemini hooks in one pass. `--target` is only for single-agent installs.
 
 Hook installation writes outside the repo, so `nexus doctor --fix` does not install hooks. Use `nexus doctor --hooks` to report missing, foreign, wrong-agent, or current hooks.
 
