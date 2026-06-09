@@ -6,7 +6,13 @@ import { join } from 'path';
 import { chdir, cwd } from 'process';
 import init from '../src/commands/init.js';
 import doctor from '../src/commands/doctor.js';
+import { AGENT_SCOPES } from '../src/lib/agentScopes.js';
 import { resetConfig } from '../src/lib/config.js';
+import {
+  CONTINUITY_TEMPLATE,
+  MEMORY_INDEX_TEMPLATE,
+  fullEntrypoint,
+} from '../src/lib/protocolText.js';
 
 function inTempRepo(fn) {
   const previous = cwd();
@@ -43,12 +49,16 @@ test('init creates managed agent guides that doctor accepts', () => {
     const output = captureLogs(() => doctor([]));
     const codexGuide = readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8');
     const codexContinuity = readFileSync(join(root, '.codex', 'CONTINUITY.md'), 'utf-8');
+    const codexMemoryIndex = readFileSync(join(root, '.codex', 'memories', 'INDEX.md'), 'utf-8');
     const agyGuide = readFileSync(join(root, '.agy', 'AGENTS.md'), 'utf-8');
     const constitution = readFileSync(join(root, '_NEXUS_CONSTITUTION.md'), 'utf-8');
     const queue = readFileSync(join(root, '_NEXUS_QUEUE.md'), 'utf-8');
     const gitignore = readFileSync(join(root, '.gitignore'), 'utf-8');
 
     assert.match(output, /All checked Nexus categories are ready/);
+    assert.equal(codexGuide, fullEntrypoint(AGENT_SCOPES['@codex']));
+    assert.equal(codexContinuity, CONTINUITY_TEMPLATE);
+    assert.equal(codexMemoryIndex, MEMORY_INDEX_TEMPLATE);
     assert.match(readFileSync(join(root, 'DECISIONS.md'), 'utf-8'), /Local agent work decisions live here/);
     assert.match(gitignore, /DECISIONS\.md/);
     assert.match(gitignore, /docs-priv\//);
