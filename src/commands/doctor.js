@@ -92,7 +92,7 @@ This project uses Nexus for multi-agent coordination.
 3. Read \`_NEXUS_STANDUP.md\` for comms, decisions, and completion notes.
 4. Read \`USER.md\` if present for local human preferences.
 5. Read \`${agent.continuity}\` for current session state.
-6. Read \`${agent.memoryIndex}\` and the latest memory entry when resync is needed.
+6. Read \`${agent.memoryIndex}\` and the latest memory entry at session start, \`nexus start\`, or resume.
 
 ### Nexus Rules
 
@@ -169,7 +169,7 @@ They are exempt from Nexus claim/release unless the user says otherwise.
 
 ### Memory Flow
 
-- On session start, read \`${agent.memoryIndex}\`, then read the newest linked entry when resync is needed.
+- On session start, \`nexus start\`, or resume, read \`${agent.memoryIndex}\`, then read the newest linked entry.
 - Memory entries are session handoffs, not permanent system truth.
 - Durable architecture and protocol decisions belong in \`DECISIONS.md\`; mention them in \`_NEXUS_STANDUP.md\` only when active agents need to coordinate around them.
 - Write memory once per session, only when the user asks, or on session end, pause, or checkpoint request.
@@ -1078,7 +1078,7 @@ function repairReadmeProtocolDoc(content) {
         '1. Run `nexus start` when entering an existing repo; it does not replace claim/release.',
         '2. Read `_NEXUS_CONSTITUTION.md`.',
         '3. Read `USER.md` when present.',
-        '4. Read continuity and latest memory when present.',
+        '4. Read continuity and latest memory at session start, `nexus start`, or resume.',
         '5. Read `_NEXUS_QUEUE.md` before taking follow-on work.',
         '6. Claim before touching shared project files.',
         '7. Release each claimed tracked file as soon as it reaches a coherent checkpoint.',
@@ -1152,10 +1152,22 @@ function repairNexusSkillDoc(content) {
       '- `Auto-flow: yes` means an agent can grab it after `nexus next`; use `no` when planning or human approval is needed.\n- Auto-flow work in `Ready Queue` should include `Review: approved` and `Approved by: human`, or `doctor` will flag it and `nexus next` may skip it.\n- `Notes` should carry dashboard-useful context, not a whole design doc.',
     );
 
+  if (!next.includes('Continuity is the compaction-safe session ledger; latest memory is required startup/resume context.')) {
+    next = next.replace(
+      '- Agent-local continuity and memory files are claim-exempt unless the user says otherwise.',
+      '- Agent-local continuity and memory files are claim-exempt unless the user says otherwise.\n- Continuity is the compaction-safe session ledger; latest memory is required startup/resume context.\n- Memory indexes use monthly folders and newest-first Markdown links with one-line outcomes.',
+    );
+  }
+
   const mandatoryNote = 'If the user, repo, or hook says Nexus is active, treat this skill as mandatory workflow. It is not optional advice.';
   if (!next.includes(mandatoryNote)) {
     next = next.replace('## Loop', `${mandatoryNote}\n\n## Loop`);
   }
+
+  next = next.replace(
+    '4. Read continuity and latest memory when present.',
+    '4. Read continuity and latest memory at session start, `nexus start`, or resume.',
+  );
 
   return next;
 }
