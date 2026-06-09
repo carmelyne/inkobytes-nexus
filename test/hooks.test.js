@@ -34,6 +34,36 @@ test('hooks install writes Codex hook to explicit target', () => {
   assert.match(content, /nexus claim \{first_rel\} \{NEXUS_AGENT\}/);
 });
 
+test('hooks install --agent all writes every supported hook to default targets', () => {
+  const root = mkdtempSync(join(tmpdir(), 'nexus-hooks-home-'));
+  const previousHome = process.env.HOME;
+  process.env.HOME = root;
+
+  try {
+    const output = captureLogs(() => hooks(['install', '--agent', 'all']));
+
+    assert.match(output, /Installed Nexus Codex hook/);
+    assert.match(output, /Installed Nexus Claude hook/);
+    assert.match(output, /Installed Nexus Gemini hook/);
+    assert.match(readFileSync(join(root, '.codex', 'hooks', 'pre_tool_use_guard.py'), 'utf-8'), /NEXUS_AGENT = '@codex'/);
+    assert.match(readFileSync(join(root, '.claude', 'hooks', 'nexus_pre_tool_use_guard.py'), 'utf-8'), /NEXUS_AGENT = '@claude'/);
+    assert.match(readFileSync(join(root, '.gemini', 'hooks', 'nexus_pre_tool_use_guard.py'), 'utf-8'), /NEXUS_AGENT = '@gemini'/);
+  } finally {
+    if (previousHome === undefined) {
+      delete process.env.HOME;
+    } else {
+      process.env.HOME = previousHome;
+    }
+  }
+});
+
+test('hooks install --agent all rejects a single explicit target', () => {
+  assert.throws(
+    () => hooks(['install', '--agent', 'all', '--target', '/tmp/nexus-hook.py']),
+    /--agent all/,
+  );
+});
+
 test('hooks install keeps existing current hook unless forced', () => {
   const root = mkdtempSync(join(tmpdir(), 'nexus-hooks-'));
   const target = join(root, 'pre_tool_use_guard.py');
@@ -100,4 +130,3 @@ test('doctor reports hooks only when explicitly requested', () => {
   const hooksReport = JSON.parse(withHooks);
   assert.ok(hooksReport.sections.Hooks.length >= 3);
 });
-
