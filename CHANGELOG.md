@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.8 - 2026-06-10
+
+- Added a shared protocol wording source so `nexus init`, `nexus doctor`, README repair, and tests stay aligned.
+- Tightened generated agent protocol around required continuity/latest-memory reads and claim-before-read/edit behavior.
+- Added `nexus hooks install --agent all` for installing Codex, Claude, and Gemini guard hooks in one pass.
+
 ## 1.0.7 - 2026-06-06
 
 - Added `nexus install-skill` to install the bundled Nexus skill into `~/.agents/skills/nexus`.
