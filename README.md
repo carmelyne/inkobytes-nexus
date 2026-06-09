@@ -487,6 +487,8 @@ Nexus ships an agent skill at `skills/nexus/SKILL.md`.
 
 The CLI is the coordination engine. The skill is the lean playbook for this flow: `start -> claim -> work -> release -> next`.
 
+Generated agent protocol text lives in `src/lib/protocolText.js`. Update that module first when changing shared protocol wording, then run doctor/init tests so scaffolded guides, README repair, and the bundled skill stay aligned.
+
 ## Legacy Helper Transition
 
 Older Nexus experiments used shell helpers:
