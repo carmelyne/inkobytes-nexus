@@ -50,6 +50,9 @@ test('doctor --fix creates agent scaffolds and protocol blocks', () => {
     assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /NEXUS-AGENT-PROTOCOL:START/);
     assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /less than 14 days/);
     assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /### Current File State/);
+    assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /active requirements, not optional guidance/);
+    assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /Do not bypass the hook/);
+    assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /Claim before reading implementation files/);
     assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /### Git Write Safety/);
     assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /Never infer from similar folder names or cached context/);
     assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /untrack them; do not delete local folders/);
@@ -241,6 +244,8 @@ test('doctor --fix repairs Nexus README and skill protocol drift in the Nexus pr
     assert.match(readme, /agent-native and file-native, not human-native/);
     assert.match(readme, /start -> claim -> work -> release -> next/);
     assert.match(skill, /Read `_NEXUS_CONSTITUTION\.md`\./);
+    assert.match(skill, /not optional advice/);
+    assert.match(skill, /Do not work around the hook/);
     assert.match(skill, /Release each claimed tracked file through Nexus as soon as it reaches a coherent checkpoint/);
     assert.match(skill, /Review: approved/);
     assert.match(skill, /Approved by: human/);
@@ -328,6 +333,9 @@ Keep this note.
     assert.equal(next.match(/This project uses Nexus for multi-agent coordination\./g).length, 1);
     assert.equal(next.match(/NEXUS-AGENT-PROTOCOL:START/g).length, 1);
     assert.match(next, /atomic lock-and-read boundary/);
+    assert.match(next, /active requirements, not optional guidance/);
+    assert.match(next, /Do not bypass the hook/);
+    assert.match(next, /Claim before reading implementation files/);
     assert.match(next, /read a shared file before claiming it, treat that read as stale after claim succeeds/);
     assert.match(next, /claim appears stale/);
     assert.match(next, /### Drills/);
