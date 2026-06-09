@@ -15,6 +15,7 @@ test('help output lists completion command', () => {
   const result = run(['help'], { FORCE_COLOR: '0', NO_COLOR: '1' });
   assert.equal(result.status, 0);
   assert.match(result.stdout, /completion zsh/);
+  assert.match(result.stdout, /install-skill \[--target <path>\] \[--force\]/);
   assert.match(result.stdout, /source <\(nexus completion zsh\)/);
 });
 
@@ -29,5 +30,6 @@ test('completion zsh prints compdef script', () => {
   assert.equal(result.status, 0);
   assert.match(result.stdout, /^#compdef nexus/m);
   assert.match(result.stdout, /completion:Print a shell completion script/);
+  assert.match(result.stdout, /install-skill:Install bundled Nexus skill/);
   assert.match(result.stdout, /@codex/);
 });
