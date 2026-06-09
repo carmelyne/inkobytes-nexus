@@ -67,6 +67,7 @@ When adding work to `_NEXUS_QUEUE.md`, keep tasks dashboard-parseable and immedi
 - Agent-local continuity and memory files are claim-exempt unless the user says otherwise.
 - Continuity is the compaction-safe session ledger; latest memory is required startup/resume context.
 - Memory indexes use monthly folders and newest-first Markdown links with one-line outcomes.
+- Shared generated protocol wording is sourced from `src/lib/protocolText.js`; update that first, then run doctor/init tests.
 - When using subagents or parallel workers, the lead agent owns the repo effects: claim the full path scope, pass boundaries down, re-read affected files, and mention delegated work in release or standup notes.
 - Avoid parallel `nexus release`.
 - Do not install packages younger than 14 days; if age is unknown, ask.
