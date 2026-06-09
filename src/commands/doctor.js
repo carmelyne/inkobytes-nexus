@@ -92,7 +92,9 @@ This project uses Nexus for multi-agent coordination.
 
 ### Nexus Rules
 
+- On compaction, resume, or a fresh Codex turn, treat this file and the Nexus protocol as active requirements, not optional guidance.
 - Claim before editing shared project files: \`nexus claim <path> @Agent "intent"\`.
+- If a hook blocks reading, editing, committing, or releasing because a path is unclaimed, stop and claim the exact path. Do not bypass the hook with another tool, shell trick, cached content, or manual git command.
 - Nexus is agent-native and file-native, not human-native: optimize for concurrency and rollback, not feature-commit aesthetics.
 - Release each claimed file as soon as it reaches a coherent checkpoint.
 - Never hold claims just to bundle a prettier feature commit; that blocks other agents.
@@ -105,6 +107,8 @@ This project uses Nexus for multi-agent coordination.
 ### Current File State
 
 - Treat previous chat context, cached model memory, and earlier reads as stale when file contents matter.
+- Unclaimed orientation reads are limited to Nexus protocol, queue, standup, human preference, continuity, and memory files named in Start Here.
+- Claim before reading implementation files, tests, docs, generated artifacts, or agent instruction files outside that orientation set.
 - Before claiming what a file says, making edits, or judging current state, read the file from disk with a fresh command.
 - Treat \`nexus claim\` as the atomic lock-and-read boundary and its output as fresh file state for the claimed path.
 - If you read a shared file before claiming it, treat that read as stale after claim succeeds.
@@ -1057,7 +1061,7 @@ function repairReadmeProtocolDoc(content) {
 }
 
 function repairNexusSkillDoc(content) {
-  return content
+  let next = content
     .replace(
       [
         '1. Run `nexus start`; set `NEXUS_AGENT` for your CLI, or pass `--agent @agy|@claude|@codex|@gemini`. Start is orientation only, not permission to edit.',
@@ -1085,13 +1089,14 @@ function repairNexusSkillDoc(content) {
       ].join('\n'),
       [
         '8. Treat claim output as current file state. Ignore cached file memory when contents matter.',
-        '9. Work only inside the claimed surface and run focused validation.',
-        '10. Release each claimed tracked file through Nexus as soon as it reaches a coherent checkpoint:',
+        '9. If a hook blocks access because a path is unclaimed, stop and claim that exact path. Do not work around the hook with another command, cached content, or manual git operation.',
+        '10. Work only inside the claimed surface and run focused validation.',
+        '11. Release each claimed tracked file through Nexus as soon as it reaches a coherent checkpoint:',
       ].join('\n'),
     )
     .replace(
       '```\\n\\n## Queue Items',
-      '```\\n\\n11. Do not hold claims to bundle related work into a prettier feature commit. Nexus is agent-native and file-native: optimize for file availability, rollback safety, and agent throughput.\\n\\n## Queue Items',
+      '```\\n\\n12. Do not hold claims to bundle related work into a prettier feature commit. Nexus is agent-native and file-native: optimize for file availability, rollback safety, and agent throughput.\\n\\n## Queue Items',
     )
     .replace(
       [
@@ -1111,6 +1116,13 @@ function repairNexusSkillDoc(content) {
       '- `Auto-flow: yes` means an agent can grab it after `nexus next`; use `no` when planning or human approval is needed.\n- `Notes` should carry dashboard-useful context, not a whole design doc.',
       '- `Auto-flow: yes` means an agent can grab it after `nexus next`; use `no` when planning or human approval is needed.\n- Auto-flow work in `Ready Queue` should include `Review: approved` and `Approved by: human`, or `doctor` will flag it and `nexus next` may skip it.\n- `Notes` should carry dashboard-useful context, not a whole design doc.',
     );
+
+  const mandatoryNote = 'If the user, repo, or hook says Nexus is active, treat this skill as mandatory workflow. It is not optional advice.';
+  if (!next.includes(mandatoryNote)) {
+    next = next.replace('## Loop', `${mandatoryNote}\n\n## Loop`);
+  }
+
+  return next;
 }
 
 const SUSPICIOUS_SCRIPT_PATTERNS = [
