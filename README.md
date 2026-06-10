@@ -124,6 +124,8 @@ Hooks are the enforcement layer. Without hooks, Nexus is a coordination protocol
 - `_NEXUS_CONSTITUTION.md` - agent operating protocol
 - `.nexus/locks/` - local lock state, ignored by Git
 
+Track the `_NEXUS_*` coordination files in Git. The queue is the program your agents execute — tracking it gives state flips commit history, diffs, and rollback, and makes `nexus doctor --fix` protocol updates auditable. `nexus release` also needs tracked files to produce commit receipts; gitignored paths fail release and force receipt-less lock drops. If your repo is public and standup/report chatter should stay private, those two are the reasonable exceptions. The live `_NEXUS.md` blackboard will show as dirty between releases — that is lock state doing its job.
+
 It also scaffolds agent-local startup and handoff files when missing:
 
 - `.codex/AGENTS.md`
