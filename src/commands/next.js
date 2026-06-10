@@ -7,8 +7,11 @@ import { readFileSync, existsSync } from 'fs';
 import { getConfig } from '../lib/config.js';
 import { readBoard } from '../lib/blackboard.js';
 import { spawnSync } from 'child_process';
+import { refuseIfHalted } from './halt.js';
 
 export default function next(args) {
+  refuseIfHalted('next');
+
   const agent = args[0];
 
   if (!agent) {
