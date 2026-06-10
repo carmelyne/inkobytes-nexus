@@ -24,6 +24,7 @@ import {
   protocolBlock,
 } from '../lib/protocolText.js';
 import { HOOK_AGENT_CONFIGS, hookStatus } from './hooks.js';
+import { contractViolations, parseContractTasks } from '../lib/taskContract.js';
 
 const LOCAL_DECISIONS_TEMPLATE = `# Decisions
 
@@ -525,29 +526,39 @@ export default function doctor(args) {
     }
   }
 
-  // Queue authorship gate — warn on auto-flow tasks in Ready Queue missing Review: approved
+  // Queue authorship gate — list auto-flow tasks in Ready Queue failing the
+  // task contract (Review approved, Approved by human, Notes, Files, Cost).
+  // Reported at every autonomy level; nexus next enforces it at autonomy 1+.
   const queuePath = join(root, '_NEXUS_QUEUE.md');
   if (existsSync(queuePath)) {
     const queueContent = readFileSync(queuePath, 'utf-8');
     const readySection = extractReadyQueueSection(queueContent);
-    const unapproved = findUnapprovedAutoFlow(readySection);
-    if (unapproved.length) {
-      for (const id of unapproved) {
+    const failing = parseContractTasks(readySection)
+      .filter((t) => !t.done && t.status !== 'Done' && t.autoFlow === 'yes')
+      .map((t) => ({ task: t, violations: contractViolations(t) }))
+      .filter(({ violations }) => violations.length);
+
+    if (failing.length) {
+      for (const { task, violations } of failing) {
+        const id = task.id || task.title;
+        const needsApproval = violations.some((v) => v.field === 'Review' || v.field === 'Approved by');
         sections['Queue Authorship'].push({
-          issue: `Task "${id}" is missing Review: approved`,
-          fix: 'add `Review: approved` and `Approved by: human`, or move it to `## Proposed Queue`',
+          issue: `Task "${id}" fails the auto-flow task contract (${violations.map((v) => v.field).join(', ')})`,
+          fix: needsApproval
+            ? 'add `Review: approved` and `Approved by: human`, or move it to `## Proposed Queue`'
+            : 'fill in the missing fields in `_NEXUS_QUEUE.md`, or move it to `## Proposed Queue`',
           displayGroup: id,
           queueInfo: {
             taskId: id,
             state: 'auto-flow: yes in Ready Queue',
-            needs: 'Review: approved',
+            needs: violations.map((v) => v.needs).join(', '),
             impact: 'nexus next will skip it',
           },
         });
       }
     } else {
       sections['Queue Authorship'].push({
-        issue: 'All auto-flow tasks in Ready Queue have Review: approved',
+        issue: 'All auto-flow tasks in Ready Queue satisfy the task contract',
         fix: 'No action needed.',
         ok: true,
       });
@@ -823,43 +834,6 @@ function extractReadyQueueSection(content) {
     if (inSection) result.push(line);
   }
   return result.join('\n');
-}
-
-function findUnapprovedAutoFlow(sectionContent) {
-  const unapproved = [];
-  const lines = sectionContent.split('\n');
-  let currentId = '';
-  let isAutoFlow = false;
-  let hasReview = false;
-
-  for (const line of lines) {
-    const taskMatch = line.match(/^- \[[ ]\] TASK\/.+?:\s*(.+)/);
-    if (taskMatch) {
-      if (currentId && isAutoFlow && !hasReview) unapproved.push(currentId);
-      currentId = '';
-      isAutoFlow = false;
-      hasReview = false;
-      continue;
-    }
-    if (line.match(/^- \[x\]/)) {
-      if (currentId && isAutoFlow && !hasReview) unapproved.push(currentId);
-      currentId = '';
-      isAutoFlow = false;
-      hasReview = false;
-      continue;
-    }
-    if (!line.trim().startsWith('- ')) continue;
-    const kv = line.trim().replace(/^-\s*/, '');
-    const colonIdx = kv.indexOf(':');
-    if (colonIdx === -1) continue;
-    const key = kv.slice(0, colonIdx).trim().toLowerCase();
-    const val = kv.slice(colonIdx + 1).trim().toLowerCase();
-    if (key === 'id') currentId = val;
-    if (key === 'auto-flow' && val === 'yes') isAutoFlow = true;
-    if (key === 'review' && val === 'approved') hasReview = true;
-  }
-  if (currentId && isAutoFlow && !hasReview) unapproved.push(currentId);
-  return unapproved;
 }
 
 function replaceLegacyHelperCommands(content) {
