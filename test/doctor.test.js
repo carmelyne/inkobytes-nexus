@@ -761,3 +761,38 @@ test('doctor renders queue authorship warnings as compact task fields', () => {
     assert.doesNotMatch(output, /is auto-flow: yes in Ready Queue but missing Review: approved/);
   });
 });
+
+test('doctor warns when autonomy is 1+ without a release verify command', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
+    mkdirSync(join(root, '.nexus'), { recursive: true });
+    writeFileSync(join(root, '.nexus', 'config.json'), JSON.stringify({ autonomy: 1 }), 'utf-8');
+    resetConfig();
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /Loop Readiness/);
+    assert.match(output, /autonomy is 1 but release\.verifyCommand is not configured/);
+    assert.match(output, /Set release\.verifyCommand in \.nexus\/config\.json/);
+  });
+});
+
+test('doctor reports loop readiness ok when autonomy 1+ has a verify command', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
+    mkdirSync(join(root, '.nexus'), { recursive: true });
+    writeFileSync(join(root, '.nexus', 'config.json'), JSON.stringify({
+      autonomy: 1,
+      release: { verifyCommand: 'npm test' },
+    }), 'utf-8');
+    resetConfig();
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /autonomy 1 with release verify gate configured \(npm test\)/);
+  });
+});
