@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, writeFileSync } from 'fs';
+import { mkdtempSync, mkdirSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { chdir, cwd } from 'process';
@@ -72,6 +72,88 @@ test('next prints manually pinned related drills from queue', () => {
     assert.match(output, /- data-mutation-delete-rows/);
     assert.match(output, /- task-contract/);
     assert.match(output, /nexus drill show <id>/);
+  });
+});
+
+function writeAutonomy(root, level) {
+  mkdirSync(join(root, '.nexus'), { recursive: true });
+  writeFileSync(join(root, '.nexus', 'config.json'), JSON.stringify({ autonomy: level }), 'utf-8');
+  resetConfig();
+}
+
+const CONTRACT_QUEUE = `# Nexus Queue
+
+## Ready Queue
+
+- [ ] TASK/Codex: Fully specified task
+  - Id: good-task
+  - Epic: Loop readiness
+  - Status: Ready
+  - Depends on: none
+  - Files: src/good.js
+  - Affinity: cli
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Complete contract, safe to flow.
+
+- [ ] TASK/Codex: Under-specified task
+  - Id: vague-task
+  - Epic: Loop readiness
+  - Status: Ready
+  - Depends on: none
+  - Files: src/vague.js
+  - Affinity: cli
+  - Auto-flow: yes
+  - Review: approved
+`;
+
+test('next at autonomy 1 skips contract-failing auto-flow tasks and prints the missing fields', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), CONTRACT_QUEUE, 'utf-8');
+    writeAutonomy(root, 1);
+
+    const output = captureLogs(() => next(['@codex']));
+
+    assert.match(output, /Task: good-task/);
+    assert.match(output, /Task contract \(autonomy 1\): skipped 1 auto-flow task/);
+    assert.match(output, /vague-task: needs Approved by: human, non-empty Notes, non-empty Cost/);
+    assert.match(output, /Repair the fields in _NEXUS_QUEUE\.md or move the task to ## Proposed Queue\./);
+  });
+});
+
+test('next at autonomy 0 keeps legacy behavior — review-approved tasks flow without the full contract', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), CONTRACT_QUEUE, 'utf-8');
+    writeAutonomy(root, 0);
+
+    const output = captureLogs(() => next(['@codex']));
+
+    assert.doesNotMatch(output, /Task contract/);
+    assert.match(output, /Task: (good-task|vague-task)/);
+  });
+});
+
+test('next at autonomy 1 stands by with contract report when every auto-flow task fails', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), `# Nexus Queue
+
+## Ready Queue
+
+- [ ] TASK/Codex: Under-specified task
+  - Id: vague-task
+  - Status: Ready
+  - Depends on: none
+  - Files: src/vague.js
+  - Auto-flow: yes
+`, 'utf-8');
+    writeAutonomy(root, 1);
+
+    const output = captureLogs(() => next(['@codex']));
+
+    assert.match(output, /vague-task: needs Review: approved, Approved by: human, non-empty Notes, non-empty Cost/);
+    assert.match(output, /No safe auto-flow tasks available for @codex\. Standby\./);
   });
 });
 
