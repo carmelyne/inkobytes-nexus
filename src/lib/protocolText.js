@@ -79,8 +79,8 @@ This project uses Nexus for multi-agent coordination.
 
 - On compaction, resume, or a fresh turn, treat this file and the Nexus protocol as active requirements, not optional guidance.
 - Claim before touching shared project files: \`nexus claim <path> @Agent "intent"\`.
-- If a hook blocks reading, editing, committing, or releasing because a path is unclaimed, stop and claim the exact path. Do not bypass the hook with another tool, shell trick, cached content, or manual git command.
-- Claim first, then read/edit. No exceptions, no "I'll claim after."
+- If a hook blocks reading, editing, committing, or releasing because a shared path is unclaimed, stop and claim the exact path. Do not bypass the hook with another tool, shell trick, cached content, or manual git command.
+- Claim shared project files before editing. Claim before reading only when the file is outside the startup/orientation set or a hook explicitly requires it.
 - Nexus is agent-native and file-native, not human-native: optimize for concurrency and rollback, not feature-commit aesthetics.
 - Release each claimed file as soon as it reaches a coherent checkpoint.
 - Never hold claims just to bundle a prettier feature commit; that blocks other agents.
@@ -94,7 +94,7 @@ This project uses Nexus for multi-agent coordination.
 
 - Treat previous chat context, cached model memory, and earlier reads as stale when file contents matter.
 - Unclaimed orientation reads are limited to Nexus protocol, queue, standup, human preference, continuity, and memory files named in Start Here.
-- Claim before reading implementation files, tests, docs, generated artifacts, or agent instruction files outside that orientation set.
+- Claim before reading implementation files, tests, docs, generated artifacts, or shared agent instruction files outside that orientation set.
 - Before claiming what a file says, making edits, or judging current state, read the file from disk with a fresh command.
 - Treat \`nexus claim\` as the atomic lock-and-read boundary and its output as fresh file state for the claimed path.
 - If you read a shared file before claiming it, treat that read as stale after claim succeeds.
@@ -137,8 +137,8 @@ If the situation resembles a drill, use that drill before acting.
 
 ### Agent-Local Files
 
-\`${agent.continuity}\` and \`${agent.memoryIndex}\` are agent-local handoff files.
-They are exempt from Nexus claim/release unless the user says otherwise.
+\`${agent.continuity}\`, \`${agent.memoryIndex}\`, and files under \`${agent.memoryDir}/\` are agent-local handoff files.
+They are exempt from Nexus claim/release unless the user says otherwise, and read-only access to them should not take a lock.
 
 ### Continuity Flow
 
