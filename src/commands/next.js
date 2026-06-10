@@ -6,6 +6,7 @@
 import { readFileSync, existsSync } from 'fs';
 import { getConfig } from '../lib/config.js';
 import { readBoard } from '../lib/blackboard.js';
+import { contractViolations } from '../lib/taskContract.js';
 import { spawnSync } from 'child_process';
 import { refuseIfHalted } from './halt.js';
 
@@ -47,15 +48,34 @@ export default function next(args) {
   // Load budget if available
   const budget = loadBudget(config.budgetFile, agent);
 
-  // Score and filter tasks — only Ready Queue, only human-approved auto-flow
+  // Score and filter tasks — only Ready Queue, only human-approved auto-flow.
+  // At autonomy 1+ the queue is the program: the full task contract applies,
+  // and skipped tasks are reported so the human can repair them.
+  const contractSkipped = [];
   const candidates = tasks
     .filter(t => t.status === 'Ready')
     .filter(t => t.autoFlow === 'yes')
-    .filter(t => t.review === 'approved')
+    .filter(t => {
+      if (config.autonomy < 1) return t.review === 'approved';
+      const violations = contractViolations(t);
+      if (violations.length) {
+        contractSkipped.push({ id: t.id || t.title, violations });
+        return false;
+      }
+      return true;
+    })
     .filter(t => !hasFileConflict(t.files, claimedFiles))
     .filter(t => dependenciesMet(t.dependsOn, tasks, config.root))
     .filter(t => t.cost !== 'spiky')
     .filter(t => fitsbudget(t.cost, budget));
+
+  if (contractSkipped.length) {
+    console.log(`⚠️  Task contract (autonomy ${config.autonomy}): skipped ${contractSkipped.length} auto-flow task(s) with missing fields:`);
+    for (const { id, violations } of contractSkipped) {
+      console.log(`   - ${id}: needs ${violations.map(v => v.needs).join(', ')}`);
+    }
+    console.log('   Repair the fields in _NEXUS_QUEUE.md or move the task to ## Proposed Queue.');
+  }
 
   if (candidates.length === 0) {
     console.log(`📋 No safe auto-flow tasks available for ${agent}. Standby.`);
@@ -73,7 +93,7 @@ export default function next(args) {
   console.log(`   Task: ${pick.id}`);
   console.log(`   Epic: ${pick.epic}`);
   console.log(`   Files: ${pick.files.join(', ')}`);
-  console.log(`   Cost: ${pick.cost}`);
+  console.log(`   Cost: ${pick.cost || 'unspecified (treated as medium)'}`);
   console.log(`   Auto-flow: ${pick.autoFlow}`);
   printRelatedDrills(pick);
   console.log('');
@@ -207,7 +227,7 @@ function parseReadyTasks(content) {
         files: [],
         affinity: [],
         drills: [],
-        cost: 'medium',
+        cost: '', // empty means the task never declared Cost — the contract can see that
         autoFlow: 'no',
         review: '',
         approvedBy: '',
