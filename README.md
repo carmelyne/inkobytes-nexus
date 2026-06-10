@@ -238,16 +238,19 @@ nexus start
 
 Start reports only local facts: repo path, branch, last commits, dirty files, active locks, and the continuity/memory path for the selected model scope. Start is orientation only, not clearance to edit; agents still claim before shared reads/edits and release when done. Set `NEXUS_AGENT=@claude`, `@codex`, `@gemini`, or `@agy` so agents can run plain `nexus start`; `--agent` is available as an override.
 
-### `nexus dashboard --serve [--port <port>]`
+### `nexus dashboard --serve [--port <port>] [--lan]`
 
 Serve a read-only local Nexus dashboard to see progress and issues.
 
 ```bash
 nexus dashboard --serve
 nexus dashboard --serve --port 13787
+nexus dashboard --serve --lan
 ```
 
-The dashboard prints both `127.0.0.1` and local-network URLs when available, then shows repo health, active locks, queue items, recent standup lines, recent release notes, and dirty git files. It uses local files as the source of truth and updates the page through server-sent events. The default port is `13787`; if that port is already in use, Nexus tries `13788`, `13789`, and so on. Passing `--port` uses that exact port.
+The dashboard shows repo health, active locks, queue items, recent standup lines, recent release notes, and dirty git files. It uses local files as the source of truth and updates the page through server-sent events. The default port is `13787`; if that port is already in use, Nexus tries `13788`, `13789`, and so on. Passing `--port` uses that exact port.
+
+By default the dashboard binds `127.0.0.1`, so it is reachable only from your machine. The dashboard has no authentication and exposes repo coordination state (paths, branch, dirty files, lock intents, standup history), so network exposure is opt-in: pass `--lan` to bind all interfaces and print local-network URLs for other devices. Only use `--lan` on networks you trust.
 
 ### `nexus completion zsh`
 
