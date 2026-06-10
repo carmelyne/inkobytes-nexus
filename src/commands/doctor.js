@@ -203,6 +203,7 @@ export default function doctor(args) {
     Hooks: [],
     promptCHMOD: [],
     'Queue Authorship': [],
+    'Loop Readiness': [],
   };
   const changes = [];
   const config = getConfig(root);
@@ -547,6 +548,21 @@ export default function doctor(args) {
       sections['Queue Authorship'].push({
         issue: 'All auto-flow tasks in Ready Queue have Review: approved',
         fix: 'No action needed.',
+        ok: true,
+      });
+    }
+  }
+
+  // Loop readiness — autonomy above supervised requires a release verify gate
+  if (config.autonomy >= 1) {
+    if (!config.release.verifyCommand) {
+      sections['Loop Readiness'].push({
+        issue: `autonomy is ${config.autonomy} but release.verifyCommand is not configured — agents can compound on unverified commits`,
+        fix: 'Set release.verifyCommand in .nexus/config.json (e.g. "npm test") or lower autonomy to 0.',
+      });
+    } else {
+      sections['Loop Readiness'].push({
+        issue: `autonomy ${config.autonomy} with release verify gate configured (${config.release.verifyCommand})`,
         ok: true,
       });
     }
