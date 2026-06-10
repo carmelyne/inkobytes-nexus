@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'child_process';
+import { readFileSync } from 'fs';
 import { cwd } from 'process';
 
 function run(args, env = {}) {
@@ -23,6 +24,13 @@ test('help output colorizes when forced', () => {
   const result = run(['help'], { FORCE_COLOR: '1' });
   assert.equal(result.status, 0);
   assert.match(result.stdout, /\u001b\[36m/);
+});
+
+test('--version reports the package.json version', () => {
+  const pkg = JSON.parse(readFileSync('package.json', 'utf-8'));
+  const result = run(['--version'], { FORCE_COLOR: '0', NO_COLOR: '1' });
+  assert.equal(result.status, 0);
+  assert.equal(result.stdout.trim(), `@inkobytes/nexus v${pkg.version}`);
 });
 
 test('completion zsh prints compdef script', () => {
