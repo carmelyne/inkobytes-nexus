@@ -3,7 +3,8 @@
  */
 
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'fs';
-import { join } from 'path';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 import { cwd } from 'process';
 import { spawnSync } from 'child_process';
 import { listLocks } from '../lib/lockManager.js';
@@ -564,6 +565,28 @@ export default function doctor(args) {
       sections['Loop Readiness'].push({
         issue: `autonomy ${config.autonomy} with release verify gate configured (${config.release.verifyCommand})`,
         ok: true,
+      });
+    }
+  }
+
+  // Level 2 — bounded unattended additionally requires volume bounds and a recovery path
+  if (config.autonomy >= 2) {
+    if (!existsSync(config.budgetFile)) {
+      sections['Loop Readiness'].push({
+        issue: `autonomy is ${config.autonomy} but no agent budget file exists (.nexus/agent-budgets.json) — unattended work has no volume bounds`,
+        fix: 'Create .nexus/agent-budgets.json with per-agent budgets, or lower autonomy to 1.',
+      });
+    } else {
+      sections['Loop Readiness'].push({
+        issue: `autonomy ${config.autonomy} with agent budget file present (.nexus/agent-budgets.json)`,
+        ok: true,
+      });
+    }
+
+    if (!existsSync(join(dirname(fileURLToPath(import.meta.url)), 'recover.js'))) {
+      sections['Loop Readiness'].push({
+        issue: `autonomy is ${config.autonomy} but this Nexus build has no \`nexus recover\` command — rollback after unattended mistakes is manual git work`,
+        fix: 'Accept manual git recovery for now, or hold Level 2 until release-recovery ships.',
       });
     }
   }
