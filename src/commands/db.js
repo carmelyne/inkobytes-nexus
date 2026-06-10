@@ -8,7 +8,7 @@
  * nexus db schedule             Show cron setup instructions
  */
 
-import { existsSync, mkdirSync, copyFileSync, readdirSync, statSync, readFileSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, copyFileSync, readdirSync, statSync, readFileSync, writeFileSync, openSync, closeSync } from 'fs';
 import { join, dirname, relative } from 'path';
 import { cwd, env } from 'process';
 import { spawnSync } from 'child_process';
@@ -76,10 +76,19 @@ function backupPostgres(db, backupPath) {
 }
 
 function backupMysql(db, backupPath) {
+  // DATABASE_URL comes from .env and is attacker-influenced; pass it as a
+  // literal argument and redirect in Node — never through a shell string.
   const outFile = join(backupPath, 'dump.sql');
-  const result = spawnSync('sh', ['-c', `mysqldump "${db.url}" > "${outFile}"`], {
-    encoding: 'utf-8', stdio: 'pipe',
-  });
+  const out = openSync(outFile, 'w');
+  let result;
+  try {
+    result = spawnSync('mysqldump', [db.url], {
+      encoding: 'utf-8', stdio: ['ignore', out, 'pipe'],
+    });
+  } finally {
+    closeSync(out);
+  }
+  if (result.error) throw new Error(`mysqldump failed: ${result.error.message}`);
   if (result.status !== 0) throw new Error(`mysqldump failed: ${result.stderr}`);
   return 'dump.sql';
 }
@@ -243,7 +252,14 @@ function runRestore(root, stamp) {
     if (entry.type === 'mysql') {
       const url = env.DATABASE_URL || env.MYSQL_URL;
       if (!url) { console.log(`  ✗ mysql: DATABASE_URL not set`); continue; }
-      const result = spawnSync('sh', ['-c', `mysql "${url}" < "${backupFile}"`], { stdio: 'inherit' });
+      // Same injection surface as backupMysql: literal argument, fd redirection.
+      const input = openSync(backupFile, 'r');
+      let result;
+      try {
+        result = spawnSync('mysql', [url], { stdio: [input, 'inherit', 'inherit'] });
+      } finally {
+        closeSync(input);
+      }
       console.log(result.status === 0 ? `  ✓ mysql restored` : `  ✗ mysql restore failed`);
     }
   }
