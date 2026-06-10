@@ -4,6 +4,7 @@
  */
 
 import { appendFileSync } from 'fs';
+import { spawnSync } from 'child_process';
 import { removeEntry } from '../lib/blackboard.js';
 import { listLocks, readGitHead, releaseLock } from '../lib/lockManager.js';
 import { stageAndCommit } from '../lib/git.js';
@@ -15,10 +16,12 @@ import { refuseIfHalted } from './halt.js';
 export default function release(args) {
   refuseIfHalted('release');
 
-  let target = args[0];
+  const noVerify = args.includes('--no-verify');
+  const positional = args.filter((arg) => arg !== '--no-verify');
+  let target = positional[0];
 
   if (!target) {
-    console.error('Usage: nexus release <filepath_or_dir> "<commit message>"');
+    console.error('Usage: nexus release <filepath_or_dir> "<commit message>" [--no-verify]');
     process.exit(1);
   }
 
@@ -29,7 +32,7 @@ export default function release(args) {
     process.exit(1);
   }
 
-  const commitMsg = args[1] || `chore: agent updated ${target}`;
+  const commitMsg = positional[1] || `chore: agent updated ${target}`;
   const lock = listLocks().find((entry) => entry.target === target);
   const config = getConfig();
   const releaseHead = readGitHead(config.root);
@@ -39,6 +42,8 @@ export default function release(args) {
   if (hasHeadDrift) {
     console.warn(`[WARN] HEAD changed since claim for ${target}: claimed ${shortSha(claimHead)}, releasing from ${shortSha(releaseHead)}. Review interleaved commits if needed.`);
   }
+
+  runVerifyGate({ config, target, agent: lock?.agent || 'unknown', noVerify });
 
   // Stage and commit first
   const gitResult = stageAndCommit(target, commitMsg, lock?.agent || '');
@@ -91,6 +96,65 @@ export default function release(args) {
   } catch { /* ledger is reporting only; release should still complete */ }
 
   console.log('[LOCK RELEASED & COMMITTED]');
+}
+
+// Gate A: agents must not compound on unverified commits. The verify command
+// is human-configured in .nexus/config.json (release.verifyCommand), so
+// running it through a shell is config-as-code, not untrusted input.
+function runVerifyGate({ config, target, agent, noVerify }) {
+  const verifyCommand = config.release?.verifyCommand;
+  if (!verifyCommand) return;
+
+  if (noVerify) {
+    if (config.autonomy > 0) {
+      console.error(`[ERROR] --no-verify is only allowed at autonomy level 0 (current: ${config.autonomy}).`);
+      console.error('Fix the failure or ask the human to lower the autonomy level.');
+      appendStandupLine(config, `${standupTimestamp()} ${agent} [BLOCKED]: release ${target} attempted --no-verify at autonomy ${config.autonomy} — refused`);
+      process.exit(1);
+    }
+    console.warn(`[VERIFY SKIPPED] --no-verify used for ${target} — logged to standup.`);
+    appendStandupLine(config, `${standupTimestamp()} ${agent} [WARN]: release ${target} committed with --no-verify (verify command not run)`);
+    return;
+  }
+
+  console.log(`[VERIFY] Running: ${verifyCommand}`);
+  const result = spawnSync(verifyCommand, {
+    shell: true, cwd: config.root, encoding: 'utf-8', stdio: 'pipe',
+  });
+
+  if (result.status === 0) {
+    console.log('[VERIFY OK]');
+    return;
+  }
+
+  console.error(`[VERIFY FAILED] ${verifyCommand} exited with ${result.status ?? 'no status'}. Release refused; your claim on ${target} is kept.`);
+  console.error('Fix the failure and release again. Last output:');
+  console.error(tailLines(`${result.stdout || ''}\n${result.stderr || ''}`, 12));
+  appendStandupLine(config, `${standupTimestamp()} ${agent} [BLOCKED]: release ${target} refused — verify failed (${verifyCommand})`);
+  process.exit(1);
+}
+
+function appendStandupLine(config, line) {
+  try {
+    appendFileSync(config.standup, `${line}\n`, 'utf-8');
+  } catch { /* standup file might not exist yet; the refusal itself still stands */ }
+}
+
+function tailLines(text, count) {
+  const lines = text.split('\n').map((line) => line.trimEnd()).filter(Boolean);
+  return lines.slice(-count).map((line) => `  ${line}`).join('\n');
+}
+
+function standupTimestamp() {
+  const date = new Date();
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  const rawHour = date.getHours();
+  const hour = String(rawHour % 12 || 12).padStart(2, '0');
+  const minute = String(date.getMinutes()).padStart(2, '0');
+  const period = rawHour < 12 ? 'AM' : 'PM';
+  return `${yyyy}-${mm}-${dd} ${hour}:${minute} ${period}`;
 }
 
 function shortSha(sha) {
