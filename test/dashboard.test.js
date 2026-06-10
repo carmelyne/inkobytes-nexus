@@ -5,7 +5,7 @@ import { tmpdir } from 'os';
 import { join } from 'path';
 import { chdir, cwd } from 'process';
 import { spawnSync } from 'child_process';
-import { buildSnapshot, resolveDashboardPort } from '../src/commands/dashboard.js';
+import { buildSnapshot, resolveDashboardPort, resolveDashboardHost } from '../src/commands/dashboard.js';
 import { resetConfig } from '../src/lib/config.js';
 
 function inTempRepo(fn) {
@@ -119,4 +119,10 @@ test('dashboard snapshot summarizes Nexus repo state', () => {
 test('dashboard default port starts at the Nexus port', () => {
   assert.equal(resolveDashboardPort([]), 13787);
   assert.equal(resolveDashboardPort(['--port', '14000']), 14000);
+});
+
+test('dashboard binds localhost unless --lan opts into network exposure', () => {
+  assert.equal(resolveDashboardHost([]), '127.0.0.1');
+  assert.equal(resolveDashboardHost(['--serve', '--port', '14000']), '127.0.0.1');
+  assert.equal(resolveDashboardHost(['--serve', '--lan']), '0.0.0.0');
 });
