@@ -54,6 +54,7 @@ Local agent work decisions live here. This file is gitignored by Nexus.
   - Auto-flow: yes
   - Review: approved
   - Approved by: human
+  - Notes: Sample starter task — print a hello message from src/hello.js.
 
 - [ ] TASK/Agent-2: Create the utils.js helper
   - Id: hello-utils
@@ -66,6 +67,7 @@ Local agent work decisions live here. This file is gitignored by Nexus.
   - Auto-flow: yes
   - Review: approved
   - Approved by: human
+  - Notes: Sample starter task — add a small helper used by hello.js.
 
 ---
 
@@ -113,6 +115,7 @@ Adversarial result:
   - Auto-flow: yes
   - Review: approved
   - Approved by: human
+  - Notes: Sample starter task — print a hello message from src/hello.js.
 
 - [ ] TASK/Agent-2: Create the utils.js helper
   - Id: hello-utils
@@ -125,6 +128,7 @@ Adversarial result:
   - Auto-flow: yes
   - Review: approved
   - Approved by: human
+  - Notes: Sample starter task — add a small helper used by hello.js.
 `,
 
   '_NEXUS_CHMOD.md': DEFAULT_MATRIX,
