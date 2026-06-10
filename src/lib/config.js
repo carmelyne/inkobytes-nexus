@@ -32,6 +32,15 @@ export function getConfig(fromDir) {
     doctor: {
       allowTrackedAgentTrees: Boolean(localConfig.doctor?.allowTrackedAgentTrees),
     },
+    release: {
+      verifyCommand: typeof localConfig.release?.verifyCommand === 'string'
+        ? localConfig.release.verifyCommand.trim()
+        : '',
+    },
+    // 0 = supervised, 1 = checkpointed, 2 = bounded unattended. Human-set.
+    autonomy: Number.isInteger(localConfig.autonomy) && localConfig.autonomy >= 0 && localConfig.autonomy <= 2
+      ? localConfig.autonomy
+      : 0,
   };
 
   return _config;
