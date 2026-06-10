@@ -25,6 +25,8 @@ const COMMANDS = {
   'install-skill': () => import('../src/commands/install-skill.js'),
   chmod: () => import('../src/commands/chmod.js'),
   db: () => import('../src/commands/db.js'),
+  halt: () => import('../src/commands/halt.js'),
+  resume: () => import('../src/commands/resume.js'),
   help: () => import('../src/commands/help.js'),
 };
 
@@ -77,6 +79,8 @@ function printHelp() {
     ['ledger [--json|backfill]', 'Show or backfill completed task ledger'],
     ['chmod [--list] [--init]', 'Show or set promptCHMOD permissions'],
     ['db <backup|list|restore|schedule>', 'Database backup and recovery'],
+    ['halt "<reason>"', 'Stop the swarm: claim/release/next refuse'],
+    ['resume', 'Lift a halt (human-owned by convention)'],
     ['drill <list|show|run|report>', 'Inspect or run protocol drills'],
     ['hooks install --agent @handle|all', 'Install agent-specific local guard hooks'],
     ['soul [--file <path>] [--status | --remove]', 'Manage local soul overlay in agent files'],
@@ -102,6 +106,7 @@ function printHelp() {
     'nexus standup "2026-06-01 08:38 AM @codex [DONE]: Updated tests"',
     'nexus clean --stale',
     'nexus next @claude',
+    'nexus halt "queue drift detected, need human review"',
   ];
 
   const width = Math.max(...commands.map(([left]) => left.length)) + 2;
