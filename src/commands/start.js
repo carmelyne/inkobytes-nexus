@@ -9,6 +9,14 @@ import { spawnSync } from 'child_process';
 import { listLocks } from '../lib/lockManager.js';
 import { AGENT_SCOPE_ENTRIES, AGENT_SCOPES, normalizeAgentHandle } from '../lib/agentScopes.js';
 import { loadPermissions, getChmodPath } from '../lib/permissions.js';
+import { getConfig } from '../lib/config.js';
+
+// Human-set in .nexus/config.json; changing it is human-only by convention.
+const AUTONOMY_LABELS = {
+  0: 'supervised — human approves each significant step',
+  1: 'checkpointed — work the queue between human checkpoints, verify gate required',
+  2: 'bounded unattended — explicit budgets and recovery required',
+};
 
 function git(args) {
   const result = spawnSync('git', args, { cwd: cwd(), encoding: 'utf-8', stdio: 'pipe' });
@@ -68,6 +76,8 @@ export default function start(args = []) {
   console.log(`Repo: ${root}`);
   console.log(`Branch: ${branch}`);
   console.log(`Agent: ${scope ? `${scope.label} (${agent})` : 'unspecified'}`);
+  const autonomy = getConfig(root).autonomy;
+  console.log(`Autonomy: level ${autonomy} (${AUTONOMY_LABELS[autonomy]})`);
 
   console.log('\nLast commits:');
   if (commits.length) {
