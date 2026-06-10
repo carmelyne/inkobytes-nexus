@@ -1,5 +1,7 @@
 # @inkobytes/nexus
 
+[![CI](https://github.com/carmelyne/inkobytes-nexus/actions/workflows/ci.yml/badge.svg)](https://github.com/carmelyne/inkobytes-nexus/actions/workflows/ci.yml)
+
 Shared awareness and traffic control for Codex, Claude, Gemini, and other SOTA coding agents working on the same branch.
 
 Nexus helps multiple top-level coding agents share one local checkout without stepping on each other. It gives them local repo state they can all understand: who is working on what, why a file is locked, what was released, and what is safe to do next.
