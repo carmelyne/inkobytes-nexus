@@ -105,6 +105,13 @@ test('hook template includes compact multi-file claim guidance', () => {
   assert.match(content, /rel\.replace\('\/', '~2F'\)/);
 });
 
+test('hook template describes write blocking rather than read blocking', () => {
+  const content = hookScriptContent('@codex');
+
+  assert.match(content, /Blocks writes to Nexus repo files/);
+  assert.doesNotMatch(content, /Claim first, then read\/edit/);
+});
+
 test('hookStatus detects current, foreign, and wrong-agent hooks', () => {
   const root = mkdtempSync(join(tmpdir(), 'nexus-hooks-'));
   const current = join(root, 'current.py');
