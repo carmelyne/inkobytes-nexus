@@ -404,6 +404,27 @@ When configured, `nexus release` runs the command before staging. On failure it 
 
 `--no-verify` skips the gate but is only allowed at autonomy level 0 (supervised), and the skip is logged loudly to standup. At autonomy 1 or higher, `--no-verify` is refused and `nexus doctor` warns whenever no `verifyCommand` is configured.
 
+#### Autonomy levels
+
+`.nexus/config.json` carries a repo-wide `autonomy` level (default `0`):
+
+```json
+{
+  "autonomy": 1,
+  "release": { "verifyCommand": "npm test" }
+}
+```
+
+| Level | Name | Meaning | Doctor prerequisites |
+|---|---|---|---|
+| 0 | Supervised | Human approves each significant step; `--no-verify` allowed | none |
+| 1 | Checkpointed | Agents work the queue between human checkpoints | `release.verifyCommand` configured |
+| 2 | Bounded unattended | Agents run without a human present, inside explicit volume bounds | Level 1 plus `.nexus/agent-budgets.json`; flags the missing `nexus recover` command |
+
+`nexus start` reports the level so agents know the operating mode before claiming work, and `nexus doctor` warns when a level's prerequisites are missing.
+
+Changing the level is human-only **by convention** — Nexus does not mechanically prevent an agent from editing `.nexus/config.json`. Doctor reports prerequisite gaps; the claim stops there, honestly.
+
 ### `nexus standup "<dated message>"`
 
 Append a validated standup line to `_NEXUS_STANDUP.md`.
