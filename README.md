@@ -49,7 +49,7 @@ Codex knows what Claude is doing. Claude knows why Gemini claimed that directory
 Nexus is:
 
 - shared awareness for multiple SOTA coding agents on one branch
-- file claims before shared reads and edits
+- file claims before shared edits and non-orientation shared reads
 - local guard hooks that block unclaimed writes
 - a queue so agents know what is safe to pick up next
 - a release command that commits only the claimed path
@@ -79,11 +79,13 @@ npx @inkobytes/nexus help
 
 Requires Node.js 18 or newer.
 
-## What's New In 1.0.8
+## What's New In 1.1.0
 
-- Shared protocol wording keeps `nexus init`, `nexus doctor`, README repair, and tests aligned.
-- Generated agent guides now require continuity/latest-memory reads at session start, `nexus start`, or resume.
-- `nexus hooks install --agent all` installs Codex, Claude, and Gemini guard hooks in one pass.
+- `nexus halt "<reason>"` / `nexus resume` adds a repo-wide circuit breaker for swarms.
+- Release verification can run `release.verifyCommand` before every `nexus release`.
+- Autonomy levels document supervised, checkpointed, and bounded unattended modes.
+- Dashboard exposure is localhost-only by default; LAN serving now requires `--lan`.
+- Database restore, mysql backup/restore, promptCHMOD wording, CI, and version handling were hardened.
 
 See [CHANGELOG.md](./CHANGELOG.md) for the release summary.
 
@@ -518,7 +520,7 @@ The agent rule of thumb:
 3. Read `USER.md` when present.
 4. Read continuity and latest memory at session start, `nexus start`, or resume.
 5. Read `_NEXUS_QUEUE.md` before taking follow-on work.
-6. Claim before touching shared project files.
+6. Claim before editing shared project files, and before reading shared non-orientation files.
 7. Release each claimed tracked file as soon as it reaches a coherent checkpoint.
 8. Use `nexus next @Agent` instead of free-roaming.
 
@@ -529,7 +531,7 @@ Use model names as lock handles so ownership stays clear:
 - `@gemini`
 - `@agy`
 
-Agent-local continuity and memory files are exempt from claim/release unless the human says otherwise.
+Agent-local continuity and memory files are exempt from claim/release unless the human says otherwise; read-only access should not take a lock.
 
 Nexus is agent-native and file-native, not human-native: optimize for concurrency and rollback, not feature-commit aesthetics. Do not hold claims to bundle related work into prettier feature commits; that blocks other agents waiting on files.
 
