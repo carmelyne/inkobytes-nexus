@@ -11,6 +11,7 @@ import { join } from 'path';
 import { getConfig } from '../lib/config.js';
 import { listLocks } from '../lib/lockManager.js';
 import { readLedgerEntries } from './ledger.js';
+import { getHalt } from './halt.js';
 
 const DEFAULT_PORT = 13787;
 const MAX_PORT_SEARCH = 30;
@@ -60,6 +61,7 @@ export function buildSnapshot() {
   return {
     generatedAt: new Date().toISOString(),
     repo: config.root,
+    halt: getHalt(),
     branch: git.branch,
     dirtyFiles: git.files,
     health: getHealth(config),
