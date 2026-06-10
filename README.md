@@ -390,6 +390,20 @@ If Git's index is temporarily locked by another release, Nexus waits briefly and
 
 Each release appends a repo-local receipt to `_NEXUS_REPORT.md`. If the released path is listed on a completed queue task and the release message names that task id, Nexus also appends one deduplicated completed-task entry to `_NEXUS_LEDGER.md`.
 
+#### Release verification gate
+
+Set `release.verifyCommand` in `.nexus/config.json` to make every release prove itself first:
+
+```json
+{
+  "release": { "verifyCommand": "npm test" }
+}
+```
+
+When configured, `nexus release` runs the command before staging. On failure it refuses to commit, keeps your claim so you can fix and retry, prints the last lines of output, and appends a `[BLOCKED]` line to standup. Loop principle: agents must not compound on unverified commits.
+
+`--no-verify` skips the gate but is only allowed at autonomy level 0 (supervised), and the skip is logged loudly to standup. At autonomy 1 or higher, `--no-verify` is refused and `nexus doctor` warns whenever no `verifyCommand` is configured.
+
 ### `nexus standup "<dated message>"`
 
 Append a validated standup line to `_NEXUS_STANDUP.md`.
