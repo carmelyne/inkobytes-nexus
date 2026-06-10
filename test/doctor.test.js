@@ -762,6 +762,60 @@ test('doctor renders queue authorship warnings as compact task fields', () => {
   });
 });
 
+test('doctor lists auto-flow tasks failing the full task contract with the missing fields', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), [
+      '# Queue',
+      '',
+      '## Ready Queue',
+      '',
+      '- [ ] TASK/Codex: Approved but hollow task',
+      '  - Id: hollow-task',
+      '  - Status: Ready',
+      '  - Auto-flow: yes',
+      '  - Review: approved',
+      '  - Approved by: human',
+      '',
+    ].join('\n'), 'utf-8');
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /task: hollow-task/);
+    assert.match(output, /needs: non-empty Notes, non-empty Files, non-empty Cost/);
+    assert.match(output, /fix: fill in the missing fields in `_NEXUS_QUEUE\.md`/);
+  });
+});
+
+test('doctor reports contract ok when auto-flow tasks carry all required fields', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), [
+      '# Queue',
+      '',
+      '## Ready Queue',
+      '',
+      '- [ ] TASK/Codex: Fully specified task',
+      '  - Id: good-task',
+      '  - Status: Ready',
+      '  - Files: src/good.js',
+      '  - Cost: small',
+      '  - Auto-flow: yes',
+      '  - Review: approved',
+      '  - Approved by: human',
+      '  - Notes: Complete contract.',
+      '',
+    ].join('\n'), 'utf-8');
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /All auto-flow tasks in Ready Queue satisfy the task contract/);
+    assert.doesNotMatch(output, /fails the auto-flow task contract/);
+  });
+});
+
 test('doctor warns when autonomy is 1+ without a release verify command', () => {
   inTempRepo((root) => {
     writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
