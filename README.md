@@ -254,6 +254,19 @@ The dashboard shows repo health, active locks, queue items, recent standup lines
 
 By default the dashboard binds `127.0.0.1`, so it is reachable only from your machine. The dashboard has no authentication and exposes repo coordination state (paths, branch, dirty files, lock intents, standup history), so network exposure is opt-in: pass `--lan` to bind all interfaces and print local-network URLs for other devices. Only use `--lan` on networks you trust.
 
+### `nexus halt "<reason>"` and `nexus resume`
+
+Repo-wide circuit breaker for agent swarms.
+
+```bash
+nexus halt "queue drift detected, need human review"
+nexus resume
+```
+
+`nexus halt` writes `.nexus/HALT` with the reason, timestamp, and initiator. While it exists, `claim`, `release`, and `next` refuse with the halt reason and instruct agents to log a standup line and stand by. The dashboard shows a prominent halted banner. One command stops the swarm, repo-wide, instantly.
+
+Any agent or human may halt — an agent that detects swarm-level trouble should be able to stop everyone. Only humans resume: `nexus resume` refuses inside recognized agent sessions (`CLAUDECODE=1` or `NEXUS_AGENT` set). Like promptCHMOD, that check is an advisory contract honored at session level, not mechanical enforcement — a process that lies about its identity can bypass it. The audit trail, not the gate, is the real guarantee.
+
 ### `nexus completion zsh`
 
 Print a zsh completion script for Nexus.
