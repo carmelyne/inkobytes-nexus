@@ -17,14 +17,14 @@ If the user, repo, or hook says Nexus is active, treat this skill as mandatory w
 4. Read continuity and latest memory at session start, `nexus start`, or resume.
 5. Read `_NEXUS_QUEUE.md` and `_NEXUS_STANDUP.md`.
 6. Choose user-assigned work or `nexus next @Agent`; do not free-roam into `Auto-flow: no`.
-7. Claim exact shared files before reading/editing:
+7. Claim exact shared files before editing, and before reading shared non-orientation files:
 
    ```bash
    nexus claim <path> @Agent "intent"
    ```
 
 8. Treat claim output as current file state. Ignore cached file memory when contents matter.
-9. If a hook blocks access because a path is unclaimed, stop and claim that exact path. Do not work around the hook with another command, cached content, or manual git operation.
+9. If a hook blocks access because a shared path is unclaimed, stop and claim that exact path. Do not work around the hook with another command, cached content, or manual git operation.
 10. Work only inside the claimed surface and run focused validation.
 11. Release each claimed tracked file through Nexus as soon as it reaches a coherent checkpoint:
 
@@ -64,7 +64,7 @@ When adding work to `_NEXUS_QUEUE.md`, keep tasks dashboard-parseable and immedi
 - Ask before `nexus doctor --fix` unless scaffold repair is already approved.
 - Use `nexus doctor` for audit/repair, not as the normal startup command.
 - Use CLI/model names as lock handles: `@agy`, `@claude`, `@codex`, `@gemini`.
-- Agent-local continuity and memory files are claim-exempt unless the user says otherwise.
+- Agent-local continuity and memory files are claim-exempt unless the user says otherwise; read-only access should not take a lock.
 - Continuity is the compaction-safe session ledger; latest memory is required startup/resume context.
 - Memory indexes use monthly folders and newest-first Markdown links with one-line outcomes.
 - Shared generated protocol wording is sourced from `src/lib/protocolText.js`; update that first, then run doctor/init tests.
