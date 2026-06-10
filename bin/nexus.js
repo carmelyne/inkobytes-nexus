@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { argv, exit } from 'process';
+import { readFileSync } from 'fs';
 
 const COMMANDS = {
   init: () => import('../src/commands/init.js'),
@@ -27,7 +28,7 @@ const COMMANDS = {
   help: () => import('../src/commands/help.js'),
 };
 
-const VERSION = '1.0.8';
+const VERSION = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf-8')).version;
 const COLORS = createColors();
 
 const args = argv.slice(2);
