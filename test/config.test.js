@@ -99,6 +99,32 @@ test('getConfig() caches — subsequent calls ignore new fromDir argument', () =
   });
 });
 
+test('getConfig() defaults autonomy to 0 when config.json is absent', () => {
+  inTempRepo(() => {
+    assert.equal(getConfig().autonomy, 0);
+  });
+});
+
+test('getConfig() reads valid autonomy levels from config.json', () => {
+  for (const level of [0, 1, 2]) {
+    inTempRepo(() => {
+      mkdirSync('.nexus', { recursive: true });
+      writeFileSync('.nexus/config.json', JSON.stringify({ autonomy: level }), 'utf-8');
+      assert.equal(getConfig().autonomy, level);
+    });
+  }
+});
+
+test('getConfig() falls back to autonomy 0 for invalid values', () => {
+  for (const bad of [3, -1, 1.5, '2', null, true]) {
+    inTempRepo(() => {
+      mkdirSync('.nexus', { recursive: true });
+      writeFileSync('.nexus/config.json', JSON.stringify({ autonomy: bad }), 'utf-8');
+      assert.equal(getConfig().autonomy, 0, `autonomy ${JSON.stringify(bad)} should fall back to 0`);
+    });
+  }
+});
+
 test('getConfig() reads .nexus/config.json doctor settings when present', () => {
   inTempRepo(() => {
     mkdirSync('.nexus', { recursive: true });
