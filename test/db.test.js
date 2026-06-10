@@ -64,6 +64,41 @@ function latestStamp(root) {
   return readdirSync(join(root, BACKUP_DIR)).sort().pop();
 }
 
+const DB_URL_VARS = ['DATABASE_URL', 'POSTGRES_URL', 'MYSQL_URL'];
+
+// Shadows a real binary with a recorder script so we can assert exactly what
+// argv the command received — the injection tests hinge on this.
+function withFakeBin(root, names, urlEnv, fn) {
+  const binDir = join(root, 'fake-bin');
+  mkdirSync(binDir, { recursive: true });
+  const argsFiles = {};
+  for (const name of names) {
+    argsFiles[name] = join(binDir, `${name}-args.txt`);
+    writeFileSync(join(binDir, name), `#!/bin/sh\nprintf '%s\\n' "$@" > "${argsFiles[name]}"\nexit 0\n`, { mode: 0o755 });
+  }
+
+  const originalPath = process.env.PATH;
+  const originalUrls = {};
+  for (const key of DB_URL_VARS) {
+    originalUrls[key] = process.env[key];
+    delete process.env[key];
+  }
+  process.env.PATH = `${binDir}:${originalPath}`;
+  Object.assign(process.env, urlEnv);
+
+  try {
+    return fn(argsFiles);
+  } finally {
+    process.env.PATH = originalPath;
+    for (const key of DB_URL_VARS) {
+      if (originalUrls[key] === undefined) delete process.env[key];
+      else process.env[key] = originalUrls[key];
+    }
+  }
+}
+
+const HOSTILE_URL = 'mysql://u:p@host/db"; touch pwned; echo "';
+
 test('nested sqlite backup and restore round trip preserves the original path', () => {
   inTempRepo((root) => {
     mkdirSync(join(root, 'data'), { recursive: true });
@@ -147,6 +182,38 @@ test('restore fails loudly when the original directory is gone', () => {
     assert.match(output, /✗ sqlite app\.sqlite: original directory is gone/);
     assert.equal(process.exitCode, 1);
     assert.ok(!existsSync(join(root, 'app.sqlite')), 'must not silently restore to repo root');
+  });
+});
+
+test('mysql backup passes a hostile DATABASE_URL as a literal argument, never a shell string', () => {
+  inTempRepo((root) => {
+    withFakeBin(root, ['mysqldump'], { MYSQL_URL: HOSTILE_URL }, (argsFiles) => {
+      capture(() => db(['backup']));
+
+      assert.equal(readFileSync(argsFiles.mysqldump, 'utf-8'), `${HOSTILE_URL}\n`);
+      assert.ok(!existsSync(join(root, 'pwned')), 'hostile URL must never reach a shell');
+    });
+  });
+});
+
+test('mysql restore passes a hostile DATABASE_URL as a literal argument, never a shell string', () => {
+  inTempRepo((root) => {
+    const stampDir = join(root, BACKUP_DIR, 'mysql-stamp');
+    mkdirSync(stampDir, { recursive: true });
+    writeFileSync(join(stampDir, 'dump.sql'), '-- dump', 'utf-8');
+    writeFileSync(join(stampDir, 'manifest.json'), JSON.stringify({
+      stamp: 'mysql-stamp',
+      root,
+      dbs: [{ db: 'mysql', type: 'mysql', file: 'dump.sql', ok: true }],
+    }), 'utf-8');
+
+    withFakeBin(root, ['mysql'], { MYSQL_URL: HOSTILE_URL }, (argsFiles) => {
+      const output = capture(() => db(['restore', 'mysql-stamp']));
+
+      assert.match(output, /✓ mysql restored/);
+      assert.equal(readFileSync(argsFiles.mysql, 'utf-8'), `${HOSTILE_URL}\n`);
+      assert.ok(!existsSync(join(root, 'pwned')), 'hostile URL must never reach a shell');
+    });
   });
 });
 
