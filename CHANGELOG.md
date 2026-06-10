@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.1.0 - 2026-06-11
+
+- Added `nexus halt "<reason>"` / `nexus resume` circuit breaker: claim, release, and next refuse while `.nexus/HALT` is present, the dashboard shows a halted banner, and resume is human-gated by convention.
+- Added a release verification gate: when `release.verifyCommand` is set in `.nexus/config.json`, `nexus release` runs it before staging and refuses to commit on failure, keeping the claim. `--no-verify` is allowed only at autonomy level 0 and logged to standup.
+- Added `autonomy` level (0–2) to `.nexus/config.json`; `nexus doctor` now warns when autonomy 1+ has no `verifyCommand` (Loop Readiness check).
+- Dashboard now binds 127.0.0.1 by default; LAN exposure requires the explicit `--lan` flag.
+- Fixed `nexus db restore` writing nested database files to the repo root: the backup manifest now stores repo-relative paths and restores round-trip exactly.
+- Removed shell interpolation from mysql backup/restore; `DATABASE_URL` is passed as literal arguments, never through `sh -c`.
+- Aligned promptCHMOD messaging and docs to "advisory contract, not mechanically enforced," with the x-bit threat model documented honestly.
+- CLI version is now read from `package.json` at runtime, and `prepublishOnly: npm test` blocks publishing on a failing suite.
+- Added GitHub Actions CI running tests and `npm pack --dry-run` on Node 18/20/22.
+
 ## 1.0.8 - 2026-06-10
 
 - Added a shared protocol wording source so `nexus init`, `nexus doctor`, README repair, and tests stay aligned.
