@@ -10,8 +10,11 @@ import { stageAndCommit } from '../lib/git.js';
 import { getConfig } from '../lib/config.js';
 import { normalizeTarget } from '../lib/pathSafety.js';
 import { appendCompletedLedgerEntries } from './ledger.js';
+import { refuseIfHalted } from './halt.js';
 
 export default function release(args) {
+  refuseIfHalted('release');
+
   let target = args[0];
 
   if (!target) {
