@@ -779,6 +779,67 @@ test('doctor warns when autonomy is 1+ without a release verify command', () => 
   });
 });
 
+test('doctor warns at autonomy 2 when no agent budget file exists', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
+    mkdirSync(join(root, '.nexus'), { recursive: true });
+    writeFileSync(join(root, '.nexus', 'config.json'), JSON.stringify({
+      autonomy: 2,
+      release: { verifyCommand: 'npm test' },
+    }), 'utf-8');
+    resetConfig();
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /autonomy is 2 but no agent budget file exists/);
+    assert.match(output, /Create \.nexus\/agent-budgets\.json with per-agent budgets/);
+  });
+});
+
+test('doctor reports budget ok at autonomy 2 when budget file exists, still flags missing recover', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
+    mkdirSync(join(root, '.nexus'), { recursive: true });
+    writeFileSync(join(root, '.nexus', 'config.json'), JSON.stringify({
+      autonomy: 2,
+      release: { verifyCommand: 'npm test' },
+    }), 'utf-8');
+    writeFileSync(join(root, '.nexus', 'agent-budgets.json'), JSON.stringify({ '@claude': { maxTasks: 3 } }), 'utf-8');
+    resetConfig();
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /autonomy 2 with agent budget file present/);
+    // Intentional tripwire: when release-recovery ships src/commands/recover.js,
+    // this assertion fails and that task must update Level 2 readiness here.
+    assert.match(output, /no `nexus recover` command/);
+    assert.doesNotMatch(output, /autonomy is 2 but no agent budget file exists/);
+  });
+});
+
+test('doctor stays quiet about level 2 prerequisites at autonomy 0 and 1', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
+    mkdirSync(join(root, '.nexus'), { recursive: true });
+    writeFileSync(join(root, '.nexus', 'config.json'), JSON.stringify({
+      autonomy: 1,
+      release: { verifyCommand: 'npm test' },
+    }), 'utf-8');
+    resetConfig();
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.doesNotMatch(output, /agent budget file/);
+    assert.doesNotMatch(output, /nexus recover/);
+  });
+});
+
 test('doctor reports loop readiness ok when autonomy 1+ has a verify command', () => {
   inTempRepo((root) => {
     writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
