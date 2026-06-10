@@ -1,13 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, existsSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { chdir, cwd } from 'process';
 import { spawnSync } from 'child_process';
 import { stageAndCommit } from '../src/lib/git.js';
 import release from '../src/commands/release.js';
-import { acquireLock } from '../src/lib/lockManager.js';
+import { acquireLock, listLocks } from '../src/lib/lockManager.js';
 import { resetConfig } from '../src/lib/config.js';
 
 function inTempRepo(fn) {
@@ -133,6 +133,99 @@ test('release warns and reports when HEAD changed since claim', () => {
     assert.match(report, new RegExp(`- Release HEAD: ${releaseHead}`));
     assert.match(report, /- Drift: yes/);
     assert.match(report, /- SHA: [0-9a-f]{40}/);
+  });
+});
+
+function captureExit(fn) {
+  const originalLog = console.log;
+  const originalError = console.error;
+  const originalExit = process.exit;
+  const lines = [];
+  console.log = (...args) => lines.push(args.join(' '));
+  console.error = (...args) => lines.push(args.join(' '));
+  process.exit = (code) => {
+    throw Object.assign(new Error(`process.exit ${code}`), { code });
+  };
+
+  try {
+    assert.throws(fn, /process\.exit 1/);
+  } finally {
+    console.log = originalLog;
+    console.error = originalError;
+    process.exit = originalExit;
+  }
+
+  return lines.join('\n');
+}
+
+function seedVerifyRepo(root, verifyCommand, autonomy = 0) {
+  mkdirSync(join(root, '.nexus'), { recursive: true });
+  writeFileSync(join(root, '.nexus', 'config.json'), JSON.stringify({
+    autonomy,
+    release: { verifyCommand },
+  }), 'utf-8');
+  resetConfig();
+  writeFileSync(join(root, 'file.txt'), 'hello\n', 'utf-8');
+  spawnSync('git', ['add', 'file.txt'], { cwd: root, stdio: 'pipe' });
+  spawnSync('git', ['commit', '-m', 'init'], { cwd: root, stdio: 'pipe' });
+  writeFileSync(join(root, 'file.txt'), 'hello again\n', 'utf-8');
+  acquireLock('file.txt', '@codex', 'verify gate test');
+}
+
+test('release runs the configured verify command before committing', () => {
+  inTempRepo((root) => {
+    seedVerifyRepo(root, `node -e "require('fs').writeFileSync('verify-ran.txt','ok')"`);
+
+    release(['file.txt', 'verified release']);
+
+    assert.ok(existsSync(join(root, 'verify-ran.txt')), 'verify command must run');
+    const log = spawnSync('git', ['log', '-1', '--pretty=%s'], { cwd: root, encoding: 'utf-8' }).stdout.trim();
+    assert.equal(log, '[@codex] verified release');
+  });
+});
+
+test('release refuses on verify failure, keeps the claim, and logs to standup', () => {
+  inTempRepo((root) => {
+    seedVerifyRepo(root, 'node -e "console.error(`boom: broken suite`); process.exit(1)"');
+
+    const output = captureExit(() => release(['file.txt', 'should not commit']));
+
+    assert.match(output, /\[VERIFY FAILED\]/);
+    assert.match(output, /claim on file\.txt is kept/);
+    assert.match(output, /boom: broken suite/);
+    assert.ok(listLocks().find((lock) => lock.target === 'file.txt'), 'claim must survive a failed verify');
+    const log = spawnSync('git', ['log', '-1', '--pretty=%s'], { cwd: root, encoding: 'utf-8' }).stdout.trim();
+    assert.equal(log, 'init', 'nothing may be committed on verify failure');
+    const standup = readFileSync(join(root, '_NEXUS_STANDUP.md'), 'utf-8');
+    assert.match(standup, /@codex \[BLOCKED\]: release file\.txt refused — verify failed/);
+  });
+});
+
+test('release --no-verify is allowed at autonomy 0 but logged loudly', () => {
+  inTempRepo((root) => {
+    seedVerifyRepo(root, 'node -e "process.exit(1)"', 0);
+
+    release(['file.txt', 'skipped verify', '--no-verify']);
+
+    const log = spawnSync('git', ['log', '-1', '--pretty=%s'], { cwd: root, encoding: 'utf-8' }).stdout.trim();
+    assert.equal(log, '[@codex] skipped verify');
+    const standup = readFileSync(join(root, '_NEXUS_STANDUP.md'), 'utf-8');
+    assert.match(standup, /@codex \[WARN\]: release file\.txt committed with --no-verify/);
+  });
+});
+
+test('release --no-verify is refused at autonomy 1 or higher', () => {
+  inTempRepo((root) => {
+    seedVerifyRepo(root, 'node -e "process.exit(1)"', 1);
+
+    const output = captureExit(() => release(['file.txt', 'should not commit', '--no-verify']));
+
+    assert.match(output, /--no-verify is only allowed at autonomy level 0/);
+    assert.ok(listLocks().find((lock) => lock.target === 'file.txt'));
+    const log = spawnSync('git', ['log', '-1', '--pretty=%s'], { cwd: root, encoding: 'utf-8' }).stdout.trim();
+    assert.equal(log, 'init');
+    const standup = readFileSync(join(root, '_NEXUS_STANDUP.md'), 'utf-8');
+    assert.match(standup, /@codex \[BLOCKED\]: release file\.txt attempted --no-verify at autonomy 1/);
   });
 });
 

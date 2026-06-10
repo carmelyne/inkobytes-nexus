@@ -8,8 +8,8 @@
  * nexus db schedule             Show cron setup instructions
  */
 
-import { existsSync, mkdirSync, copyFileSync, readdirSync, statSync, readFileSync, writeFileSync } from 'fs';
-import { join, basename } from 'path';
+import { existsSync, mkdirSync, copyFileSync, readdirSync, statSync, readFileSync, writeFileSync, openSync, closeSync } from 'fs';
+import { join, dirname, relative } from 'path';
 import { cwd, env } from 'process';
 import { spawnSync } from 'child_process';
 
@@ -38,7 +38,7 @@ function detectDatabases(root) {
         const stat = statSync(full);
         if (stat.isDirectory()) { scanDir(full, depth + 1); continue; }
         if (/\.(sqlite|sqlite3|db)$/.test(entry)) {
-          dbs.push({ type: 'sqlite', path: full, name: entry });
+          dbs.push({ type: 'sqlite', path: full, relPath: relative(root, full), name: entry });
         }
       } catch { /* skip unreadable */ }
     }
@@ -58,8 +58,12 @@ function detectDatabases(root) {
 }
 
 function backupSqlite(db, backupPath) {
-  copyFileSync(db.path, join(backupPath, db.name));
-  return db.name;
+  // Mirror the repo-relative path inside the backup so same-named DBs in
+  // different directories cannot overwrite each other.
+  const dest = join(backupPath, db.relPath);
+  mkdirSync(dirname(dest), { recursive: true });
+  copyFileSync(db.path, dest);
+  return db.relPath;
 }
 
 function backupPostgres(db, backupPath) {
@@ -72,10 +76,19 @@ function backupPostgres(db, backupPath) {
 }
 
 function backupMysql(db, backupPath) {
+  // DATABASE_URL comes from .env and is attacker-influenced; pass it as a
+  // literal argument and redirect in Node — never through a shell string.
   const outFile = join(backupPath, 'dump.sql');
-  const result = spawnSync('sh', ['-c', `mysqldump "${db.url}" > "${outFile}"`], {
-    encoding: 'utf-8', stdio: 'pipe',
-  });
+  const out = openSync(outFile, 'w');
+  let result;
+  try {
+    result = spawnSync('mysqldump', [db.url], {
+      encoding: 'utf-8', stdio: ['ignore', out, 'pipe'],
+    });
+  } finally {
+    closeSync(out);
+  }
+  if (result.error) throw new Error(`mysqldump failed: ${result.error.message}`);
   if (result.status !== 0) throw new Error(`mysqldump failed: ${result.stderr}`);
   return 'dump.sql';
 }
@@ -121,7 +134,7 @@ function runBackup(root, auto = false) {
       if (db.type === 'sqlite')   file = backupSqlite(db, backupPath);
       if (db.type === 'postgres') file = backupPostgres(db, backupPath);
       if (db.type === 'mysql')    file = backupMysql(db, backupPath);
-      results.push({ db: db.name, type: db.type, file, ok: true });
+      results.push({ db: db.name, path: db.relPath, type: db.type, file, ok: true });
       console.log(`[nexus db] ✓ ${db.type} ${db.name} → ${BACKUP_DIR}/${stamp}/${file}`);
     } catch (err) {
       results.push({ db: db.name, type: db.type, ok: false, error: err.message });
@@ -214,14 +227,18 @@ function runRestore(root, stamp) {
     const backupFile = join(backupPath, entry.file);
 
     if (entry.type === 'sqlite') {
-      // Find original path from manifest root
-      const originalPath = manifest.dbs.find(d => d.db === entry.db)
-        ? join(manifest.root, entry.db) : null;
-      if (originalPath && existsSync(backupFile)) {
-        copyFileSync(backupFile, originalPath);
-        console.log(`  ✓ sqlite ${entry.db} restored`);
+      // Older manifests stored only the basename; fall back so they stay restorable.
+      const rel = entry.path || entry.db;
+      const target = join(root, rel);
+      if (!existsSync(backupFile)) {
+        console.error(`  ✗ sqlite ${entry.db}: backup file missing — expected ${backupFile}`);
+        process.exitCode = 1;
+      } else if (!existsSync(dirname(target))) {
+        console.error(`  ✗ sqlite ${entry.db}: original directory is gone (${dirname(rel)}/) — restore manually from ${backupFile}`);
+        process.exitCode = 1;
       } else {
-        console.log(`  ✗ sqlite ${entry.db}: original path not found — copy manually from ${backupFile}`);
+        copyFileSync(backupFile, target);
+        console.log(`  ✓ sqlite ${entry.db} → ${rel}`);
       }
     }
 
@@ -235,7 +252,14 @@ function runRestore(root, stamp) {
     if (entry.type === 'mysql') {
       const url = env.DATABASE_URL || env.MYSQL_URL;
       if (!url) { console.log(`  ✗ mysql: DATABASE_URL not set`); continue; }
-      const result = spawnSync('sh', ['-c', `mysql "${url}" < "${backupFile}"`], { stdio: 'inherit' });
+      // Same injection surface as backupMysql: literal argument, fd redirection.
+      const input = openSync(backupFile, 'r');
+      let result;
+      try {
+        result = spawnSync('mysql', [url], { stdio: [input, 'inherit', 'inherit'] });
+      } finally {
+        closeSync(input);
+      }
       console.log(result.status === 0 ? `  ✓ mysql restored` : `  ✗ mysql restore failed`);
     }
   }

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { argv, exit } from 'process';
+import { readFileSync } from 'fs';
 
 const COMMANDS = {
   init: () => import('../src/commands/init.js'),
@@ -19,13 +20,17 @@ const COMMANDS = {
   metrics: () => import('../src/commands/metrics.js'),
   ledger: () => import('../src/commands/ledger.js'),
   drill: () => import('../src/commands/drill.js'),
+  hooks: () => import('../src/commands/hooks.js'),
   soul: () => import('../src/commands/soul.js'),
+  'install-skill': () => import('../src/commands/install-skill.js'),
   chmod: () => import('../src/commands/chmod.js'),
   db: () => import('../src/commands/db.js'),
+  halt: () => import('../src/commands/halt.js'),
+  resume: () => import('../src/commands/resume.js'),
   help: () => import('../src/commands/help.js'),
 };
 
-const VERSION = '1.0.1';
+const VERSION = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf-8')).version;
 const COLORS = createColors();
 
 const args = argv.slice(2);
@@ -74,8 +79,12 @@ function printHelp() {
     ['ledger [--json|backfill]', 'Show or backfill completed task ledger'],
     ['chmod [--list] [--init]', 'Show or set promptCHMOD permissions'],
     ['db <backup|list|restore|schedule>', 'Database backup and recovery'],
+    ['halt "<reason>"', 'Stop the swarm: claim/release/next refuse'],
+    ['resume', 'Lift a halt (human-owned by convention)'],
     ['drill <list|show|run|report>', 'Inspect or run protocol drills'],
+    ['hooks install --agent @handle|all', 'Install agent-specific local guard hooks'],
     ['soul [--file <path>] [--status | --remove]', 'Manage local soul overlay in agent files'],
+    ['install-skill [--target <path>] [--force]', 'Install bundled Nexus skill into ~/.agents/skills'],
     ['help', 'Show this help'],
   ];
 
@@ -89,11 +98,15 @@ function printHelp() {
     'nexus metrics --json',
     'nexus ledger backfill',
     'nexus drill show wrong-repo-push',
+    'nexus hooks install --agent @codex',
+    'nexus hooks install --agent all',
+    'nexus install-skill',
     'nexus claim src/lib/components/login/ @claude "Building login UI"',
     'nexus release src/lib/components/login/ "feat: login form component"',
     'nexus standup "2026-06-01 08:38 AM @codex [DONE]: Updated tests"',
     'nexus clean --stale',
     'nexus next @claude',
+    'nexus halt "queue drift detected, need human review"',
   ];
 
   const width = Math.max(...commands.map(([left]) => left.length)) + 2;

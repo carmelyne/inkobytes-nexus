@@ -11,6 +11,7 @@ import { join } from 'path';
 import { cwd } from 'process';
 import { normalizeTarget } from '../lib/pathSafety.js';
 import { CANONICAL_MODEL_HANDLE_SET, CANONICAL_MODEL_HANDLES_TEXT, hasAgentAlias } from '../lib/agentScopes.js';
+import { refuseIfHalted } from './halt.js';
 
 const CORE_FILES = [
   '_NEXUS_CONSTITUTION.md',
@@ -46,6 +47,8 @@ function readFlag(args, name) {
 }
 
 export default function claim(args) {
+  refuseIfHalted('claim');
+
   const positional = [...args];
 
   const agentFlag = readFlag(positional, '--agent').trim();

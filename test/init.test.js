@@ -6,7 +6,13 @@ import { join } from 'path';
 import { chdir, cwd } from 'process';
 import init from '../src/commands/init.js';
 import doctor from '../src/commands/doctor.js';
+import { AGENT_SCOPES } from '../src/lib/agentScopes.js';
 import { resetConfig } from '../src/lib/config.js';
+import {
+  CONTINUITY_TEMPLATE,
+  MEMORY_INDEX_TEMPLATE,
+  fullEntrypoint,
+} from '../src/lib/protocolText.js';
 
 function inTempRepo(fn) {
   const previous = cwd();
@@ -42,12 +48,17 @@ test('init creates managed agent guides that doctor accepts', () => {
 
     const output = captureLogs(() => doctor([]));
     const codexGuide = readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8');
+    const codexContinuity = readFileSync(join(root, '.codex', 'CONTINUITY.md'), 'utf-8');
+    const codexMemoryIndex = readFileSync(join(root, '.codex', 'memories', 'INDEX.md'), 'utf-8');
     const agyGuide = readFileSync(join(root, '.agy', 'AGENTS.md'), 'utf-8');
     const constitution = readFileSync(join(root, '_NEXUS_CONSTITUTION.md'), 'utf-8');
     const queue = readFileSync(join(root, '_NEXUS_QUEUE.md'), 'utf-8');
     const gitignore = readFileSync(join(root, '.gitignore'), 'utf-8');
 
     assert.match(output, /All checked Nexus categories are ready/);
+    assert.equal(codexGuide, fullEntrypoint(AGENT_SCOPES['@codex']));
+    assert.equal(codexContinuity, CONTINUITY_TEMPLATE);
+    assert.equal(codexMemoryIndex, MEMORY_INDEX_TEMPLATE);
     assert.match(readFileSync(join(root, 'DECISIONS.md'), 'utf-8'), /Local agent work decisions live here/);
     assert.match(gitignore, /DECISIONS\.md/);
     assert.match(gitignore, /docs-priv\//);
@@ -84,10 +95,14 @@ test('init creates managed agent guides that doctor accepts', () => {
     assert.match(codexGuide, /DECISIONS\.md/);
     assert.match(codexGuide, /mention them in `_NEXUS_STANDUP\.md` only when active agents need to coordinate around them/);
     assert.match(codexGuide, /Memory entries are session handoffs/);
+    assert.match(codexGuide, /### Continuity Flow/);
+    assert.match(codexGuide, /Continuity is the compaction-safe session ledger/);
+    assert.match(codexGuide, /latest memory entry at session start, `nexus start`, or resume/);
     assert.match(codexGuide, /create the current month folder under `.codex\/memories` if it is missing/);
     assert.match(codexGuide, /Do not create or repair other agents' memory folders manually/);
-    assert.match(codexGuide, /# YYYY-MM-DD-HHMM - <topic>/);
+    assert.match(codexGuide, /# YYYY-MM-DD - HH:MM - <topic>/);
     assert.match(codexGuide, /Read `USER\.md` if present/);
+    assert.match(codexContinuity, /Compaction-safe session ledger/);
     assert.doesNotMatch(codexGuide, /Pong/);
     assert.match(agyGuide, /\.agy\/CONTINUITY\.md/);
     assert.match(constitution, /## 5\. Drill Guidance/);

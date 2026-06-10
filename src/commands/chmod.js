@@ -1,6 +1,9 @@
 /**
  * nexus chmod — manage the promptCHMOD permission matrix.
- * Human-controlled only: blocks unverified sessions from editing.
+ * Advisory contract honored at session start, not mechanically enforced:
+ * the matrix is human-owned by convention, and the session gate below is an
+ * env-var check any process can set in one line. It deters accidental edits;
+ * it cannot stop a process that lies about its identity.
  *
  * r = read for reference
  * w = modify (claim/release already enforces this)
@@ -59,12 +62,13 @@ export default function chmod(args) {
     process.exit(1);
   }
 
-  // Human-only gate — ties into agent-identity trust detection
+  // Session gate — advisory by design: these env vars are settable by any
+  // process, so this deters accidental edits, nothing more.
   const trustSource = process.env.CLAUDECODE === '1' ? 'harness'
     : process.env.NEXUS_AGENT ? 'operator'
     : 'unverified';
   if (trustSource === 'unverified') {
-    console.error('[ERROR] nexus chmod requires a verified session (CLAUDECODE=1 or NEXUS_AGENT set).\nThe permission matrix is human-controlled — agents cannot self-elevate.');
+    console.error('[ERROR] nexus chmod expects a recognized session (CLAUDECODE=1 or NEXUS_AGENT set).\nThe matrix is human-owned by convention; this gate is advisory, not enforcement.\nHumans can edit _NEXUS_CHMOD.md directly.');
     process.exit(1);
   }
 

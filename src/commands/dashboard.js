@@ -11,6 +11,7 @@ import { join } from 'path';
 import { getConfig } from '../lib/config.js';
 import { listLocks } from '../lib/lockManager.js';
 import { readLedgerEntries } from './ledger.js';
+import { getHalt } from './halt.js';
 
 const DEFAULT_PORT = 13787;
 const MAX_PORT_SEARCH = 30;
@@ -24,7 +25,7 @@ export default function dashboard(args) {
     return;
   }
 
-  serveDashboard(resolveDashboardPort(args));
+  serveDashboard(resolveDashboardPort(args), resolveDashboardHost(args));
 }
 
 export function buildSnapshot() {
@@ -60,6 +61,7 @@ export function buildSnapshot() {
   return {
     generatedAt: new Date().toISOString(),
     repo: config.root,
+    halt: getHalt(),
     branch: git.branch,
     dirtyFiles: git.files,
     health: getHealth(config),
@@ -76,7 +78,7 @@ export function buildSnapshot() {
   };
 }
 
-function serveDashboard(port) {
+function serveDashboard(port, host) {
   const clients = new Set();
   const server = createServer((req, res) => {
     const url = new URL(req.url || '/', `http://${req.headers.host || '127.0.0.1'}`);
@@ -133,7 +135,13 @@ function serveDashboard(port) {
   }, 2000);
 
   server.on('close', () => clearInterval(interval));
-  listenOnAvailablePort(server, port, port === DEFAULT_PORT);
+  listenOnAvailablePort(server, port, port === DEFAULT_PORT, host);
+}
+
+// The dashboard has no auth, so network exposure is opt-in: localhost unless
+// the human passes --lan.
+export function resolveDashboardHost(args) {
+  return args.includes('--lan') ? '0.0.0.0' : '127.0.0.1';
 }
 
 export function resolveDashboardPort(args) {
@@ -146,7 +154,7 @@ export function resolveDashboardPort(args) {
   return value;
 }
 
-function listenOnAvailablePort(server, port, canSearch) {
+function listenOnAvailablePort(server, port, canSearch, host = '127.0.0.1') {
   let attempts = 0;
 
   const tryListen = (candidate) => {
@@ -159,11 +167,13 @@ function listenOnAvailablePort(server, port, canSearch) {
       throw err;
     });
 
-    server.listen(candidate, '0.0.0.0', () => {
+    server.listen(candidate, host, () => {
       const moved = candidate !== port ? ` (default ${port} was busy)` : '';
       console.log(`Nexus dashboard listening at http://127.0.0.1:${candidate}${moved}`);
-      for (const url of getLanUrls(candidate)) {
-        console.log(`Local network: ${url}`);
+      if (host === '0.0.0.0') {
+        for (const url of getLanUrls(candidate)) {
+          console.log(`Local network: ${url}`);
+        }
       }
       console.log('Press Ctrl+C to stop.');
     });

@@ -1,30 +1,30 @@
 # @inkobytes/nexus
 
-Run more than one AI coding agent in the same project without them stepping on each other.
+[![CI](https://github.com/carmelyne/inkobytes-nexus/actions/workflows/ci.yml/badge.svg)](https://github.com/carmelyne/inkobytes-nexus/actions/workflows/ci.yml)
 
-The hard part starts when they are working at the same time.
+Shared awareness and traffic control for Codex, Claude, Gemini, and other SOTA coding agents working on the same branch.
 
-Nexus gives the repo a simple traffic system:
+Nexus helps multiple top-level coding agents share one local checkout without stepping on each other. It gives them local repo state they can all understand: who is working on what, why a file is locked, what was released, and what is safe to do next.
+
+The loop is intentionally small:
 
 ```text
 start -> claim -> work -> release -> next
 ```
 
-Agents use Nexus to say:
+Nexus is intentionally boring:
 
-- "I am working on this file."
-- "This is why I claimed it."
-- "This task is done."
-- "These are the files I changed."
-- "Here is what the next agent should know."
-
-Everything stays local in the repo. No server. No database. No cloud dashboard. Just files, Git, and a small CLI.
-
-Nexus is focused on one specific problem: multiple AI coding agents working at the same time in one local checkout, with explicit file claims, queue state, release receipts, and handoff notes.
+- no daemon
+- no cloud service
+- no database
+- no branch choreography requirement
+- just files, Git, hooks, and a small CLI
 
 ## Why Nexus Exists
 
-If two agents touch the same files, things get messy fast:
+The hard part starts when powerful agents work at the same time.
+
+If Codex, Claude, Gemini, Cursor, or another coding agent touch the same branch without shared state:
 
 - one agent may overwrite another agent's work
 - one agent may commit files it did not mean to commit
@@ -34,14 +34,26 @@ If two agents touch the same files, things get messy fast:
 
 With Nexus, Git still stores the code history. Nexus tracks the operational state around Git: who claimed what, what task they are doing, what got released, and what another agent should read next.
 
+Nexus is not only traffic control. It gives agents shared situational awareness:
+
+- what each agent is working on, and why they claimed it
+- which files are locked right now
+- what the queue says is safe to pick up next
+- what was released, and by whom
+- what needs human attention
+
+Codex knows what Claude is doing. Claude knows why Gemini claimed that directory. Nobody works blind.
+
 ## What Nexus Is And Is Not
 
 Nexus is:
 
-- a way for agents to reserve files before editing them
+- shared awareness for multiple SOTA coding agents on one branch
+- file claims before shared reads and edits
+- local guard hooks that block unclaimed writes
 - a queue so agents know what is safe to pick up next
 - a release command that commits only the claimed path
-- a standup and report log humans can read
+- standup, report, and ledger files humans can read
 - a local dashboard over the same repo files
 - preventive drills for known multi-agent failure cases
 
@@ -67,10 +79,11 @@ npx @inkobytes/nexus help
 
 Requires Node.js 18 or newer.
 
-## What's New In 1.0.1
+## What's New In 1.0.8
 
-- Colorized `nexus help` output for easier scanning in the terminal
-- Built-in `nexus completion zsh` support for shell completions
+- Shared protocol wording keeps `nexus init`, `nexus doctor`, README repair, and tests aligned.
+- Generated agent guides now require continuity/latest-memory reads at session start, `nexus start`, or resume.
+- `nexus hooks install --agent all` installs Codex, Claude, and Gemini guard hooks in one pass.
 
 See [CHANGELOG.md](./CHANGELOG.md) for the release summary.
 
@@ -90,12 +103,15 @@ In a Git repo:
 
 ```bash
 nexus init
-nexus start
+nexus hooks install --agent all
+nexus start --agent @codex
 nexus claim README.md @codex "try Nexus on one file"
 nexus release README.md "docs: try Nexus"
 ```
 
 `nexus start` is orientation only. The edit loop is `claim -> work -> release`.
+
+Hooks are the enforcement layer. Without hooks, Nexus is a coordination protocol agents follow. With hooks, unclaimed writes are blocked and the agent gets the exact claim command to run.
 
 `nexus init` creates the Nexus coordination files:
 
@@ -130,6 +146,12 @@ Memory folders are month-based from the start, for example:
 .agy/memories/2026-May/
 .claude/memories/2026-May/
 .gemini/memories/2026-May/
+```
+
+Memory indexes stay newest-first and link to entries with one-line outcomes:
+
+```md
+- [2026-06-09-1430-hook-protocol-fix](2026-June/2026-06-09-1430-hook-protocol-fix.md) - tightened hook claim guidance
 ```
 
 If you only want to inspect an existing repo before changing anything, run:
@@ -218,16 +240,32 @@ nexus start
 
 Start reports only local facts: repo path, branch, last commits, dirty files, active locks, and the continuity/memory path for the selected model scope. Start is orientation only, not clearance to edit; agents still claim before shared reads/edits and release when done. Set `NEXUS_AGENT=@claude`, `@codex`, `@gemini`, or `@agy` so agents can run plain `nexus start`; `--agent` is available as an override.
 
-### `nexus dashboard --serve [--port <port>]`
+### `nexus dashboard --serve [--port <port>] [--lan]`
 
 Serve a read-only local Nexus dashboard to see progress and issues.
 
 ```bash
 nexus dashboard --serve
 nexus dashboard --serve --port 13787
+nexus dashboard --serve --lan
 ```
 
-The dashboard prints both `127.0.0.1` and local-network URLs when available, then shows repo health, active locks, queue items, recent standup lines, recent release notes, and dirty git files. It uses local files as the source of truth and updates the page through server-sent events. The default port is `13787`; if that port is already in use, Nexus tries `13788`, `13789`, and so on. Passing `--port` uses that exact port.
+The dashboard shows repo health, active locks, queue items, recent standup lines, recent release notes, and dirty git files. It uses local files as the source of truth and updates the page through server-sent events. The default port is `13787`; if that port is already in use, Nexus tries `13788`, `13789`, and so on. Passing `--port` uses that exact port.
+
+By default the dashboard binds `127.0.0.1`, so it is reachable only from your machine. The dashboard has no authentication and exposes repo coordination state (paths, branch, dirty files, lock intents, standup history), so network exposure is opt-in: pass `--lan` to bind all interfaces and print local-network URLs for other devices. Only use `--lan` on networks you trust.
+
+### `nexus halt "<reason>"` and `nexus resume`
+
+Repo-wide circuit breaker for agent swarms.
+
+```bash
+nexus halt "queue drift detected, need human review"
+nexus resume
+```
+
+`nexus halt` writes `.nexus/HALT` with the reason, timestamp, and initiator. While it exists, `claim`, `release`, and `next` refuse with the halt reason and instruct agents to log a standup line and stand by. The dashboard shows a prominent halted banner. One command stops the swarm, repo-wide, instantly.
+
+Any agent or human may halt — an agent that detects swarm-level trouble should be able to stop everyone. Only humans resume: `nexus resume` refuses inside recognized agent sessions (`CLAUDECODE=1` or `NEXUS_AGENT` set). Like promptCHMOD, that check is an advisory contract honored at session level, not mechanical enforcement — a process that lies about its identity can bypass it. The audit trail, not the gate, is the real guarantee.
 
 ### `nexus completion zsh`
 
@@ -239,6 +277,37 @@ source <(nexus completion zsh)
 ```
 
 This gives `zsh` tab-completion for commands like `claim`, `release`, `doctor`, `drill`, and common agent handles such as `@codex` and `@claude`.
+
+### `nexus install-skill [--target <path>] [--force]`
+
+Install the bundled Nexus agent skill into the shared agent skill directory.
+
+```bash
+nexus install-skill
+nexus install-skill --force
+nexus install-skill --target ~/.agents/skills/nexus
+```
+
+By default, Nexus copies `skills/nexus` from the published package into `~/.agents/skills/nexus`. Restart or refresh your agent session after installing so its skill registry can discover the new `nexus` skill.
+
+### `nexus hooks install --agent @codex|@claude|@gemini|all [--target <path>] [--force]`
+
+Install an agent-specific local guard hook.
+
+```bash
+nexus hooks install --agent @codex
+nexus hooks install --agent @claude
+nexus hooks install --agent @gemini
+nexus hooks install --agent all
+```
+
+Hooks block writes in Nexus repos until the exact target path is claimed, then give the agent a compact recovery command. Each hook uses the matching claim handle, so Codex sees `@codex`, Claude sees `@claude`, and Gemini sees `@gemini`.
+
+Use `--agent all` to install the default Codex, Claude, and Gemini hooks in one pass. `--target` is only for single-agent installs.
+
+Hook installation writes outside the repo, so `nexus doctor --fix` does not install hooks. Use `nexus doctor --hooks` to report missing, foreign, wrong-agent, or current hooks.
+
+See [docs/hooks.md](./docs/hooks.md) for install targets and behavior.
 
 ### `nexus ledger [--json]`
 
@@ -320,6 +389,20 @@ Nexus stages only the released path before committing, which helps avoid unrelat
 If Git's index is temporarily locked by another release, Nexus waits briefly and retries before failing with a clearer message.
 
 Each release appends a repo-local receipt to `_NEXUS_REPORT.md`. If the released path is listed on a completed queue task and the release message names that task id, Nexus also appends one deduplicated completed-task entry to `_NEXUS_LEDGER.md`.
+
+#### Release verification gate
+
+Set `release.verifyCommand` in `.nexus/config.json` to make every release prove itself first:
+
+```json
+{
+  "release": { "verifyCommand": "npm test" }
+}
+```
+
+When configured, `nexus release` runs the command before staging. On failure it refuses to commit, keeps your claim so you can fix and retry, prints the last lines of output, and appends a `[BLOCKED]` line to standup. Loop principle: agents must not compound on unverified commits.
+
+`--no-verify` skips the gate but is only allowed at autonomy level 0 (supervised), and the skip is logged loudly to standup. At autonomy 1 or higher, `--no-verify` is refused and `nexus doctor` warns whenever no `verifyCommand` is configured.
 
 ### `nexus standup "<dated message>"`
 
@@ -412,7 +495,7 @@ The agent rule of thumb:
 1. Run `nexus start` when entering an existing repo; it does not replace claim/release.
 2. Read `_NEXUS_CONSTITUTION.md`.
 3. Read `USER.md` when present.
-4. Read continuity and latest memory when present.
+4. Read continuity and latest memory at session start, `nexus start`, or resume.
 5. Read `_NEXUS_QUEUE.md` before taking follow-on work.
 6. Claim before touching shared project files.
 7. Release each claimed tracked file as soon as it reaches a coherent checkpoint.
@@ -452,6 +535,8 @@ Nexus ships an agent skill at `skills/nexus/SKILL.md`.
 
 The CLI is the coordination engine. The skill is the lean playbook for this flow: `start -> claim -> work -> release -> next`.
 
+Generated agent protocol text lives in `src/lib/protocolText.js`. Update that module first when changing shared protocol wording, then run doctor/init tests so scaffolded guides, README repair, and the bundled skill stay aligned.
+
 ## Legacy Helper Transition
 
 Older Nexus experiments used shell helpers:
@@ -479,14 +564,6 @@ git status --short
 `nexus doctor` reports package privacy risks for local/private files such as `USER.md`, `DECISIONS.md`, `docs-priv/`, and agent-local state when package files would include them. `npm pack --dry-run` shows the exact files that would ship to npm.
 
 ## Design Notes
-
-Nexus is intentionally boring:
-
-- no daemon
-- no cloud service
-- no database
-- no private hidden coordination channel
-- no branch choreography requirement
 
 The current storage substrate is Git. Future Nexit planning explores agent-native zones, inspection, publish, and recall, but Nexus keeps today's release path stable.
 

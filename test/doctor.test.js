@@ -6,7 +6,16 @@ import { join } from 'path';
 import { chdir, cwd } from 'process';
 import { spawnSync } from 'child_process';
 import doctor from '../src/commands/doctor.js';
+import { AGENT_SCOPES } from '../src/lib/agentScopes.js';
 import { resetConfig } from '../src/lib/config.js';
+import {
+  CONTINUITY_TEMPLATE,
+  MEMORY_INDEX_TEMPLATE,
+  REQUIRED_CONTEXT_READ,
+  SKILL_CONTEXT_GUARDRAIL,
+  MEMORY_INDEX_GUARDRAIL,
+  protocolBlock,
+} from '../src/lib/protocolText.js';
 
 function inTempRepo(fn) {
   const previous = cwd();
@@ -47,21 +56,28 @@ test('doctor --fix creates agent scaffolds and protocol blocks', () => {
     const output = captureLogs(() => doctor(['--fix']));
 
     assert.match(output, /All checked Nexus categories are ready/);
-    assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /NEXUS-AGENT-PROTOCOL:START/);
-    assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /less than 14 days/);
-    assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /### Current File State/);
-    assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /### Git Write Safety/);
-    assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /Never infer from similar folder names or cached context/);
-    assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /untrack them; do not delete local folders/);
-    assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /create the current month folder under `.codex\/memories` if it is missing/);
-    assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /Do not create or repair other agents' memory folders manually/);
-    assert.match(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /Read `USER\.md` if present/);
-    assert.doesNotMatch(readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8'), /Pong/);
-    assert.match(readFileSync(join(root, '.codex', 'CONTINUITY.md'), 'utf-8'), /# CONTINUITY/);
+    const codexGuide = readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8');
+    assert.ok(codexGuide.includes(protocolBlock(AGENT_SCOPES['@codex'])));
+    assert.match(codexGuide, /less than 14 days/);
+    assert.match(codexGuide, /### Current File State/);
+    assert.match(codexGuide, /active requirements, not optional guidance/);
+    assert.match(codexGuide, /Do not bypass the hook/);
+    assert.match(codexGuide, /Claim before reading implementation files/);
+    assert.match(codexGuide, /### Git Write Safety/);
+    assert.match(codexGuide, /Never infer from similar folder names or cached context/);
+    assert.match(codexGuide, /untrack them; do not delete local folders/);
+    assert.match(codexGuide, /create the current month folder under `.codex\/memories` if it is missing/);
+    assert.match(codexGuide, /Do not create or repair other agents' memory folders manually/);
+    assert.match(codexGuide, /Markdown link plus one-line outcome/);
+    assert.match(codexGuide, /Continuity is the compaction-safe session ledger/);
+    assert.match(codexGuide, /latest memory entry at session start, `nexus start`, or resume/);
+    assert.match(codexGuide, /Read `USER\.md` if present/);
+    assert.doesNotMatch(codexGuide, /Pong/);
+    assert.equal(readFileSync(join(root, '.codex', 'CONTINUITY.md'), 'utf-8'), CONTINUITY_TEMPLATE);
     assert.match(readFileSync(join(root, 'DECISIONS.md'), 'utf-8'), /Local agent work decisions live here/);
     assert.match(readFileSync(join(root, '.gitignore'), 'utf-8'), /DECISIONS\.md/);
     assert.match(readFileSync(join(root, '.gitignore'), 'utf-8'), /docs-priv\//);
-    assert.match(readFileSync(join(root, '.codex', 'memories', 'INDEX.md'), 'utf-8'), /YYYY-Month/);
+    assert.equal(readFileSync(join(root, '.codex', 'memories', 'INDEX.md'), 'utf-8'), MEMORY_INDEX_TEMPLATE);
   });
 });
 
@@ -227,6 +243,10 @@ test('doctor --fix repairs Nexus README and skill protocol drift in the Nexus pr
       '- `Auto-flow: yes` means an agent can grab it after `nexus next`; use `no` when planning or human approval is needed.',
       '- `Notes` should carry dashboard-useful context, not a whole design doc.',
       '',
+      '## Guardrails',
+      '',
+      '- Agent-local continuity and memory files are claim-exempt unless the user says otherwise.',
+      '',
     ].join('\n'), 'utf-8');
 
     captureLogs(() => doctor(['--fix']));
@@ -237,10 +257,16 @@ test('doctor --fix repairs Nexus README and skill protocol drift in the Nexus pr
     assert.match(readme, /Review: approved/);
     assert.match(readme, /Approved by: human/);
     assert.match(readme, /Read `_NEXUS_CONSTITUTION\.md`\./);
+    assert.ok(readme.includes(REQUIRED_CONTEXT_READ));
     assert.match(readme, /Release each claimed tracked file as soon as it reaches a coherent checkpoint/);
     assert.match(readme, /agent-native and file-native, not human-native/);
     assert.match(readme, /start -> claim -> work -> release -> next/);
     assert.match(skill, /Read `_NEXUS_CONSTITUTION\.md`\./);
+    assert.ok(skill.includes(REQUIRED_CONTEXT_READ));
+    assert.ok(skill.includes(SKILL_CONTEXT_GUARDRAIL));
+    assert.ok(skill.includes(MEMORY_INDEX_GUARDRAIL));
+    assert.match(skill, /not optional advice/);
+    assert.match(skill, /Do not work around the hook/);
     assert.match(skill, /Release each claimed tracked file through Nexus as soon as it reaches a coherent checkpoint/);
     assert.match(skill, /Review: approved/);
     assert.match(skill, /Approved by: human/);
@@ -328,6 +354,9 @@ Keep this note.
     assert.equal(next.match(/This project uses Nexus for multi-agent coordination\./g).length, 1);
     assert.equal(next.match(/NEXUS-AGENT-PROTOCOL:START/g).length, 1);
     assert.match(next, /atomic lock-and-read boundary/);
+    assert.match(next, /active requirements, not optional guidance/);
+    assert.match(next, /Do not bypass the hook/);
+    assert.match(next, /Claim before reading implementation files/);
     assert.match(next, /read a shared file before claiming it, treat that read as stale after claim succeeds/);
     assert.match(next, /claim appears stale/);
     assert.match(next, /### Drills/);
@@ -353,7 +382,10 @@ Keep this note.
     assert.match(next, /Memory entries are session handoffs/);
     assert.match(next, /create the current month folder under `.codex\/memories` if it is missing/);
     assert.match(next, /Do not create or repair other agents' memory folders manually/);
-    assert.match(next, /# YYYY-MM-DD-HHMM - <topic>/);
+    assert.match(next, /### Continuity Flow/);
+    assert.match(next, /ask once instead of guessing/);
+    assert.match(next, /read `.codex\/memories\/INDEX\.md`, then read the newest linked entry/);
+    assert.match(next, /# YYYY-MM-DD - HH:MM - <topic>/);
     assert.match(next, /## Local Notes\n\nKeep this note\./);
   });
 });
@@ -727,5 +759,40 @@ test('doctor renders queue authorship warnings as compact task fields', () => {
     assert.match(output, /impact: nexus next will skip it/);
     assert.match(output, /fix: add `Review: approved` and `Approved by: human`, or move it to `## Proposed Queue`/);
     assert.doesNotMatch(output, /is auto-flow: yes in Ready Queue but missing Review: approved/);
+  });
+});
+
+test('doctor warns when autonomy is 1+ without a release verify command', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
+    mkdirSync(join(root, '.nexus'), { recursive: true });
+    writeFileSync(join(root, '.nexus', 'config.json'), JSON.stringify({ autonomy: 1 }), 'utf-8');
+    resetConfig();
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /Loop Readiness/);
+    assert.match(output, /autonomy is 1 but release\.verifyCommand is not configured/);
+    assert.match(output, /Set release\.verifyCommand in \.nexus\/config\.json/);
+  });
+});
+
+test('doctor reports loop readiness ok when autonomy 1+ has a verify command', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
+    mkdirSync(join(root, '.nexus'), { recursive: true });
+    writeFileSync(join(root, '.nexus', 'config.json'), JSON.stringify({
+      autonomy: 1,
+      release: { verifyCommand: 'npm test' },
+    }), 'utf-8');
+    resetConfig();
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /autonomy 1 with release verify gate configured \(npm test\)/);
   });
 });

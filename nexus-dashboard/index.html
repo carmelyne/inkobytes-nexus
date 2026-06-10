@@ -70,6 +70,10 @@
             </div>
           </div>
         </header>
+        <div id="halt-banner" hidden style="background:#7f1d1d;border:1px solid #ef4444;color:#fecaca;padding:14px 18px;border-radius:10px;margin-bottom:16px;font-weight:600;">
+          <span style="margin-right:8px;">⛔</span><span id="halt-text"></span>
+          <div id="halt-meta" style="font-weight:400;opacity:.85;margin-top:4px;font-size:.85em;"></div>
+        </div>
         <div id="health-alert" class="health-alert" hidden>
           <div class="health-alert-inner">
             <span class="health-alert-icon">🔴</span>
@@ -172,6 +176,16 @@
 
         // Always update the timestamp — it's benign
         document.getElementById('updated').textContent = 'Updated ' + new Date(data.generatedAt).toLocaleTimeString();
+
+        // Halt banner always reflects current state, even with a popover open
+        const haltBanner = document.getElementById('halt-banner');
+        if (data.halt) {
+          haltBanner.hidden = false;
+          document.getElementById('halt-text').textContent = 'SWARM HALTED — ' + data.halt.reason;
+          document.getElementById('halt-meta').textContent = 'since ' + data.halt.at + ' by ' + data.halt.by + ' — claim, release, and next refuse until a human runs nexus resume';
+        } else {
+          haltBanner.hidden = true;
+        }
 
         // Don't re-render DOM while user has a popover open or is working in DevTools
         if (document.querySelector('.task-popover:popover-open')) return;
