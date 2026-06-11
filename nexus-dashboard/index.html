@@ -513,8 +513,18 @@
           + '</div>'
           + (meta ? '<div class="queue-task-meta">' + meta + '</div>' : '')
           + (issues ? '<div class="queue-task-issues">' + issues + '</div>' : '')
-          + '<pre class="queue-task-raw">' + escapeHtml(task.raw || task.title || '') + '</pre>'
+          + '<pre class="queue-task-raw">' + formatTaskRaw(task.raw || task.title || '') + '</pre>'
           + '</article>';
+      }
+
+      function formatTaskRaw(value) {
+        return String(value || '').split('\n').map((line) => {
+          const field = line.match(/^(\s*-\s)([^:]+:)(.*)$/);
+          if (!field) return escapeHtml(line);
+          return escapeHtml(field[1])
+            + '<span class="queue-task-raw-label">' + escapeHtml(field[2]) + '</span>'
+            + escapeHtml(field[3]);
+        }).join('\n');
       }
 
       function renderLedgerEntry(entry) {
