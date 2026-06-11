@@ -16,6 +16,7 @@ const COMMANDS = {
   status: () => import('../src/commands/status.js'),
   clean: () => import('../src/commands/clean.js'),
   next: () => import('../src/commands/next.js'),
+  q: () => import('../src/commands/q.js'),
   start: () => import('../src/commands/start.js'),
   dashboard: () => import('../src/commands/dashboard.js'),
   metrics: () => import('../src/commands/metrics.js'),
@@ -74,7 +75,8 @@ function printHelp() {
     ['standup "<dated message>"', 'Append a validated standup line'],
     ['status', 'Show current blackboard state'],
     ['clean [--stale | <path>]', 'Prune locks (surgical, stale, or nuke)'],
-    ['next <agent>', 'Suggest next safe task from queue'],
+    ['next <agent> [--take]', 'Suggest or delegate next safe task from queue'],
+    ['q <agent> | q done <id> <agent>', 'Show an agent lane or write a lane-local completion receipt'],
     ['start [--agent @handle]', 'Orient an agent entering this repo'],
     ['dashboard --serve [--port <port>]', 'Serve live local Nexus dashboard'],
     ['metrics [--json]', 'Summarize commits, releases, and queue cost'],
@@ -108,6 +110,9 @@ function printHelp() {
     'nexus standup "2026-06-01 08:38 AM @codex [DONE]: Updated tests"',
     'nexus clean --stale',
     'nexus next @claude',
+    'nexus next @codex --take',
+    'nexus q @codex',
+    'nexus q done hot-file-contention @codex',
     'nexus halt "queue drift detected, need human review"',
   ];
 
