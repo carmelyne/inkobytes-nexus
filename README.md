@@ -457,12 +457,13 @@ YYYY-MM-DD HH:MM AM/PM @agent [STATUS]: message
 
 Missing agent handles, bad date/time format, missing status, or empty messages fail before writing.
 
-### `nexus next <agent>`
+### `nexus next <agent> [--take]`
 
 Suggest the next safe auto-flow task from `_NEXUS_QUEUE.md`.
 
 ```bash
 nexus next @codex
+nexus next @codex --take
 ```
 
 Nexus checks:
@@ -472,10 +473,24 @@ Nexus checks:
 - dependencies
 - claimed file conflicts
 - optional agent budget file
+- delegated lane state
 
 The suggestion includes any declared task primitives (`Goal`, `Outcome`, `Constraints`, `Stop If`, `Evidence`) and lists missing ones as an advisory.
 
+With `--take`, Nexus delegates the selected task into the agent's lane file, such as `_NEXUS_Q_CODEX.md`, and marks the master queue task as `Status: Delegated` with a lane pointer and pending receipt. The full task block travels with the copy, including task primitives, so the lane is the working contract. Delegated tasks are skipped by later `nexus next` runs until reconciliation lands.
+
 If nothing is safe, the agent should stand by.
+
+### `nexus q <agent>` and `nexus q done <id> <agent>`
+
+Inspect an agent queue lane or write a lane-local completion receipt.
+
+```bash
+nexus q @codex
+nexus q done hot-file-contention @codex
+```
+
+`nexus q done <id> <agent>` updates the agent lane file only. It removes the task from `## Active`, appends a pending receipt under `## Completed`, and leaves `_NEXUS_QUEUE.md` unchanged. The master registry is updated later by the planned batch reconciliation flow.
 
 ### `nexus status`
 
