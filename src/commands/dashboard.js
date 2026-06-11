@@ -248,38 +248,99 @@ function parseTasks(content) {
   const lines = content.split('\n');
   let current = null;
 
+  const finishCurrent = () => {
+    if (!current) return;
+    current.raw = current.rawLines.join('\n').trimEnd();
+    current.date = current.created || current.done || current.delegatedAt || current.completedAt || '';
+    current.dateTs = parseTaskDate(current.date);
+    current.issueLabels = getTaskIssues(current);
+    current.issues = current.issueLabels.map(issue => issue.id);
+    delete current.rawLines;
+    tasks.push(current);
+  };
+
   for (const line of lines) {
     const task = line.match(/^- \[([ x])\] TASK\/([^:]+):\s*(.+)$/);
     if (task) {
-      if (current) tasks.push(current);
+      finishCurrent();
       current = {
         checked: task[1] === 'x',
         agent: task[2].trim(),
         title: task[3].trim(),
         id: '', epic: '', status: '', depends: '',
         files: '', drills: '', cost: '', autoFlow: '', notes: '',
-        review: '', approvedBy: '',
+        review: '', approvedBy: '', affinity: '', created: '', done: '',
+        delegatedTo: '', delegatedAt: '', lane: '', receipt: '',
+        completedAt: '', blockedBy: '',
+        fields: [],
+        rawLines: [line],
       };
       continue;
     }
     if (!current) continue;
+    if (line.trim() === '') {
+      current.rawLines.push(line);
+      continue;
+    }
     const field = line.trim().match(/^- ([^:]+):\s*(.+)$/);
-    if (!field) continue;
+    if (!field) {
+      current.rawLines.push(line);
+      continue;
+    }
+    current.rawLines.push(line);
     const key = field[1].toLowerCase();
-    if (key === 'id') current.id = field[2];
-    if (key === 'epic') current.epic = field[2];
-    if (key === 'status') current.status = field[2];
-    if (key === 'depends on') current.depends = field[2];
-    if (key === 'files') current.files = field[2];
-    if (key === 'drills') current.drills = field[2];
-    if (key === 'cost') current.cost = field[2];
-    if (key === 'auto-flow') current.autoFlow = field[2];
-    if (key === 'notes') current.notes = field[2];
-    if (key === 'review') current.review = field[2];
-    if (key === 'approved by') current.approvedBy = field[2];
+    const value = field[2];
+    current.fields.push({ key, label: field[1], value });
+    if (key === 'id') current.id = value;
+    if (key === 'epic') current.epic = value;
+    if (key === 'status') current.status = value;
+    if (key === 'created') current.created = value;
+    if (key === 'done') current.done = value;
+    if (key === 'depends on') current.depends = value;
+    if (key === 'files') current.files = value;
+    if (key === 'drills') current.drills = value;
+    if (key === 'affinity') current.affinity = value;
+    if (key === 'cost') current.cost = value;
+    if (key === 'auto-flow') current.autoFlow = value;
+    if (key === 'notes') current.notes = value;
+    if (key === 'review') current.review = value;
+    if (key === 'approved by') current.approvedBy = value;
+    if (key === 'delegated to') current.delegatedTo = value;
+    if (key === 'delegated at') current.delegatedAt = value;
+    if (key === 'lane') current.lane = value;
+    if (key === 'receipt') current.receipt = value;
+    if (key === 'completed at') current.completedAt = value;
+    if (key === 'blocked by') current.blockedBy = value;
   }
-  if (current) tasks.push(current);
+  finishCurrent();
   return tasks;
+}
+
+function parseTaskDate(value) {
+  if (!value) return null;
+  const parsed = Date.parse(value);
+  return Number.isNaN(parsed) ? null : parsed;
+}
+
+function getTaskIssues(task) {
+  const issues = [];
+  const status = String(task.status || '').toLowerCase();
+  const review = String(task.review || '').toLowerCase();
+  const autoFlow = String(task.autoFlow || '').toLowerCase();
+  const approvedBy = String(task.approvedBy || '').trim();
+  const isDone = task.checked || status === 'done';
+
+  if (!isDone && status.includes('blocked')) issues.push({ id: 'blocked', label: 'blocked' });
+  if (!isDone && status === 'delegated') issues.push({ id: 'delegated', label: 'delegated' });
+  if (!isDone && task.dateTs && Date.now() - task.dateTs > 7 * 24 * 60 * 60 * 1000) {
+    issues.push({ id: 'stale', label: 'stale' });
+  }
+  if (!isDone && review && review !== 'approved') issues.push({ id: 'review', label: `review ${review}` });
+  if (!isDone && autoFlow === 'yes' && (review !== 'approved' || !approvedBy)) {
+    issues.push({ id: 'approval', label: 'approval needed' });
+  }
+
+  return issues;
 }
 
 function parseQueue(content) {
