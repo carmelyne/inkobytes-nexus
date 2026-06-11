@@ -61,6 +61,7 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Review: approved
   - Approved by: human
   - Notes: Add a lightweight update check comparing the installed Nexus version with the latest npm registry version for `@inkobytes/nexus`. Cache the result locally for 24 hours so normal commands do not hit the network every run. Never block CLI execution if the check fails. Skip in CI and when `NEXUS_NO_UPDATE_CHECK=1` is set. Print a small notice only when a newer version is available. Document the README opt-out. No telemetry, repo data, command usage tracking, user id, task data, or command names may be sent anywhere.
+  - Acceptance: Shows update notice only when latest npm version is greater than local version; caches npm lookup for 24 hours; skips update check in CI or when `NEXUS_NO_UPDATE_CHECK=1`; fails silently if offline or registry request fails; does not send repo path, command name, task data, user id, or usage events anywhere; includes README note for opt-out.
 
 ### Audit batch 2026-06-10 (source: docs-priv/audit-2026-06-10-claude.md)
 
