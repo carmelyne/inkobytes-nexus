@@ -365,22 +365,11 @@
       }
 
       function renderNextSuggestion(task, agent) {
-        const lines = [
-          `NEXUS SUGGESTS for ${agent}:`,
-          `   Task: ${task.id || task.title || 'unknown'}`,
-          `   Epic: ${task.epic || 'unknown'}`,
-          `   Files: ${task.files || 'no files'}`,
-          `   Cost: ${task.cost || 'unknown'}`,
-          `   Auto-flow: ${task.autoFlow || 'no'}`,
-        ];
         const drills = relatedDrillsForTask(task);
-        if (drills.length) {
-          lines.push('');
-          lines.push('   Related known failure-mode guidance from drills:');
-          for (const id of drills) lines.push(`   - ${id}`);
-          lines.push('   Run `nexus drill show <id>` if the task matches that risk.');
-        }
-        return '<div class="next-suggestion"><pre>' + escapeHtml(lines.join('\n')) + '</pre></div>'
+        const drillChips = drills.length
+          ? '<div class="next-drill-list"><span>Drills</span>' + drills.map(id => '<code>' + escapeHtml(id) + '</code>').join('') + '</div>'
+          : '';
+        return '<div class="next-suggestion"><span class="next-suggestion-label">Suggested next for ' + escapeHtml(agent) + '</span>' + drillChips + '</div>'
           + renderTask(task);
       }
 
