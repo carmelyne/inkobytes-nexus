@@ -17,6 +17,7 @@ const COMMANDS = {
   clean: () => import('../src/commands/clean.js'),
   next: () => import('../src/commands/next.js'),
   q: () => import('../src/commands/q.js'),
+  queue: () => import('../src/commands/queue.js'),
   start: () => import('../src/commands/start.js'),
   dashboard: () => import('../src/commands/dashboard.js'),
   metrics: () => import('../src/commands/metrics.js'),
@@ -77,6 +78,7 @@ function printHelp() {
     ['clean [--stale | <path>]', 'Prune locks (surgical, stale, or nuke)'],
     ['next <agent> [--take]', 'Suggest or delegate next safe task from queue'],
     ['q <agent> | q done <id> <agent>', 'Show an agent lane or write a lane-local completion receipt'],
+    ['queue reconcile', 'Batch lane receipts back into the master queue'],
     ['start [--agent @handle]', 'Orient an agent entering this repo'],
     ['dashboard --serve [--port <port>]', 'Serve live local Nexus dashboard'],
     ['metrics [--json]', 'Summarize commits, releases, and queue cost'],
@@ -113,6 +115,7 @@ function printHelp() {
     'nexus next @codex --take',
     'nexus q @codex',
     'nexus q done hot-file-contention @codex',
+    'nexus queue reconcile',
     'nexus halt "queue drift detected, need human review"',
   ];
 
