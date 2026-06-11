@@ -88,7 +88,8 @@ This project uses Nexus for multi-agent coordination.
 - Use \`nexus next @Agent\` for the next safe queue task.
 - Use \`nexus next @Agent --take\` when work should be delegated into an agent lane; it copies the full task block into \`_NEXUS_Q_<AGENT>.md\` and marks the master task delegated.
 - Use \`nexus q @Agent\` to inspect an agent lane, and \`nexus q done <id> @Agent\` to write a lane-local receipt without mutating \`_NEXUS_QUEUE.md\`.
-- Treat \`_NEXUS_QUEUE.md\` as the registry during delegated work; active notes and done receipts live in the assigned lane until batch reconciliation.
+- Use \`nexus queue reconcile\` at a human checkpoint or explicit agent checkpoint to batch pending lane receipts back into \`_NEXUS_QUEUE.md\`.
+- Treat \`_NEXUS_QUEUE.md\` as the registry during delegated work; active notes and done receipts live in the assigned lane until batch reconciliation. If \`nexus doctor\` reports unreconciled receipts, duplicate receipts, stale delegated tasks, or master/lane disagreement, inspect before reconciling.
 - Do not free-roam into unassigned or \`Auto-flow: no\` work without user approval.
 - Direct user instruction can override queue order, but not claim/release, data, security, or approval gates.
 - If no safe task remains, announce \`Standby\` with what you are waiting for, then stop until user input, queue change, or explicit assignment.
