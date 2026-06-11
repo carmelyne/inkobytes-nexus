@@ -73,6 +73,8 @@ When adding work to `_NEXUS_QUEUE.md`, keep tasks dashboard-parseable and immedi
 - Delegated tasks are skipped by `nexus next` until reconciliation lands, so two agents do not take the same unreconciled work.
 - Use `nexus q @Agent` to inspect the lane.
 - Use `nexus q done <id> @Agent` to write a lane-local completion receipt. This updates the agent lane only and leaves `_NEXUS_QUEUE.md` unchanged.
+- Use `nexus queue reconcile` at a human checkpoint or explicit agent checkpoint to batch pending lane receipts back into `_NEXUS_QUEUE.md`.
+- If `nexus doctor` reports unreconciled receipts, duplicate receipts, stale delegated tasks, or master/lane disagreement, inspect the lane and master queue before reconciling.
 
 ## Guardrails
 
