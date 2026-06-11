@@ -48,11 +48,12 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Approved by: human
   - Notes: Use `docs/nexus-dynamic-governed-loops.md` as the source brief to create a clear graphic explaining the dynamic discovery loop, approval gate, and governed execution loop. Anchor the graphic around: "Dynamic before approval. Deterministic after approval." Decide whether the first deliverable is Mermaid, README art, dashboard explainer, or a Figma/FigJam handoff.
 
-- [ ] TASK/Codex: Add cached update notice for Nexus CLI
+- [x] TASK/Codex: Add cached update notice for Nexus CLI
   - Id: cached-update-notice
   - Epic: Distribution and release visibility
-  - Status: Ready
+  - Status: Done
   - Created: 2026-06-11
+  - Done: 2026-06-11
   - Depends on: none
   - Files: bin/nexus.js, src/utils/update-check.js, test/update-check.test.js, README.md
   - Affinity: cli, release, dx
