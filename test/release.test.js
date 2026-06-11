@@ -91,6 +91,70 @@ test('release appends matching completed queue task to ledger', () => {
   });
 });
 
+test('release without a lock falls back to NEXUS_AGENT for commit and ledger attribution', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, 'file.txt'), 'hello\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), [
+      '- [x] TASK/Claude: Lockless release task',
+      '  - Id: lockless-release',
+      '  - Epic: Loop readiness',
+      '  - Files: file.txt',
+      '  - Cost: small',
+    ].join('\n'), 'utf-8');
+    spawnSync('git', ['add', '.'], { cwd: root, stdio: 'pipe' });
+    spawnSync('git', ['commit', '-m', 'init'], { cwd: root, stdio: 'pipe' });
+    writeFileSync(join(root, 'file.txt'), 'hello again\n', 'utf-8');
+
+    const originalEnv = process.env.NEXUS_AGENT;
+    process.env.NEXUS_AGENT = '@claude';
+    const originalWarn = console.warn;
+    console.warn = () => {};
+    try {
+      release(['file.txt', 'lockless-release: close it']);
+    } finally {
+      console.warn = originalWarn;
+      if (originalEnv === undefined) delete process.env.NEXUS_AGENT;
+      else process.env.NEXUS_AGENT = originalEnv;
+    }
+
+    const log = spawnSync('git', ['log', '-1', '--pretty=%s'], { cwd: root, encoding: 'utf-8' }).stdout.trim();
+    assert.equal(log, '[@claude] lockless-release: close it');
+    const ledger = readFileSync(join(root, '_NEXUS_LEDGER.md'), 'utf-8');
+    assert.match(ledger, /- Agent: @claude/);
+  });
+});
+
+test('release without a lock or NEXUS_AGENT attributes the ledger entry to the task owner', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, 'file.txt'), 'hello\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), [
+      '- [x] TASK/Gemini: Ownerless lock release task',
+      '  - Id: ownerless-lock-release',
+      '  - Epic: Loop readiness',
+      '  - Files: file.txt',
+      '  - Cost: small',
+    ].join('\n'), 'utf-8');
+    spawnSync('git', ['add', '.'], { cwd: root, stdio: 'pipe' });
+    spawnSync('git', ['commit', '-m', 'init'], { cwd: root, stdio: 'pipe' });
+    writeFileSync(join(root, 'file.txt'), 'hello again\n', 'utf-8');
+
+    const originalEnv = process.env.NEXUS_AGENT;
+    delete process.env.NEXUS_AGENT;
+    const originalWarn = console.warn;
+    console.warn = () => {};
+    try {
+      release(['file.txt', 'ownerless-lock-release: close it']);
+    } finally {
+      console.warn = originalWarn;
+      if (originalEnv !== undefined) process.env.NEXUS_AGENT = originalEnv;
+    }
+
+    const ledger = readFileSync(join(root, '_NEXUS_LEDGER.md'), 'utf-8');
+    assert.match(ledger, /- Agent: @gemini/);
+    assert.doesNotMatch(ledger, /- Agent: unknown/);
+  });
+});
+
 test('release warns and reports when HEAD changed since claim', () => {
   inTempRepo((root) => {
     writeFileSync(join(root, 'file.txt'), 'hello\n', 'utf-8');
