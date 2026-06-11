@@ -24,7 +24,7 @@ import {
   protocolBlock,
 } from '../lib/protocolText.js';
 import { HOOK_AGENT_CONFIGS, hookStatus } from './hooks.js';
-import { contractViolations, parseContractTasks } from '../lib/taskContract.js';
+import { contractViolations, parseContractTasks, primitiveGaps } from '../lib/taskContract.js';
 
 const LOCAL_DECISIONS_TEMPLATE = `# Decisions
 
@@ -563,6 +563,41 @@ export default function doctor(args) {
         ok: true,
       });
     }
+
+    // Task primitives — Outcome + Evidence + Stop If are the anti-over-looping
+    // contract: they say when a loop agent is finished and when it must stop.
+    // Missing primitives are actionable at autonomy 2, advisory below.
+    const primitivesRequired = config.autonomy >= 2;
+    const primitiveFailing = parseContractTasks(readySection)
+      .filter((t) => !t.done && t.status !== 'Done' && t.autoFlow === 'yes')
+      .map((t) => ({ task: t, gaps: primitiveGaps(t) }))
+      .filter(({ gaps }) => gaps.length);
+
+    if (primitiveFailing.length) {
+      for (const { task, gaps } of primitiveFailing) {
+        const id = task.id || task.title;
+        sections['Queue Authorship'].push({
+          issue: `Task "${id}" is missing task primitives (${gaps.map((g) => g.field).join(', ')})`,
+          fix: 'declare Goal, Outcome, Constraints, Stop If, and Evidence in `_NEXUS_QUEUE.md` — Outcome + Evidence + Stop If define when a loop agent is done and when it must stop',
+          ok: !primitivesRequired,
+          displayGroup: id,
+          queueInfo: {
+            taskId: id,
+            state: primitivesRequired
+              ? `auto-flow: yes in Ready Queue at autonomy ${config.autonomy}`
+              : `auto-flow: yes in Ready Queue (advisory at autonomy ${config.autonomy}; required at autonomy 2)`,
+            needs: gaps.map((g) => `${g.field} (${g.describes})`).join(', '),
+            impact: primitivesRequired ? 'under-specified for unattended loop work' : '',
+          },
+        });
+      }
+    } else {
+      sections['Queue Authorship'].push({
+        issue: 'All auto-flow tasks in Ready Queue declare the task primitives',
+        fix: 'No action needed.',
+        ok: true,
+      });
+    }
   }
 
   // Loop readiness — autonomy above supervised requires a release verify gate
@@ -1006,6 +1041,31 @@ function repairNexusSkillDoc(content) {
   const mandatoryNote = 'If the user, repo, or hook says Nexus is active, treat this skill as mandatory workflow. It is not optional advice.';
   if (!next.includes(mandatoryNote)) {
     next = next.replace('## Loop', `${mandatoryNote}\n\n## Loop`);
+  }
+
+  if (!next.includes('  - Stop If: Conditions that require stopping for human review.')) {
+    next = next.replace(
+      '  - Notes: One practical paragraph with scope, constraints, and definition of done.',
+      [
+        '  - Notes: One practical paragraph with scope, constraints, and definition of done.',
+        '  - Goal: Why this task exists, one line.',
+        '  - Outcome: What must be true when the task is complete.',
+        '  - Constraints: What the agent must not change or assume.',
+        '  - Stop If: Conditions that require stopping for human review.',
+        '  - Evidence: Tests, logs, or reports that prove completion.',
+      ].join('\n'),
+    );
+  }
+
+  if (!next.includes('are the loop contract')) {
+    next = next.replace(
+      '- `Notes` should carry dashboard-useful context, not a whole design doc.',
+      [
+        '- `Notes` should carry dashboard-useful context, not a whole design doc.',
+        '- Task primitives (`Goal`, `Outcome`, `Constraints`, `Stop If`, `Evidence`) are advisory today and required for auto-flow at autonomy 2. `Outcome` + `Evidence` + `Stop If` are the loop contract: when an agent is finished and when it must stop.',
+        '- Write `Evidence` prospectively when authoring (what will prove completion); update it to point at the real artifacts when the task is Done.',
+      ].join('\n'),
+    );
   }
 
   next = next.replace(
