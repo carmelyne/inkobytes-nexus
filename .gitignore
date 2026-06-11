@@ -3,6 +3,7 @@
 .claude/
 .codex/
 .gemini/
+.gemmacli/
 .agy/
 .agent-session-logs/
 session-logs/
