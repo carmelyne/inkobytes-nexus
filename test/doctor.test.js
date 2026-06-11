@@ -911,3 +911,91 @@ test('doctor reports loop readiness ok when autonomy 1+ has a verify command', (
     assert.match(output, /autonomy 1 with release verify gate configured \(npm test\)/);
   });
 });
+
+const PRIMITIVE_GAP_QUEUE = [
+  '# Queue',
+  '',
+  '## Ready Queue',
+  '',
+  '- [ ] TASK/Codex: Contract-complete task without primitives',
+  '  - Id: no-primitives-task',
+  '  - Status: Ready',
+  '  - Files: src/good.js',
+  '  - Cost: small',
+  '  - Auto-flow: yes',
+  '  - Review: approved',
+  '  - Approved by: human',
+  '  - Notes: Complete contract, no primitives yet.',
+  '',
+].join('\n');
+
+test('doctor reports missing task primitives as advisory below autonomy 2', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), PRIMITIVE_GAP_QUEUE, 'utf-8');
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /task: no-primitives-task/);
+    assert.match(output, /advisory at autonomy 0; required at autonomy 2/);
+    assert.match(output, /needs: Goal \(why the task exists\), Outcome \(what must be true when complete\), Constraints \(what the agent must not change or assume\), Stop If \(conditions requiring human review\), Evidence \(tests, logs, or reports proving completion\)/);
+    assert.doesNotMatch(output, /under-specified for unattended loop work/);
+  });
+});
+
+test('doctor flags missing task primitives as actionable at autonomy 2', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), PRIMITIVE_GAP_QUEUE, 'utf-8');
+    mkdirSync(join(root, '.nexus'), { recursive: true });
+    writeFileSync(join(root, '.nexus', 'config.json'), JSON.stringify({
+      autonomy: 2,
+      release: { verifyCommand: 'npm test' },
+    }), 'utf-8');
+    writeFileSync(join(root, '.nexus', 'agent-budgets.json'), JSON.stringify({ '@claude': { maxTasks: 3 } }), 'utf-8');
+    resetConfig();
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /task: no-primitives-task/);
+    assert.match(output, /auto-flow: yes in Ready Queue at autonomy 2/);
+    assert.match(output, /impact: under-specified for unattended loop work/);
+    assert.match(output, /fix: declare Goal, Outcome, Constraints, Stop If, and Evidence/);
+    assert.doesNotMatch(output, /advisory at autonomy/);
+  });
+});
+
+test('doctor reports primitives ok when auto-flow tasks declare all of them', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), [
+      '# Queue',
+      '',
+      '## Ready Queue',
+      '',
+      '- [ ] TASK/Codex: Fully primitive task',
+      '  - Id: primitive-task',
+      '  - Status: Ready',
+      '  - Files: src/good.js',
+      '  - Cost: small',
+      '  - Auto-flow: yes',
+      '  - Review: approved',
+      '  - Approved by: human',
+      '  - Notes: Complete contract.',
+      '  - Goal: Prove the primitive checks.',
+      '  - Outcome: Doctor reports the primitives as declared.',
+      '  - Constraints: Touch only src/good.js.',
+      '  - Stop If: The check needs new fields.',
+      '  - Evidence: test/doctor.test.js covers the ok path.',
+      '',
+    ].join('\n'), 'utf-8');
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /All auto-flow tasks in Ready Queue declare the task primitives/);
+    assert.doesNotMatch(output, /is missing task primitives/);
+  });
+});
