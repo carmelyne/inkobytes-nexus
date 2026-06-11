@@ -9,14 +9,21 @@ import { readBoard } from '../lib/blackboard.js';
 import { contractViolations, TASK_PRIMITIVES, primitiveGaps } from '../lib/taskContract.js';
 import { spawnSync } from 'child_process';
 import { refuseIfHalted } from './halt.js';
+import {
+  delegatedTaskIds,
+  delegateTask,
+  extractSection,
+  parseReadyTasks,
+} from '../lib/queue.js';
 
 export default function next(args) {
   refuseIfHalted('next');
 
-  const agent = args[0];
+  const take = args.includes('--take');
+  const agent = args.find(arg => !arg.startsWith('--'));
 
   if (!agent) {
-    console.error('Usage: nexus next <agent_name>');
+    console.error('Usage: nexus next <agent_name> [--take]');
     process.exit(1);
   }
 
@@ -47,6 +54,7 @@ export default function next(args) {
 
   // Load budget if available
   const budget = loadBudget(config.budgetFile, agent);
+  const delegatedIds = delegatedTaskIds(config.root);
 
   // Score and filter tasks — only Ready Queue, only human-approved auto-flow.
   // At autonomy 1+ the queue is the program: the full task contract applies,
@@ -64,6 +72,7 @@ export default function next(args) {
       }
       return true;
     })
+    .filter(t => !delegatedIds.has(t.id))
     .filter(t => !hasFileConflict(t.files, claimedFiles))
     .filter(t => dependenciesMet(t.dependsOn, tasks, config.root))
     .filter(t => t.cost !== 'spiky')
@@ -97,6 +106,21 @@ export default function next(args) {
   console.log(`   Auto-flow: ${pick.autoFlow}`);
   printTaskPrimitives(pick, config.autonomy);
   printRelatedDrills(pick);
+
+  if (take) {
+    const result = delegateTask({
+      root: config.root,
+      queuePath: config.queue,
+      queueContent,
+      task: pick,
+      agent,
+    });
+    console.log('');
+    console.log(`   Delegated: ${pick.id} -> ${result.lane}`);
+    console.log(`   Delegated at: ${result.delegatedAt}`);
+    console.log('   Receipt: pending reconciliation');
+  }
+
   console.log('');
 }
 
@@ -206,88 +230,6 @@ function parseRunway(content, agent) {
     }
   }
   return [];
-}
-
-function extractSection(content, heading) {
-  const lines = content.split('\n');
-  let inSection = false;
-  const result = [];
-  for (const line of lines) {
-    if (line.startsWith('## ')) {
-      inSection = line.trim() === heading;
-      continue;
-    }
-    if (inSection) result.push(line);
-  }
-  return result.join('\n');
-}
-
-function parseReadyTasks(content) {
-  // Only read from ## Ready Queue — Proposed section is invisible to nexus next
-  const sectionContent = extractSection(content, '## Ready Queue');
-  const tasks = [];
-  const lines = sectionContent.split('\n');
-  let current = null;
-
-  for (const line of lines) {
-    const taskMatch = line.match(/^- \[[ x]\] TASK\/.+?:\s*(.+)/);
-    if (taskMatch) {
-      if (current) tasks.push(current);
-      current = {
-        title: taskMatch[1],
-        id: '',
-        epic: '',
-        status: '',
-        dependsOn: '',
-        files: [],
-        affinity: [],
-        drills: [],
-        cost: '', // empty means the task never declared Cost — the contract can see that
-        autoFlow: 'no',
-        review: '',
-        approvedBy: '',
-        notes: '',
-        goal: '',
-        outcome: '',
-        constraints: '',
-        stopIf: '',
-        evidence: '',
-      };
-      continue;
-    }
-
-    if (current && line.match(/^\s+-\s/)) {
-      const kv = line.trim().replace(/^-\s*/, '');
-      const colonIdx = kv.indexOf(':');
-      if (colonIdx === -1) continue;
-
-      const key = kv.slice(0, colonIdx).trim().toLowerCase();
-      const val = kv.slice(colonIdx + 1).trim();
-
-      switch (key) {
-        case 'id': current.id = val; break;
-        case 'epic': current.epic = val; break;
-        case 'status': current.status = val; break;
-        case 'depends on': current.dependsOn = val; break;
-        case 'files': current.files = val.split(',').map(s => s.trim()); break;
-        case 'affinity': current.affinity = val.split(',').map(s => s.trim()); break;
-        case 'drills': current.drills = val.split(',').map(s => s.trim()).filter(Boolean); break;
-        case 'cost': current.cost = val; break;
-        case 'auto-flow': current.autoFlow = val; break;
-        case 'review': current.review = val.toLowerCase(); break;
-        case 'approved by': current.approvedBy = val; break;
-        case 'notes': current.notes = val; break;
-        case 'goal': current.goal = val; break;
-        case 'outcome': current.outcome = val; break;
-        case 'constraints': current.constraints = val; break;
-        case 'stop if': current.stopIf = val; break;
-        case 'evidence': current.evidence = val; break;
-      }
-    }
-  }
-
-  if (current) tasks.push(current);
-  return tasks;
 }
 
 function parseClaimed(boardContent) {
