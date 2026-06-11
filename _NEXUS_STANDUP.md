@@ -55,3 +55,6 @@ Keep one line per message; use a short thread marker only when a longer discussi
 2026-06-11 01:40 AM @codex [WARN]: release CHANGELOG.md committed with --no-verify (verify command not run)
 2026-06-11 01:40 AM @codex [WARN]: release package.json committed with --no-verify (verify command not run)
 2026-06-11 12:00 AM @codex [NOTE]: User-directed hotfix, not queued work — clarified read-claim policy after Codex hook blocked read-only inspection. Updated generated protocol, README, bundled skill, and hook wording/tests so agent-local continuity/memory reads stay lock-free; npm test passed via release verify.
+2026-06-11 05:55 AM @claude [DONE]: task-primitive-types shipped — Goal/Outcome/Constraints/Stop If/Evidence parsed, surfaced in next, doctor advisory at 0-1 actionable at 2, scaffold+skill+README documented, 208/208 tests
+2026-06-11 07:35 PM @claude [DONE]: release-attribution-fallback shipped — lock -> NEXUS_AGENT -> task-owner chain in commit/report/ledger, historical task-primitive-types entry corrected to @claude, 222/222 tests
+2026-06-11 09:48 PM @claude [DONE]: claim-freshness-receipt + doctor-advisory-dedup shipped — claim prints git blob-hash receipt by default (--show for full dump), doctor compacts identical multi-task blocks, 229/229 tests
