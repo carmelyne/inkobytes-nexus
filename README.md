@@ -207,6 +207,7 @@ Doctor reports grouped issues:
 - grouped Git Privacy summaries for tracked private/local trees, with shared agent dirs collapsed into one concise note
 - colorized action buckets so fixes and informational lock notes are easier to scan
 - stale nexus locks
+- unreconciled queue lane receipts, duplicate receipts, stale delegated tasks, and master/lane disagreements
 - missing agent instructions specifically for nexus
 - missing continuity and memory scaffolds
 - legacy `_nexus_*.sh` helper references
@@ -490,7 +491,19 @@ nexus q @codex
 nexus q done hot-file-contention @codex
 ```
 
-`nexus q done <id> <agent>` updates the agent lane file only. It removes the task from `## Active`, appends a pending receipt under `## Completed`, and leaves `_NEXUS_QUEUE.md` unchanged. The master registry is updated later by the planned batch reconciliation flow.
+`nexus q done <id> <agent>` updates the agent lane file only. It removes the task from `## Active`, appends a pending receipt under `## Completed`, and leaves `_NEXUS_QUEUE.md` unchanged.
+
+### `nexus queue reconcile`
+
+Batch pending lane receipts back into the master queue registry.
+
+```bash
+nexus queue reconcile
+```
+
+Reconciliation is the bounded master write: Nexus reads pending receipts from `_NEXUS_Q_<AGENT>.md`, marks matching master queue tasks `Done`, records completion and reconciliation timestamps, and marks the lane receipts reconciled. It refuses duplicate pending receipts for the same task id so humans can resolve contradictions before the registry changes.
+
+Run this as a human checkpoint ritual, or as an explicit agent checkpoint when the repo's autonomy rules allow it. `nexus doctor` warns about unreconciled receipts, duplicate receipts, stale delegated tasks, and master/lane disagreements.
 
 ### `nexus status`
 
