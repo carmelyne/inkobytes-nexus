@@ -257,14 +257,14 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Status: Ready
   - Created: 2026-06-11
   - Depends on: none
-  - Files: src/lib/lockManager.js, src/commands/status.js, src/commands/doctor.js, src/commands/claim.js, src/commands/next.js, test/lockManager.test.js, test/status.test.js, test/doctor.test.js, README.md, _NEXUS_CONSTITUTION.md
+  - Files: src/lib/lockManager.js, src/commands/status.js, src/commands/doctor.js, src/commands/claim.js, src/commands/next.js, test/lockManager.test.js, test/status.test.js, test/doctor.test.js, README.md, skills/nexus/SKILL.md, _NEXUS_CONSTITUTION.md
   - Affinity: locks, blockers, human-in-loop, flow-control
   - Cost: medium
   - Auto-flow: no
   - Review: approved
   - Approved by: human
-  - Outcome: Nexus can mark a claimed path or task as intentionally waiting on human approval, so status and doctor report it as human-held instead of stale, crashed, or abandoned.
-  - Evidence: A hold records blocker type, blocker name, reason, timestamp, and optional task id; `nexus status` shows human-held locks distinctly; `nexus doctor` does not suggest stale cleanup for human-held locks unless a configured max hold age is exceeded; `nexus next` treats human-held paths as unavailable; tests cover creating a hold, rendering status, doctor behavior, clearing a hold, and transition back to stale when the hold expires or is cleared.
+  - Outcome: Nexus can mark a claimed path or task as intentionally waiting on human approval, so status and doctor report it as human-held instead of stale, crashed, or abandoned. README, the bundled Nexus Skill, and the constitution document how agents record and clear human approval holds.
+  - Evidence: A hold records blocker type, blocker name, reason, timestamp, and optional task id; `nexus status` shows human-held locks distinctly; `nexus doctor` does not suggest stale cleanup for human-held locks unless a configured max hold age is exceeded; `nexus next` treats human-held paths as unavailable; README and `skills/nexus/SKILL.md` describe the hold workflow; tests cover creating a hold, rendering status, doctor behavior, clearing a hold, and transition back to stale when the hold expires or is cleared.
   - Notes: Waiting on Pong is not a crash. Add a command or flag such as `nexus hold <path> --by human --reason "awaiting approval"` or `nexus claim ... --blocked-by human`. If agent runtimes expose active tool or pending approval metadata, capture it opportunistically; otherwise Nexus should record the last known Nexus command, lock intent, task id, and explicit hold reason without pretending it can see hidden agent internals. Human-held work should stay visible and bounded, but should not be framed as abandoned.
 
 ### Loop readiness 2026-06-10 (source: docs-priv/loop-readiness-plan-2026-06-10.md)
