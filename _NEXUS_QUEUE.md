@@ -54,7 +54,7 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Status: Ready
   - Created: 2026-06-11
   - Depends on: none
-  - Files: src/cli.js, src/utils/update-check.js, test/update-check.test.js, README.md
+  - Files: bin/nexus.js, src/utils/update-check.js, test/update-check.test.js, README.md
   - Affinity: cli, release, dx
   - Cost: medium
   - Auto-flow: yes
