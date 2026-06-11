@@ -313,10 +313,11 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Approved by: human (2026-06-11, Wave 2 reassigned Codex->Claude)
   - Notes: At autonomy level 1 or higher, nexus next skips Auto-flow tasks missing required contract fields: non-empty Notes, Files, Cost, Review approved, and Approved by human; it prints which field is missing so the human can repair the task. Doctor lists Auto-flow tasks failing the contract at any level. Loop principle: in loop mode the queue is the program, so under-specified tasks are bugs and must not auto-flow.
 
-- [ ] TASK/Claude: Introduce Task Primitive types for agent-native task definitions
+- [x] TASK/Claude: Introduce Task Primitive types for agent-native task definitions
   - Id: task-primitive-types
   - Epic: Loop readiness
-  - Status: Ready
+  - Status: Done
+  - Done: 2026-06-11
   - Created: 2026-06-11
   - Depends on: autoflow-task-contract
   - Files: src/lib/taskContract.js, src/commands/next.js, src/commands/doctor.js, src/commands/init.js, skills/nexus/SKILL.md, _NEXUS_QUEUE.md, README.md, test/next.test.js, test/doctor.test.js
@@ -326,6 +327,8 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Review: approved
   - Approved by: human (2026-06-11, human-initiated)
   - Notes: Human-proposed primitive set (2026-06-11) for agent-native task definitions — Goal (why the task exists), Outcome (what must be true when complete), Scope (files/commands/surfaces included), Constraints (what the agent must not change or assume), Gates (what must be approved before proceeding), Stop If (conditions requiring human review), Evidence (tests/logs/screenshots/changelog/reports proving completion), Affinity, Cost, Dependencies. Mapping to existing template: Scope extends Files, Dependencies = Depends on, Gates extends Review/Approved by, Affinity and Cost already exist; net-new fields are Goal, Outcome, Constraints, Stop If, Evidence. Loop principle: Outcome + Evidence + Stop If define when a loop agent is finished and when it must stop — the anti-over-looping contract. Implementation: extend queue parsing to recognize the new fields, surface them in nexus next output, have doctor flag Auto-flow tasks missing them at autonomy 2 (advisory at lower levels), update the init scaffold and skill docs. Backward compatible: existing tasks stay valid; primitives tier into the Auto-flow contract gradually. Build on the shared field-contract module from autoflow-task-contract.
+  - Outcome: Queue parsing recognizes Goal, Outcome, Constraints, Stop If, and Evidence; nexus next prints declared primitives and lists missing ones as an advisory; doctor reports primitive gaps on auto-flow tasks as advisory at autonomy 0-1 and actionable at autonomy 2; init scaffold, skill doc, and README document the set; existing tasks stay valid.
+  - Evidence: test/next.test.js covers primitive surfacing and the missing-primitives advisory; test/doctor.test.js covers advisory below autonomy 2, actionable at autonomy 2, and the all-declared ok path; 208/208 tests pass; doctor on this repo shows advisory primitive entries and Docs & Skills OK.
 
 - [ ] TASK/@claude: Design loop progress signals for stuck-but-alive agents
   - Id: loop-progress-signals
