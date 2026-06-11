@@ -4237,3 +4237,833 @@ Structured release receipts.
 - SHA: c4b88f2a43d6a1ed37cbb3e6f2a38f7b05a89b5f
 - Commit: chore(nexus): first tracked commit of _NEXUS_CHMOD.md (queue-git-tracking)
 
+## [2026-06-11 02:06:02 AM] _NEXUS_STANDUP.md
+
+- Agent: @claude
+- Target: _NEXUS_STANDUP.md
+- Claim HEAD: 4d799df1f91143a19e27c6b43e0c633114edc004
+- Release HEAD: 4d799df1f91143a19e27c6b43e0c633114edc004
+- Drift: no
+- SHA: 6ebd9d08d733a2c9938b1fdaf40b609869f05ba1
+- Commit: chore(nexus): first tracked commit of _NEXUS_STANDUP.md (queue-git-tracking)
+
+## [2026-06-11 02:06:45 AM] README.md
+
+- Agent: @claude
+- Target: README.md
+- Claim HEAD: 6ebd9d08d733a2c9938b1fdaf40b609869f05ba1
+- Release HEAD: 6ebd9d08d733a2c9938b1fdaf40b609869f05ba1
+- Drift: no
+- SHA: d195b1f8dbc4e8ba9e6950bf81017f6d8a4a0a09
+- Commit: docs(readme): coordination-file tracking guidance — queue history, release receipts, public-repo exceptions (queue-git-tracking)
+
+## [2026-06-11 02:07:17 AM] _NEXUS_STANDUP.md
+
+- Agent: @claude
+- Target: _NEXUS_STANDUP.md
+- Claim HEAD: d195b1f8dbc4e8ba9e6950bf81017f6d8a4a0a09
+- Release HEAD: d195b1f8dbc4e8ba9e6950bf81017f6d8a4a0a09
+- Drift: no
+- SHA: 82ef05e14a8ddf9de7f5c2541d6f95f25576c690
+- Commit: chore(standup): Wave 2 + queue-git-tracking closure notes (queue-git-tracking)
+
+## [2026-06-11 12:15:54 PM] _NEXUS_QUEUE.md
+
+- Agent: @codex
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: 82ef05e14a8ddf9de7f5c2541d6f95f25576c690
+- Release HEAD: 82ef05e14a8ddf9de7f5c2541d6f95f25576c690
+- Drift: no
+- SHA: 970b5c8b9673f3582577adc3b1ba0fd928cd57e0
+- Commit: chore(queue): add cached update notice task
+
+## [2026-06-11 12:16:33 PM] _NEXUS_QUEUE.md
+
+- Agent: @codex
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: 970b5c8b9673f3582577adc3b1ba0fd928cd57e0
+- Release HEAD: 970b5c8b9673f3582577adc3b1ba0fd928cd57e0
+- Drift: no
+- SHA: be8c4d98643a10104d1b25b257a9d3e1112339e8
+- Commit: chore(queue): add cached update notice acceptance
+
+## [2026-06-11 12:18:27 PM] _NEXUS_QUEUE.md
+
+- Agent: @codex
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: be8c4d98643a10104d1b25b257a9d3e1112339e8
+- Release HEAD: be8c4d98643a10104d1b25b257a9d3e1112339e8
+- Drift: no
+- SHA: 2f07b053a6b291cdb3408d2fa7b8345427d2764e
+- Commit: chore(queue): use bin entrypoint for update notice
+
+## [2026-06-11 12:20:22 PM] src/utils/update-check.js
+
+- Agent: @codex
+- Target: src/utils/update-check.js
+- Claim HEAD: 970b5c8b9673f3582577adc3b1ba0fd928cd57e0
+- Release HEAD: 2f07b053a6b291cdb3408d2fa7b8345427d2764e
+- Drift: yes
+- SHA: 0a53adc2b5609671a655044e9ff3fc1bd4895cb8
+- Commit: feat(cli): add cached update checker
+
+## [2026-06-11 12:20:32 PM] test/update-check.test.js
+
+- Agent: @codex
+- Target: test/update-check.test.js
+- Claim HEAD: 970b5c8b9673f3582577adc3b1ba0fd928cd57e0
+- Release HEAD: 0a53adc2b5609671a655044e9ff3fc1bd4895cb8
+- Drift: yes
+- SHA: c75cdc420f4939cd8d0a3ac840d8a7ca8600f584
+- Commit: test(cli): cover cached update notice
+
+## [2026-06-11 12:20:42 PM] bin/nexus.js
+
+- Agent: @codex
+- Target: bin/nexus.js
+- Claim HEAD: 970b5c8b9673f3582577adc3b1ba0fd928cd57e0
+- Release HEAD: c75cdc420f4939cd8d0a3ac840d8a7ca8600f584
+- Drift: yes
+- SHA: df0a9003231c656de161619ba2a37a50a0323f6d
+- Commit: feat(cli): show cached update notice
+
+## [2026-06-11 12:20:52 PM] README.md
+
+- Agent: @codex
+- Target: README.md
+- Claim HEAD: 970b5c8b9673f3582577adc3b1ba0fd928cd57e0
+- Release HEAD: df0a9003231c656de161619ba2a37a50a0323f6d
+- Drift: yes
+- SHA: 20cbb853fd889646879447ee9b85c76a5c189fc0
+- Commit: docs(readme): document update check opt-out
+
+## [2026-06-11 12:21:29 PM] _NEXUS_QUEUE.md
+
+- Agent: @codex
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: 20cbb853fd889646879447ee9b85c76a5c189fc0
+- Release HEAD: 20cbb853fd889646879447ee9b85c76a5c189fc0
+- Drift: no
+- SHA: 32fcf531e6551e0499577546cc11b4ec4c8417a7
+- Commit: chore(queue): close cached-update-notice
+
+## [2026-06-11 12:25:24 PM] .gitignore
+
+- Agent: @codex
+- Target: .gitignore
+- Claim HEAD: 32fcf531e6551e0499577546cc11b4ec4c8417a7
+- Release HEAD: 32fcf531e6551e0499577546cc11b4ec4c8417a7
+- Drift: no
+- SHA: 17cd83208c8ed375da7268c48ca582cfbf556107
+- Commit: chore(gitignore): ignore Gemma CLI state
+
+## [2026-06-11 12:28:16 PM] _NEXUS_QUEUE.md
+
+- Agent: @codex
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: 17cd83208c8ed375da7268c48ca582cfbf556107
+- Release HEAD: 17cd83208c8ed375da7268c48ca582cfbf556107
+- Drift: no
+- SHA: 22a626cd13b9e8590ff20268c88aefde3b1549b3
+- Commit: chore(queue): use outcome evidence wording
+
+## [2026-06-11 05:52:38 PM] _NEXUS_QUEUE.md
+
+- Agent: @codex
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: 22a626cd13b9e8590ff20268c88aefde3b1549b3
+- Release HEAD: 22a626cd13b9e8590ff20268c88aefde3b1549b3
+- Drift: no
+- SHA: 43082cecc868ec1963f4b50ec356c872082933e7
+- Commit: chore(queue): add delegated lanes reconciliation task
+
+## [2026-06-11 05:53:27 PM] src/lib/taskContract.js
+
+- Agent: @claude
+- Target: src/lib/taskContract.js
+- Claim HEAD: 22a626cd13b9e8590ff20268c88aefde3b1549b3
+- Release HEAD: 43082cecc868ec1963f4b50ec356c872082933e7
+- Drift: yes
+- SHA: 6086138e68270477606d6fc359b0fde285cefc19
+- Commit: feat(contract): add task primitives set and primitiveGaps
+
+## [2026-06-11 05:53:42 PM] src/commands/next.js
+
+- Agent: @claude
+- Target: src/commands/next.js
+- Claim HEAD: 22a626cd13b9e8590ff20268c88aefde3b1549b3
+- Release HEAD: 6086138e68270477606d6fc359b0fde285cefc19
+- Drift: yes
+- SHA: abbbc04233411a4d0ba07c52cb58979c565a6bed
+- Commit: feat(next): surface task primitives in suggestions
+
+## [2026-06-11 05:53:49 PM] src/commands/doctor.js
+
+- Agent: @claude
+- Target: src/commands/doctor.js
+- Claim HEAD: 22a626cd13b9e8590ff20268c88aefde3b1549b3
+- Release HEAD: abbbc04233411a4d0ba07c52cb58979c565a6bed
+- Drift: yes
+- SHA: 75e68987ee297ba2d8b82601d3a585a2c0d7e4a0
+- Commit: feat(doctor): check task primitives, advisory below autonomy 2
+
+## [2026-06-11 05:53:55 PM] src/commands/init.js
+
+- Agent: @claude
+- Target: src/commands/init.js
+- Claim HEAD: 22a626cd13b9e8590ff20268c88aefde3b1549b3
+- Release HEAD: 75e68987ee297ba2d8b82601d3a585a2c0d7e4a0
+- Drift: yes
+- SHA: 15cd234105eb7ba185044fb778fbfd2957593801
+- Commit: feat(init): scaffold sample task with primitives
+
+## [2026-06-11 05:54:12 PM] test/next.test.js
+
+- Agent: @claude
+- Target: test/next.test.js
+- Claim HEAD: 22a626cd13b9e8590ff20268c88aefde3b1549b3
+- Release HEAD: 15cd234105eb7ba185044fb778fbfd2957593801
+- Drift: yes
+- SHA: 8445f71fd9e6daf27eaf4104fc5826f33faac6e5
+- Commit: test(next): cover primitive surfacing and advisory
+
+## [2026-06-11 05:54:19 PM] test/doctor.test.js
+
+- Agent: @claude
+- Target: test/doctor.test.js
+- Claim HEAD: 22a626cd13b9e8590ff20268c88aefde3b1549b3
+- Release HEAD: 8445f71fd9e6daf27eaf4104fc5826f33faac6e5
+- Drift: yes
+- SHA: d99bfc4667af0a336f009ecfa724585be0612511
+- Commit: test(doctor): cover primitive advisory, autonomy 2, ok path
+
+## [2026-06-11 05:54:26 PM] skills/nexus/SKILL.md
+
+- Agent: @claude
+- Target: skills/nexus/SKILL.md
+- Claim HEAD: 22a626cd13b9e8590ff20268c88aefde3b1549b3
+- Release HEAD: d99bfc4667af0a336f009ecfa724585be0612511
+- Drift: yes
+- SHA: 0b95ee158f7f746e66b5eaef4a83e3bdfc247a63
+- Commit: docs(skill): document task primitives and loop contract
+
+## [2026-06-11 05:54:36 PM] README.md
+
+- Agent: @claude
+- Target: README.md
+- Claim HEAD: 22a626cd13b9e8590ff20268c88aefde3b1549b3
+- Release HEAD: 0b95ee158f7f746e66b5eaef4a83e3bdfc247a63
+- Drift: yes
+- SHA: cdaba39ca4fbd3e86be54862fc2f50b9986ad1f2
+- Commit: docs(readme): document task primitives
+
+## [2026-06-11 05:54:48 PM] _NEXUS_QUEUE.md
+
+- Agent: unknown
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: unknown
+- Release HEAD: cdaba39ca4fbd3e86be54862fc2f50b9986ad1f2
+- Drift: no
+- SHA: a2211708be5b5e451772c99bfcabaf70673fd218
+- Commit: chore(queue): close task-primitive-types with outcome evidence
+
+## [2026-06-11 05:59:10 PM] _NEXUS_QUEUE.md
+
+- Agent: @codex
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: a2211708be5b5e451772c99bfcabaf70673fd218
+- Release HEAD: a2211708be5b5e451772c99bfcabaf70673fd218
+- Drift: no
+- SHA: e3ae21c19b550e962935c3e6aac5d5b163460c92
+- Commit: chore(queue): add delegated lanes review notes
+
+## [2026-06-11 06:02:17 PM] _NEXUS_QUEUE.md
+
+- Agent: @codex
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: e3ae21c19b550e962935c3e6aac5d5b163460c92
+- Release HEAD: e3ae21c19b550e962935c3e6aac5d5b163460c92
+- Drift: no
+- SHA: a3465b8779bec52873518d8468f95dff7d0a5faa
+- Commit: chore(queue): add human approval holds task
+
+## [2026-06-11 06:03:36 PM] _NEXUS_QUEUE.md
+
+- Agent: @codex
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: a3465b8779bec52873518d8468f95dff7d0a5faa
+- Release HEAD: a3465b8779bec52873518d8468f95dff7d0a5faa
+- Drift: no
+- SHA: c35117d5a006ca158fe0f72938d289e3b21bae36
+- Commit: chore(queue): require docs for human approval holds
+
+## [2026-06-11 06:05:04 PM] _NEXUS_QUEUE.md
+
+- Agent: @codex
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: c35117d5a006ca158fe0f72938d289e3b21bae36
+- Release HEAD: c35117d5a006ca158fe0f72938d289e3b21bae36
+- Drift: no
+- SHA: 796b1d454e4a70347a21172012be59349a689613
+- Commit: chore(queue): include protocol generator scope
+
+## [2026-06-11 06:15:57 PM] src/lib/queue.js
+
+- Agent: @codex
+- Target: src/lib/queue.js
+- Claim HEAD: 796b1d454e4a70347a21172012be59349a689613
+- Release HEAD: 796b1d454e4a70347a21172012be59349a689613
+- Drift: no
+- SHA: 597b94cbab6a99bee7803937a3bc97e76e937a22
+- Commit: feat: add delegated queue lane helpers
+
+## [2026-06-11 06:16:08 PM] src/commands/next.js
+
+- Agent: @codex
+- Target: src/commands/next.js
+- Claim HEAD: 796b1d454e4a70347a21172012be59349a689613
+- Release HEAD: 597b94cbab6a99bee7803937a3bc97e76e937a22
+- Drift: yes
+- SHA: bf1706300d499caad5c7b9a00ca29c4a7363c155
+- Commit: feat: delegate next tasks into agent lanes
+
+## [2026-06-11 06:16:19 PM] src/commands/q.js
+
+- Agent: @codex
+- Target: src/commands/q.js
+- Claim HEAD: 796b1d454e4a70347a21172012be59349a689613
+- Release HEAD: bf1706300d499caad5c7b9a00ca29c4a7363c155
+- Drift: yes
+- SHA: 2a9bf9da84c0a26e3eda1d4b18a514bd1c24ea9f
+- Commit: feat: add queue lane command
+
+## [2026-06-11 06:16:29 PM] bin/nexus.js
+
+- Agent: @codex
+- Target: bin/nexus.js
+- Claim HEAD: 796b1d454e4a70347a21172012be59349a689613
+- Release HEAD: 2a9bf9da84c0a26e3eda1d4b18a514bd1c24ea9f
+- Drift: yes
+- SHA: 9a8dec6c805d254acfcaa143ad1d775db6d9b85a
+- Commit: feat: expose queue lane command
+
+## [2026-06-11 06:16:40 PM] src/commands/completion.js
+
+- Agent: @codex
+- Target: src/commands/completion.js
+- Claim HEAD: 796b1d454e4a70347a21172012be59349a689613
+- Release HEAD: 9a8dec6c805d254acfcaa143ad1d775db6d9b85a
+- Drift: yes
+- SHA: d7676b635d671793d6b27b82fa971ffb32ebf244
+- Commit: feat: complete queue lane commands
+
+## [2026-06-11 06:16:51 PM] test/next.test.js
+
+- Agent: @codex
+- Target: test/next.test.js
+- Claim HEAD: 796b1d454e4a70347a21172012be59349a689613
+- Release HEAD: d7676b635d671793d6b27b82fa971ffb32ebf244
+- Drift: yes
+- SHA: 424d69e584ea345705b72dd0c1a8869c33ec2587
+- Commit: test: cover next queue lane delegation
+
+## [2026-06-11 06:17:01 PM] test/q.test.js
+
+- Agent: @codex
+- Target: test/q.test.js
+- Claim HEAD: 796b1d454e4a70347a21172012be59349a689613
+- Release HEAD: 424d69e584ea345705b72dd0c1a8869c33ec2587
+- Drift: yes
+- SHA: 62ca98d4a576c21f84fd0d3816063e4aa74329a4
+- Commit: test: cover q lane receipts
+
+## [2026-06-11 06:17:13 PM] README.md
+
+- Agent: @codex
+- Target: README.md
+- Claim HEAD: 796b1d454e4a70347a21172012be59349a689613
+- Release HEAD: 62ca98d4a576c21f84fd0d3816063e4aa74329a4
+- Drift: yes
+- SHA: 5b5603b43996f0df0c96166fb8d5bc0818bded00
+- Commit: docs: document queue lane delegation
+
+## [2026-06-11 06:17:25 PM] skills/nexus/SKILL.md
+
+- Agent: @codex
+- Target: skills/nexus/SKILL.md
+- Claim HEAD: 796b1d454e4a70347a21172012be59349a689613
+- Release HEAD: 5b5603b43996f0df0c96166fb8d5bc0818bded00
+- Drift: yes
+- SHA: 413715c805cec9fb98f9808aa385af160a5ead8b
+- Commit: docs: teach nexus skill queue lanes
+
+## [2026-06-11 06:17:35 PM] src/lib/protocolText.js
+
+- Agent: @codex
+- Target: src/lib/protocolText.js
+- Claim HEAD: 796b1d454e4a70347a21172012be59349a689613
+- Release HEAD: 413715c805cec9fb98f9808aa385af160a5ead8b
+- Drift: yes
+- SHA: bf10985a885e8a507d96057380453d247879ff6c
+- Commit: docs: add queue lanes to generated protocol
+
+## [2026-06-11 06:18:28 PM] _NEXUS_QUEUE.md
+
+- Agent: @codex
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: bf10985a885e8a507d96057380453d247879ff6c
+- Release HEAD: bf10985a885e8a507d96057380453d247879ff6c
+- Drift: no
+- SHA: ceaefaa690e0691d4e0ca3c37b6c4673f21d16a2
+- Commit: chore: note delegated lanes phase one
+
+## [2026-06-11 06:49:58 PM] src/lib/queue.js
+
+- Agent: @codex
+- Target: src/lib/queue.js
+- Claim HEAD: ceaefaa690e0691d4e0ca3c37b6c4673f21d16a2
+- Release HEAD: ceaefaa690e0691d4e0ca3c37b6c4673f21d16a2
+- Drift: no
+- SHA: e24d1bc501c3db67650918e72098a9ee714b0cd0
+- Commit: feat: reconcile queue lane receipts
+
+## [2026-06-11 06:50:12 PM] src/commands/queue.js
+
+- Agent: @codex
+- Target: src/commands/queue.js
+- Claim HEAD: ceaefaa690e0691d4e0ca3c37b6c4673f21d16a2
+- Release HEAD: e24d1bc501c3db67650918e72098a9ee714b0cd0
+- Drift: yes
+- SHA: 63896a877587865af3d94d6433666dc308a51a14
+- Commit: feat: add queue reconcile command
+
+## [2026-06-11 06:50:23 PM] src/commands/doctor.js
+
+- Agent: @codex
+- Target: src/commands/doctor.js
+- Claim HEAD: ceaefaa690e0691d4e0ca3c37b6c4673f21d16a2
+- Release HEAD: 63896a877587865af3d94d6433666dc308a51a14
+- Drift: yes
+- SHA: e358aa16fc3a8f24657c7d46711f57573d72738d
+- Commit: feat: warn on queue lane drift
+
+## [2026-06-11 06:50:37 PM] src/commands/q.js
+
+- Agent: @codex
+- Target: src/commands/q.js
+- Claim HEAD: ceaefaa690e0691d4e0ca3c37b6c4673f21d16a2
+- Release HEAD: e358aa16fc3a8f24657c7d46711f57573d72738d
+- Drift: yes
+- SHA: 3107ddf27cde8c7f1c3fb64ea6ed87b2925b7719
+- Commit: docs: point q done at queue reconcile
+
+## [2026-06-11 06:50:50 PM] bin/nexus.js
+
+- Agent: @codex
+- Target: bin/nexus.js
+- Claim HEAD: ceaefaa690e0691d4e0ca3c37b6c4673f21d16a2
+- Release HEAD: 3107ddf27cde8c7f1c3fb64ea6ed87b2925b7719
+- Drift: yes
+- SHA: 00a6f31155535e0584323a3445328fd361da0f3e
+- Commit: feat: expose queue reconcile
+
+## [2026-06-11 06:51:04 PM] src/commands/completion.js
+
+- Agent: @codex
+- Target: src/commands/completion.js
+- Claim HEAD: ceaefaa690e0691d4e0ca3c37b6c4673f21d16a2
+- Release HEAD: 00a6f31155535e0584323a3445328fd361da0f3e
+- Drift: yes
+- SHA: ce2a203630ef6960ab226e3c3fd948b0d568a374
+- Commit: feat: complete queue reconcile
+
+## [2026-06-11 06:51:17 PM] test/queue.test.js
+
+- Agent: @codex
+- Target: test/queue.test.js
+- Claim HEAD: ceaefaa690e0691d4e0ca3c37b6c4673f21d16a2
+- Release HEAD: ce2a203630ef6960ab226e3c3fd948b0d568a374
+- Drift: yes
+- SHA: 650af63638d2bcb9e4057e71c1c30f07b1cb2707
+- Commit: test: cover queue reconcile
+
+## [2026-06-11 06:51:31 PM] test/doctor.test.js
+
+- Agent: @codex
+- Target: test/doctor.test.js
+- Claim HEAD: ceaefaa690e0691d4e0ca3c37b6c4673f21d16a2
+- Release HEAD: 650af63638d2bcb9e4057e71c1c30f07b1cb2707
+- Drift: yes
+- SHA: bdade7a70616312f9a6e7f38aae6b0fcbb6685ef
+- Commit: test: cover queue lane doctor warnings
+
+## [2026-06-11 06:51:45 PM] test/q.test.js
+
+- Agent: @codex
+- Target: test/q.test.js
+- Claim HEAD: ceaefaa690e0691d4e0ca3c37b6c4673f21d16a2
+- Release HEAD: bdade7a70616312f9a6e7f38aae6b0fcbb6685ef
+- Drift: yes
+- SHA: 9f05aa24ed0c50bbfa52a0a647e7ea125551edd1
+- Commit: test: update q reconcile guidance
+
+## [2026-06-11 06:52:06 PM] src/lib/protocolText.js
+
+- Agent: @codex
+- Target: src/lib/protocolText.js
+- Claim HEAD: ceaefaa690e0691d4e0ca3c37b6c4673f21d16a2
+- Release HEAD: 9f05aa24ed0c50bbfa52a0a647e7ea125551edd1
+- Drift: yes
+- SHA: ace9644bd30bd88e28f91fc0a09de13d1501c8c2
+- Commit: docs: add queue reconcile to generated protocol
+
+## [2026-06-11 06:52:23 PM] README.md
+
+- Agent: @codex
+- Target: README.md
+- Claim HEAD: ceaefaa690e0691d4e0ca3c37b6c4673f21d16a2
+- Release HEAD: ace9644bd30bd88e28f91fc0a09de13d1501c8c2
+- Drift: yes
+- SHA: 4619158f8cc9efea85911606e335addb0f79d681
+- Commit: docs: document queue reconcile
+
+## [2026-06-11 06:52:39 PM] skills/nexus/SKILL.md
+
+- Agent: @codex
+- Target: skills/nexus/SKILL.md
+- Claim HEAD: ceaefaa690e0691d4e0ca3c37b6c4673f21d16a2
+- Release HEAD: 4619158f8cc9efea85911606e335addb0f79d681
+- Drift: yes
+- SHA: 2125e75c7cef6abb0f59924eddb4e013f4a3404a
+- Commit: docs: teach queue reconcile in skill
+
+## [2026-06-11 06:52:52 PM] _NEXUS_CONSTITUTION.md
+
+- Agent: @codex
+- Target: _NEXUS_CONSTITUTION.md
+- Claim HEAD: ceaefaa690e0691d4e0ca3c37b6c4673f21d16a2
+- Release HEAD: 2125e75c7cef6abb0f59924eddb4e013f4a3404a
+- Drift: yes
+- SHA: b370b85ec9f0c5c83b29d7c553aab9482955f691
+- Commit: docs: define queue lane reconciliation
+
+## [2026-06-11 06:53:06 PM] _NEXUS_QUEUE.md
+
+- Agent: @codex
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: ceaefaa690e0691d4e0ca3c37b6c4673f21d16a2
+- Release HEAD: b370b85ec9f0c5c83b29d7c553aab9482955f691
+- Drift: yes
+- SHA: d3b39e155b4554e14eccd54ad9542cce03aa546b
+- Commit: chore: close delegated queue lanes task
+
+## [2026-06-11 07:25:26 PM] src/commands/dashboard.js
+
+- Agent: @codex
+- Target: src/commands/dashboard.js
+- Claim HEAD: d3b39e155b4554e14eccd54ad9542cce03aa546b
+- Release HEAD: d3b39e155b4554e14eccd54ad9542cce03aa546b
+- Drift: no
+- SHA: 50b3f254d55a48856f766c9992b0389b26f21343
+- Commit: Expose full queue task blocks in dashboard snapshot
+
+## [2026-06-11 07:25:40 PM] nexus-dashboard/index.html
+
+- Agent: @codex
+- Target: nexus-dashboard/index.html
+- Claim HEAD: d3b39e155b4554e14eccd54ad9542cce03aa546b
+- Release HEAD: 50b3f254d55a48856f766c9992b0389b26f21343
+- Drift: yes
+- SHA: f06ac8525d54a5cc5045ac85799c9a9b1bac6815
+- Commit: Show full queue task blocks in dashboard
+
+## [2026-06-11 07:25:52 PM] nexus-dashboard/style.css
+
+- Agent: @codex
+- Target: nexus-dashboard/style.css
+- Claim HEAD: d3b39e155b4554e14eccd54ad9542cce03aa546b
+- Release HEAD: f06ac8525d54a5cc5045ac85799c9a9b1bac6815
+- Drift: yes
+- SHA: 13d81c6f87dd266d15cfc90a2134c8375ec91105
+- Commit: Style full queue task blocks in dashboard
+
+## [2026-06-11 07:26:06 PM] test/dashboard.test.js
+
+- Agent: @codex
+- Target: test/dashboard.test.js
+- Claim HEAD: d3b39e155b4554e14eccd54ad9542cce03aa546b
+- Release HEAD: 13d81c6f87dd266d15cfc90a2134c8375ec91105
+- Drift: yes
+- SHA: cc98acc669bea76b4a0db654257052ef6d01b0d9
+- Commit: Cover dashboard full queue task parsing
+
+## [2026-06-11 07:37:49 PM] nexus-dashboard/index.html
+
+- Agent: @codex
+- Target: nexus-dashboard/index.html
+- Claim HEAD: cc98acc669bea76b4a0db654257052ef6d01b0d9
+- Release HEAD: cc98acc669bea76b4a0db654257052ef6d01b0d9
+- Drift: no
+- SHA: 4b8f0e0c823429057615b14f9eb2f5d508825bed
+- Commit: Mute raw queue task labels in dashboard
+
+## [2026-06-11 07:38:01 PM] nexus-dashboard/style.css
+
+- Agent: @codex
+- Target: nexus-dashboard/style.css
+- Claim HEAD: cc98acc669bea76b4a0db654257052ef6d01b0d9
+- Release HEAD: 4b8f0e0c823429057615b14f9eb2f5d508825bed
+- Drift: yes
+- SHA: bd3acb9161614b874f63cdfe91848f347e353a42
+- Commit: Style muted raw queue task labels
+
+## [2026-06-11 07:41:16 PM] nexus-dashboard/index.html
+
+- Agent: @codex
+- Target: nexus-dashboard/index.html
+- Claim HEAD: bd3acb9161614b874f63cdfe91848f347e353a42
+- Release HEAD: bd3acb9161614b874f63cdfe91848f347e353a42
+- Drift: no
+- SHA: 17ed4d34673ef12e4de55ef8266dbcb238bc86e2
+- Commit: Remove duplicated next task dashboard summary
+
+## [2026-06-11 07:41:28 PM] nexus-dashboard/style.css
+
+- Agent: @codex
+- Target: nexus-dashboard/style.css
+- Claim HEAD: bd3acb9161614b874f63cdfe91848f347e353a42
+- Release HEAD: 17ed4d34673ef12e4de55ef8266dbcb238bc86e2
+- Drift: yes
+- SHA: e2d023c1ab650b1bd50ed37007888f3378f40b23
+- Commit: Style compact next task dashboard hint
+
+## [2026-06-11 09:24:08 PM] src/commands/release.js
+
+- Agent: @claude
+- Target: src/commands/release.js
+- Claim HEAD: e2d023c1ab650b1bd50ed37007888f3378f40b23
+- Release HEAD: e2d023c1ab650b1bd50ed37007888f3378f40b23
+- Drift: no
+- SHA: e35972ba98317148e2e7e2371b923dfbc8224452
+- Commit: feat(release): attribution fallback via NEXUS_AGENT
+
+## [2026-06-11 09:24:15 PM] src/commands/ledger.js
+
+- Agent: @claude
+- Target: src/commands/ledger.js
+- Claim HEAD: e2d023c1ab650b1bd50ed37007888f3378f40b23
+- Release HEAD: e35972ba98317148e2e7e2371b923dfbc8224452
+- Drift: yes
+- SHA: 86ec87b30d4f6188a47b9ed62aeddc59ff4ac0e8
+- Commit: feat(ledger): fall back to queue task owner for attribution
+
+## [2026-06-11 09:24:22 PM] test/release.test.js
+
+- Agent: @claude
+- Target: test/release.test.js
+- Claim HEAD: e2d023c1ab650b1bd50ed37007888f3378f40b23
+- Release HEAD: 86ec87b30d4f6188a47b9ed62aeddc59ff4ac0e8
+- Drift: yes
+- SHA: 9e07da1a5f837cea632ec93fa8ed7c276fe70fb9
+- Commit: test(release): cover lockless attribution fallbacks
+
+## [2026-06-11 09:24:28 PM] test/ledger.test.js
+
+- Agent: @claude
+- Target: test/ledger.test.js
+- Claim HEAD: e2d023c1ab650b1bd50ed37007888f3378f40b23
+- Release HEAD: 9e07da1a5f837cea632ec93fa8ed7c276fe70fb9
+- Drift: yes
+- SHA: 8cf26b830a0d72f25c8e02d9553bb65b45933795
+- Commit: test(ledger): cover owner fallback and agent precedence
+
+## [2026-06-11 09:24:35 PM] _NEXUS_LEDGER.md
+
+- Agent: @claude
+- Target: _NEXUS_LEDGER.md
+- Claim HEAD: e2d023c1ab650b1bd50ed37007888f3378f40b23
+- Release HEAD: 8cf26b830a0d72f25c8e02d9553bb65b45933795
+- Drift: yes
+- SHA: b4bbd32f933e17c0295c59a1bd0ce73b067ae789
+- Commit: chore(ledger): correct task-primitive-types agent to @claude
+
+## [2026-06-11 09:24:42 PM] _NEXUS_QUEUE.md
+
+- Agent: @claude
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: e2d023c1ab650b1bd50ed37007888f3378f40b23
+- Release HEAD: b4bbd32f933e17c0295c59a1bd0ce73b067ae789
+- Drift: yes
+- SHA: 5994116f52a46e31caecf2a14c3824e09c7cad30
+- Commit: chore(queue): close release-attribution-fallback
+
+## [2026-06-11 09:42:32 PM] src/lib/dump.js
+
+- Agent: @claude
+- Target: src/lib/dump.js
+- Claim HEAD: 5994116f52a46e31caecf2a14c3824e09c7cad30
+- Release HEAD: 5994116f52a46e31caecf2a14c3824e09c7cad30
+- Drift: no
+- SHA: 9eb62c04c0bd950d590d1a358f1cd3b277668a0b
+- Commit: feat(claim): add git freshness receipt (claim-freshness-receipt)
+
+## [2026-06-11 09:42:39 PM] src/commands/claim.js
+
+- Agent: @claude
+- Target: src/commands/claim.js
+- Claim HEAD: 5994116f52a46e31caecf2a14c3824e09c7cad30
+- Release HEAD: 9eb62c04c0bd950d590d1a358f1cd3b277668a0b
+- Drift: yes
+- SHA: 993e711de7429184a30dc798c8913c40375f0c44
+- Commit: feat(claim): receipt by default, --show for full dump
+
+## [2026-06-11 09:42:46 PM] src/lib/protocolText.js
+
+- Agent: @claude
+- Target: src/lib/protocolText.js
+- Claim HEAD: 5994116f52a46e31caecf2a14c3824e09c7cad30
+- Release HEAD: 993e711de7429184a30dc798c8913c40375f0c44
+- Drift: yes
+- SHA: de8800296ee30e9e6220e245fa2f03f6bf53eaba
+- Commit: docs(protocol): blob-hash freshness wording
+
+## [2026-06-11 09:42:52 PM] src/commands/doctor.js
+
+- Agent: @claude
+- Target: src/commands/doctor.js
+- Claim HEAD: 5994116f52a46e31caecf2a14c3824e09c7cad30
+- Release HEAD: de8800296ee30e9e6220e245fa2f03f6bf53eaba
+- Drift: yes
+- SHA: 737304f0f41112ec3f80750de512488b37ae2e03
+- Commit: feat(doctor): compact identical queue authorship blocks
+
+## [2026-06-11 09:42:59 PM] test/dump.test.js
+
+- Agent: @claude
+- Target: test/dump.test.js
+- Claim HEAD: 5994116f52a46e31caecf2a14c3824e09c7cad30
+- Release HEAD: 737304f0f41112ec3f80750de512488b37ae2e03
+- Drift: yes
+- SHA: 0580013aa7dc54672354f5caebb218eec96ea649
+- Commit: test(dump): cover freshness receipt
+
+## [2026-06-11 09:43:05 PM] test/claim.test.js
+
+- Agent: @claude
+- Target: test/claim.test.js
+- Claim HEAD: 5994116f52a46e31caecf2a14c3824e09c7cad30
+- Release HEAD: 0580013aa7dc54672354f5caebb218eec96ea649
+- Drift: yes
+- SHA: 2d8e2c34909cf4a1a48e3f3e20f50540972f9e12
+- Commit: test(claim): cover receipt default and --show
+
+## [2026-06-11 09:43:12 PM] test/doctor.test.js
+
+- Agent: @claude
+- Target: test/doctor.test.js
+- Claim HEAD: 5994116f52a46e31caecf2a14c3824e09c7cad30
+- Release HEAD: 2d8e2c34909cf4a1a48e3f3e20f50540972f9e12
+- Drift: yes
+- SHA: 2d51afb4304e908b163fbac076b70f4ec5c16d06
+- Commit: test(doctor): cover advisory compaction
+
+## [2026-06-11 09:43:18 PM] test/init.test.js
+
+- Agent: @claude
+- Target: test/init.test.js
+- Claim HEAD: 5994116f52a46e31caecf2a14c3824e09c7cad30
+- Release HEAD: 2d51afb4304e908b163fbac076b70f4ec5c16d06
+- Drift: yes
+- SHA: 9df8de1c0fa861cecae1e06b8a1f387fbcc2458d
+- Commit: test(init): update freshness wording assertion
+
+## [2026-06-11 09:43:25 PM] test/security.test.js
+
+- Agent: @claude
+- Target: test/security.test.js
+- Claim HEAD: 5994116f52a46e31caecf2a14c3824e09c7cad30
+- Release HEAD: 9df8de1c0fa861cecae1e06b8a1f387fbcc2458d
+- Drift: yes
+- SHA: 7ab10b5ff59e3b8266b1dcce86be0301506f42e5
+- Commit: test(security): update skill wording assertion
+
+## [2026-06-11 09:43:32 PM] skills/nexus/SKILL.md
+
+- Agent: @claude
+- Target: skills/nexus/SKILL.md
+- Claim HEAD: 5994116f52a46e31caecf2a14c3824e09c7cad30
+- Release HEAD: 7ab10b5ff59e3b8266b1dcce86be0301506f42e5
+- Drift: yes
+- SHA: 98bfe463498f2f5bd57c95c914154a4d52233d86
+- Commit: docs(skill): freshness receipt guidance
+
+## [2026-06-11 09:43:38 PM] README.md
+
+- Agent: @claude
+- Target: README.md
+- Claim HEAD: 5994116f52a46e31caecf2a14c3824e09c7cad30
+- Release HEAD: 98bfe463498f2f5bd57c95c914154a4d52233d86
+- Drift: yes
+- SHA: 3742f52563a2c35880f0ac393a8d5b942bf22bfb
+- Commit: docs(readme): document claim receipt and --show
+
+## [2026-06-11 09:43:45 PM] _NEXUS_QUEUE.md
+
+- Agent: @claude
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: 5994116f52a46e31caecf2a14c3824e09c7cad30
+- Release HEAD: 3742f52563a2c35880f0ac393a8d5b942bf22bfb
+- Drift: yes
+- SHA: fcd730117b9f53e5c42fca54d1c49f375a6cb7ba
+- Commit: chore(queue): close claim-freshness-receipt and doctor-advisory-dedup
+
+## [2026-06-11 10:46:30 PM] package.json
+
+- Agent: @claude
+- Target: package.json
+- Claim HEAD: fcd730117b9f53e5c42fca54d1c49f375a6cb7ba
+- Release HEAD: fcd730117b9f53e5c42fca54d1c49f375a6cb7ba
+- Drift: no
+- SHA: 3b874eca2dfc7c9c0b0dc28e178b97ec24064b7d
+- Commit: chore(release): bump to 1.2.0
+
+## [2026-06-11 10:46:37 PM] CHANGELOG.md
+
+- Agent: @claude
+- Target: CHANGELOG.md
+- Claim HEAD: fcd730117b9f53e5c42fca54d1c49f375a6cb7ba
+- Release HEAD: 3b874eca2dfc7c9c0b0dc28e178b97ec24064b7d
+- Drift: yes
+- SHA: 963900d4fc36567368df918decb77e9f90de7c89
+- Commit: docs(changelog): 1.2.0 release notes
+
+## [2026-06-11 10:46:43 PM] README.md
+
+- Agent: @claude
+- Target: README.md
+- Claim HEAD: fcd730117b9f53e5c42fca54d1c49f375a6cb7ba
+- Release HEAD: 963900d4fc36567368df918decb77e9f90de7c89
+- Drift: yes
+- SHA: c3ca88a2fe71d68e62e80fae4b7495f9c344d68e
+- Commit: docs(readme): whats new in 1.2.0
+
+## [2026-06-11 10:47:08 PM] _NEXUS_STANDUP.md
+
+- Agent: @claude
+- Target: _NEXUS_STANDUP.md
+- Claim HEAD: c3ca88a2fe71d68e62e80fae4b7495f9c344d68e
+- Release HEAD: c3ca88a2fe71d68e62e80fae4b7495f9c344d68e
+- Drift: no
+- SHA: 066cedc2c9a74c724d851f8b5c29c21dc15c363d
+- Commit: chore(standup): session notes through 1.2.0 prep
+
+## [2026-06-11 10:47:15 PM] _NEXUS_LEDGER.md
+
+- Agent: @claude
+- Target: _NEXUS_LEDGER.md
+- Claim HEAD: 066cedc2c9a74c724d851f8b5c29c21dc15c363d
+- Release HEAD: 066cedc2c9a74c724d851f8b5c29c21dc15c363d
+- Drift: no
+- SHA: a0cdf24df62ab03c8e57b5f6b899b09fd5e06b8c
+- Commit: chore(ledger): entries through doctor-advisory-dedup
+
