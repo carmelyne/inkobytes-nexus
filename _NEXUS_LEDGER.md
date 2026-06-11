@@ -647,3 +647,172 @@
 - Commit: chore(queue): close claim-freshness-receipt and doctor-advisory-dedup
 - Source: release
 
+## nexus-short-video
+
+- Id: nexus-short-video
+- Title: Build NexusShort — pure motion graphics short-form video
+- Agent: @claude
+- Epic: Content & documentation
+- Cost: large
+- Completed At: 2026-06-11T17:43:12.912Z
+- Files: remotion-labs/src/scenes/NsScene1.tsx, remotion-labs/src/scenes/NsSceneBridge.tsx, remotion-labs/src/scenes/NsScene2.tsx, remotion-labs/src/scenes/NsScene3.tsx, remotion-labs/src/scenes/NsScene4.tsx, remotion-labs/src/scenes/NsScene5.tsx, remotion-labs/src/NsComposition.tsx, remotion-labs/docs/short-form-motion-graphics.md
+- SHA: unknown
+- Commit: backfill: nexus-short-video
+- Source: backfill
+
+## cached-update-notice
+
+- Id: cached-update-notice
+- Title: Add cached update notice for Nexus CLI
+- Agent: @codex
+- Epic: Distribution and release visibility
+- Cost: medium
+- Completed At: 2026-06-11T17:43:12.912Z
+- Files: bin/nexus.js, src/utils/update-check.js, test/update-check.test.js, README.md
+- SHA: unknown
+- Commit: backfill: cached-update-notice
+- Source: backfill
+
+## db-restore-path-fix
+
+- Id: db-restore-path-fix
+- Title: Fix db restore path bug and add db command tests
+- Agent: @claude
+- Epic: Security & trust
+- Cost: medium
+- Completed At: 2026-06-11T17:43:12.912Z
+- Files: src/commands/db.js, test/db.test.js
+- SHA: unknown
+- Commit: backfill: db-restore-path-fix
+- Source: backfill
+
+## db-shell-injection-fix
+
+- Id: db-shell-injection-fix
+- Title: Remove shell interpolation from db mysql backup and restore
+- Agent: @claude
+- Epic: Security & trust
+- Cost: small
+- Completed At: 2026-06-11T17:43:12.912Z
+- Files: src/commands/db.js, test/db.test.js
+- SHA: unknown
+- Commit: backfill: db-shell-injection-fix
+- Source: backfill
+
+## dashboard-localhost-default
+
+- Id: dashboard-localhost-default
+- Title: Default dashboard to localhost bind with explicit --lan flag
+- Agent: @claude
+- Epic: Security & trust
+- Cost: small
+- Completed At: 2026-06-11T17:43:12.912Z
+- Files: src/commands/dashboard.js, test/dashboard.test.js, README.md
+- SHA: unknown
+- Commit: backfill: dashboard-localhost-default
+- Source: backfill
+
+## chmod-advisory-wording
+
+- Id: chmod-advisory-wording
+- Title: Correct promptCHMOD enforcement claims in CLI output
+- Agent: @claude
+- Epic: Security & trust
+- Cost: small
+- Completed At: 2026-06-11T17:43:12.912Z
+- Files: src/commands/chmod.js, _NEXUS_CHMOD.md, README.md, test/chmod.test.js
+- SHA: unknown
+- Commit: backfill: chmod-advisory-wording
+- Source: backfill
+
+## version-single-source
+
+- Id: version-single-source
+- Title: Single-source the CLI version and gate publish on tests
+- Agent: @claude
+- Epic: Open-source CLI release
+- Cost: small
+- Completed At: 2026-06-11T17:43:12.912Z
+- Files: bin/nexus.js, package.json, test/help.test.js
+- SHA: unknown
+- Commit: backfill: version-single-source
+- Source: backfill
+
+## ci-github-actions
+
+- Id: ci-github-actions
+- Title: Add GitHub Actions CI for tests and pack dry-run
+- Agent: @claude
+- Epic: Open-source CLI release
+- Cost: small
+- Completed At: 2026-06-11T17:43:12.912Z
+- Files: .github/workflows/ci.yml, README.md
+- SHA: unknown
+- Commit: backfill: ci-github-actions
+- Source: backfill
+
+## delegated-queue-lanes-batch-reconcile
+
+- Id: delegated-queue-lanes-batch-reconcile
+- Title: Add delegated queue lanes with batch reconciliation
+- Agent: @codex
+- Epic: Queue architecture and flow control
+- Cost: large
+- Completed At: 2026-06-11T17:43:12.912Z
+- Files: _NEXUS_QUEUE.md, _NEXUS_Q_CODEX.md, _NEXUS_Q_CLAUDE.md, _NEXUS_Q_GEMINI.md, _NEXUS_LEDGER.md, src/commands/next.js, src/commands/q.js, src/commands/queue.js, src/lib/queue.js, src/lib/receipts.js, src/lib/protocolText.js, test/next.test.js, test/q.test.js, test/queue.test.js, test/doctor.test.js, README.md, skills/nexus/SKILL.md, _NEXUS_CONSTITUTION.md
+- SHA: unknown
+- Commit: backfill: delegated-queue-lanes-batch-reconcile
+- Source: backfill
+
+## release-verify-gate
+
+- Id: release-verify-gate
+- Title: Add release verification gate
+- Agent: @claude
+- Epic: Loop readiness
+- Cost: medium
+- Completed At: 2026-06-11T17:43:12.912Z
+- Files: src/commands/release.js, src/lib/config.js, src/commands/doctor.js, test/release.test.js, test/doctor.test.js, README.md
+- SHA: unknown
+- Commit: backfill: release-verify-gate
+- Source: backfill
+
+## nexus-halt
+
+- Id: nexus-halt
+- Title: Add nexus halt and resume circuit breaker
+- Agent: @claude
+- Epic: Loop readiness
+- Cost: medium
+- Completed At: 2026-06-11T17:43:12.912Z
+- Files: bin/nexus.js, src/commands/halt.js, src/commands/claim.js, src/commands/release.js, src/commands/next.js, src/commands/dashboard.js, nexus-dashboard/index.html, test/halt.test.js, README.md
+- SHA: unknown
+- Commit: backfill: nexus-halt
+- Source: backfill
+
+## autoflow-task-contract
+
+- Id: autoflow-task-contract
+- Title: Enforce task contract for Auto-flow in next and doctor
+- Agent: @claude
+- Epic: Loop readiness
+- Cost: medium
+- Completed At: 2026-06-11T17:43:12.912Z
+- Files: src/commands/next.js, src/commands/doctor.js, test/next.test.js, test/doctor.test.js
+- SHA: unknown
+- Commit: backfill: autoflow-task-contract
+- Source: backfill
+
+## loop-progress-signals
+
+- Id: loop-progress-signals
+- Title: Design loop progress signals for stuck-but-alive agents
+- Agent: @claude
+- Epic: Loop readiness
+- Cost: medium
+- Completed At: 2026-06-11T17:43:12.912Z
+- Files: docs/loop-progress-signals.md
+- SHA: unknown
+- Commit: backfill: loop-progress-signals
+- Source: backfill
+
