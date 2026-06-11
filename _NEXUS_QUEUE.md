@@ -347,6 +347,26 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Outcome: Queue parsing recognizes Goal, Outcome, Constraints, Stop If, and Evidence; nexus next prints declared primitives and lists missing ones as an advisory; doctor reports primitive gaps on auto-flow tasks as advisory at autonomy 0-1 and actionable at autonomy 2; init scaffold, skill doc, and README document the set; existing tasks stay valid.
   - Evidence: test/next.test.js covers primitive surfacing and the missing-primitives advisory; test/doctor.test.js covers advisory below autonomy 2, actionable at autonomy 2, and the all-declared ok path; 208/208 tests pass; doctor on this repo shows advisory primitive entries and Docs & Skills OK.
 
+- [x] TASK/Claude: Add release attribution fallback for missing locks
+  - Id: release-attribution-fallback
+  - Epic: Loop readiness
+  - Status: Done
+  - Done: 2026-06-11
+  - Created: 2026-06-11
+  - Depends on: none
+  - Files: src/commands/release.js, src/commands/ledger.js, test/release.test.js, test/ledger.test.js, _NEXUS_LEDGER.md, _NEXUS_QUEUE.md
+  - Affinity: cli, release, receipts, attribution
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human (2026-06-11, human-initiated after task-primitive-types ledger showed Agent: unknown)
+  - Notes: A stale-broken lock erased agent attribution — release found no lock for _NEXUS_QUEUE.md (staleThreshold 600s vs a 75-minute work session; sweep at Codex startup) and wrote Agent: unknown to the ledger at commit a221170 with an [Agent] commit prefix. Add a fallback chain instead of degrading silently: lock agent -> NEXUS_AGENT env -> queue task TASK/<owner> header (via normalizeAgentForLedger) -> unknown. Applies to the commit prefix, verify-gate standup lines, report receipt, and ledger entry. Reporting only: lock lifecycle and stale-break behavior unchanged. The historical task-primitive-types ledger entry was corrected to @claude in the same change.
+  - Goal: Completed work always names its agent even when locks were swept.
+  - Outcome: Release attributes commits, report receipts, and ledger entries from the lock agent, then NEXUS_AGENT, then the task owner header; unknown only remains when all three are absent.
+  - Constraints: Do not change lock lifecycle, stale-break, or claim semantics; attribution reporting only.
+  - Stop If: Correct attribution would require changing the lock file format or claim flow.
+  - Evidence: test/release.test.js covers lockless release with NEXUS_AGENT and task-owner fallback; test/ledger.test.js covers owner fallback and known-agent precedence; 222/222 tests pass.
+
 - [ ] TASK/@claude: Design loop progress signals for stuck-but-alive agents
   - Id: loop-progress-signals
   - Epic: Loop readiness
