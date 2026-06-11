@@ -5067,3 +5067,13 @@ Structured release receipts.
 - SHA: a0cdf24df62ab03c8e57b5f6b899b09fd5e06b8c
 - Commit: chore(ledger): entries through doctor-advisory-dedup
 
+## [2026-06-11 11:05:04 PM] package.json
+
+- Agent: @claude
+- Target: package.json
+- Claim HEAD: 659508f88610762f6ffd27fd9f4316fb144df4b6
+- Release HEAD: 659508f88610762f6ffd27fd9f4316fb144df4b6
+- Drift: no
+- SHA: 78d15c0f37287f14b8860f8a799b38856e45b4ad
+- Commit: fix(ci): use portable test glob — node --test never ran on Node 18/20
+
