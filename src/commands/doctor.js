@@ -25,6 +25,7 @@ import {
 } from '../lib/protocolText.js';
 import { HOOK_AGENT_CONFIGS, hookStatus } from './hooks.js';
 import { contractViolations, parseContractTasks, primitiveGaps } from '../lib/taskContract.js';
+import { scanQueueLanes } from '../lib/queue.js';
 
 const LOCAL_DECISIONS_TEMPLATE = `# Decisions
 
@@ -205,6 +206,7 @@ export default function doctor(args) {
     Hooks: [],
     promptCHMOD: [],
     'Queue Authorship': [],
+    'Queue Lanes': [],
     'Loop Readiness': [],
   };
   const changes = [];
@@ -594,6 +596,30 @@ export default function doctor(args) {
     } else {
       sections['Queue Authorship'].push({
         issue: 'All auto-flow tasks in Ready Queue declare the task primitives',
+        fix: 'No action needed.',
+        ok: true,
+      });
+    }
+
+    const laneScan = scanQueueLanes(root, queueContent, undefined, new Date(), config.staleThreshold);
+    for (const receipt of laneScan.pendingReceipts) {
+      sections['Queue Lanes'].push({
+        issue: `Unreconciled lane receipt for ${receipt.id} in ${receipt.lane}`,
+        fix: 'Run `nexus queue reconcile` to batch lane receipts back into `_NEXUS_QUEUE.md`.',
+      });
+    }
+    for (const issue of laneScan.issues) {
+      const fix = issue.kind === 'duplicate_pending_receipt'
+        ? 'Resolve duplicate lane receipts manually, then run `nexus queue reconcile`.'
+        : 'Inspect the lane and master queue before reconciling.';
+      sections['Queue Lanes'].push({
+        issue: `${issue.kind}: ${issue.id} (${issue.lane || 'no lane'}) ${issue.detail}`,
+        fix,
+      });
+    }
+    if (!laneScan.pendingReceipts.length && !laneScan.issues.length) {
+      sections['Queue Lanes'].push({
+        issue: 'No unreconciled lane receipts or lane/master disagreements',
         fix: 'No action needed.',
         ok: true,
       });
