@@ -762,6 +762,97 @@ test('doctor renders queue authorship warnings as compact task fields', () => {
   });
 });
 
+test('doctor warns about unreconciled lane receipts', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), [
+      '# Queue',
+      '',
+      '## Ready Queue',
+      '',
+      '- [ ] TASK/Codex: Build thing',
+      '  - Id: build-thing',
+      '  - Status: Delegated',
+      '  - Lane: _NEXUS_Q_CODEX.md',
+      '',
+    ].join('\n'), 'utf-8');
+    writeFileSync(join(root, '_NEXUS_Q_CODEX.md'), [
+      '# Nexus Queue Lane - @codex',
+      '',
+      '## Active',
+      '',
+      '## Completed',
+      '',
+      '- [x] build-thing',
+      '  - Id: build-thing',
+      '  - Agent: @codex',
+      '  - Completed at: 2026-06-11T09:00:00.000Z',
+      '  - Receipt: pending reconciliation',
+      '',
+    ].join('\n'), 'utf-8');
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /Queue Lanes/);
+    assert.match(output, /Unreconciled lane receipt for build-thing in _NEXUS_Q_CODEX\.md/);
+    assert.match(output, /Run `nexus queue reconcile`/);
+  });
+});
+
+test('doctor warns about duplicate receipts and stale delegated lane disagreements', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), [
+      '# Queue',
+      '',
+      '## Ready Queue',
+      '',
+      '- [ ] TASK/Codex: Build thing',
+      '  - Id: build-thing',
+      '  - Status: Delegated',
+      '  - Delegated to: @codex',
+      '  - Delegated at: 2000-01-01T00:00:00.000Z',
+      '  - Lane: _NEXUS_Q_CODEX.md',
+      '',
+      '- [ ] TASK/Codex: Missing lane task',
+      '  - Id: missing-lane-task',
+      '  - Status: Delegated',
+      '  - Delegated to: @codex',
+      '  - Delegated at: 2000-01-01T00:00:00.000Z',
+      '  - Lane: _NEXUS_Q_CODEX.md',
+      '',
+    ].join('\n'), 'utf-8');
+    writeFileSync(join(root, '_NEXUS_Q_CODEX.md'), [
+      '# Nexus Queue Lane - @codex',
+      '',
+      '## Active',
+      '',
+      '## Completed',
+      '',
+      '- [x] build-thing',
+      '  - Id: build-thing',
+      '  - Agent: @codex',
+      '  - Completed at: 2026-06-11T09:00:00.000Z',
+      '  - Receipt: pending reconciliation',
+      '',
+      '- [x] build-thing',
+      '  - Id: build-thing',
+      '  - Agent: @codex',
+      '  - Completed at: 2026-06-11T09:01:00.000Z',
+      '  - Receipt: pending reconciliation',
+      '',
+    ].join('\n'), 'utf-8');
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /duplicate_pending_receipt: build-thing/);
+    assert.match(output, /master_delegated_missing_task: missing-lane-task/);
+    assert.match(output, /stale_delegated_task: missing-lane-task|stale_delegated_task: build-thing/);
+  });
+});
+
 test('doctor lists auto-flow tasks failing the full task contract with the missing fields', () => {
   inTempRepo((root) => {
     writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
