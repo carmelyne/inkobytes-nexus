@@ -86,7 +86,7 @@ test('q done writes a lane-local receipt without mutating the master queue', () 
     const queueAfter = readFileSync(join(root, '_NEXUS_QUEUE.md'), 'utf-8');
 
     assert.match(output, /Receipt written for build-thing in _NEXUS_Q_CODEX\.md/);
-    assert.match(output, /Master queue unchanged/);
+    assert.match(output, /Master queue unchanged; run `nexus queue reconcile`/);
     assert.doesNotMatch(lane, /TASK\/Codex: Build thing/);
     assert.match(lane, /- \[x\] build-thing/);
     assert.match(lane, /Receipt: pending reconciliation/);
