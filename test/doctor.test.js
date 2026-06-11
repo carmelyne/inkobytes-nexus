@@ -353,11 +353,11 @@ Keep this note.
     const next = readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8');
     assert.equal(next.match(/This project uses Nexus for multi-agent coordination\./g).length, 1);
     assert.equal(next.match(/NEXUS-AGENT-PROTOCOL:START/g).length, 1);
-    assert.match(next, /atomic lock-and-read boundary/);
+    assert.match(next, /atomic lock boundary/);
     assert.match(next, /active requirements, not optional guidance/);
     assert.match(next, /Do not bypass the hook/);
     assert.match(next, /Claim before reading implementation files/);
-    assert.match(next, /read a shared file before claiming it, treat that read as stale after claim succeeds/);
+    assert.match(next, /Same blob hash as your last read means that read is still current/);
     assert.match(next, /claim appears stale/);
     assert.match(next, /### Drills/);
     assert.match(next, /Drill guidance is defined in `_NEXUS_CONSTITUTION\.md`/);
@@ -1030,7 +1030,7 @@ test('doctor reports missing task primitives as advisory below autonomy 2', () =
 
     assert.match(output, /task: no-primitives-task/);
     assert.match(output, /advisory at autonomy 0; required at autonomy 2/);
-    assert.match(output, /needs: Goal \(why the task exists\), Outcome \(what must be true when complete\), Constraints \(what the agent must not change or assume\), Stop If \(conditions requiring human review\), Evidence \(tests, logs, or reports proving completion\)/);
+    assert.match(output, /needs: Goal, Outcome, Constraints, Stop If, Evidence/);
     assert.doesNotMatch(output, /under-specified for unattended loop work/);
   });
 });
@@ -1055,6 +1055,46 @@ test('doctor flags missing task primitives as actionable at autonomy 2', () => {
     assert.match(output, /impact: under-specified for unattended loop work/);
     assert.match(output, /fix: declare Goal, Outcome, Constraints, Stop If, and Evidence/);
     assert.doesNotMatch(output, /advisory at autonomy/);
+  });
+});
+
+test('doctor compacts identical primitive advisories across multiple tasks', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), [
+      '# Queue',
+      '',
+      '## Ready Queue',
+      '',
+      '- [ ] TASK/Codex: First task without primitives',
+      '  - Id: first-task',
+      '  - Status: Ready',
+      '  - Files: src/a.js',
+      '  - Cost: small',
+      '  - Auto-flow: yes',
+      '  - Review: approved',
+      '  - Approved by: human',
+      '  - Notes: Complete contract.',
+      '',
+      '- [ ] TASK/Codex: Second task without primitives',
+      '  - Id: second-task',
+      '  - Status: Ready',
+      '  - Files: src/b.js',
+      '  - Cost: small',
+      '  - Auto-flow: yes',
+      '  - Review: approved',
+      '  - Approved by: human',
+      '  - Notes: Complete contract.',
+      '',
+    ].join('\n'), 'utf-8');
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /2 task\(s\): auto-flow: yes in Ready Queue \(advisory at autonomy 0; required at autonomy 2\)/);
+    assert.match(output, /tasks: first-task, second-task/);
+    assert.equal(output.split('needs: Goal, Outcome').length, 2, 'needs line must print once, not per task');
+    assert.equal(output.split('fix: declare Goal').length, 2, 'fix line must print once, not per task');
   });
 });
 
