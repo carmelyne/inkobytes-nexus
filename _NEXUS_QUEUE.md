@@ -48,6 +48,20 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Approved by: human
   - Notes: Use `docs/nexus-dynamic-governed-loops.md` as the source brief to create a clear graphic explaining the dynamic discovery loop, approval gate, and governed execution loop. Anchor the graphic around: "Dynamic before approval. Deterministic after approval." Decide whether the first deliverable is Mermaid, README art, dashboard explainer, or a Figma/FigJam handoff.
 
+- [ ] TASK/Codex: Add cached update notice for Nexus CLI
+  - Id: cached-update-notice
+  - Epic: Distribution and release visibility
+  - Status: Ready
+  - Created: 2026-06-11
+  - Depends on: none
+  - Files: src/cli.js, src/utils/update-check.js, test/update-check.test.js, README.md
+  - Affinity: cli, release, dx
+  - Cost: medium
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Add a lightweight update check comparing the installed Nexus version with the latest npm registry version for `@inkobytes/nexus`. Cache the result locally for 24 hours so normal commands do not hit the network every run. Never block CLI execution if the check fails. Skip in CI and when `NEXUS_NO_UPDATE_CHECK=1` is set. Print a small notice only when a newer version is available. Document the README opt-out. No telemetry, repo data, command usage tracking, user id, task data, or command names may be sent anywhere.
+
 ### Audit batch 2026-06-10 (source: docs-priv/audit-2026-06-10-claude.md)
 
 - [x] TASK/Claude: Fix db restore path bug and add db command tests
