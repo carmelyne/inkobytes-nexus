@@ -79,6 +79,18 @@ npx @inkobytes/nexus help
 
 Requires Node.js 18 or newer.
 
+## Update Notices
+
+Nexus checks the npm registry for the latest `@inkobytes/nexus` version after normal commands and prints a small stderr notice only when a newer version is available. The lookup is cached in the user OS cache directory for 24 hours, so commands do not hit the network every run.
+
+The check is skipped in CI, and you can opt out locally:
+
+```bash
+NEXUS_NO_UPDATE_CHECK=1 nexus start
+```
+
+The update check sends only the package metadata request to npm. It does not send repo paths, command names, task data, user ids, telemetry, or usage events.
+
 ## What's New In 1.1.0
 
 - `nexus halt "<reason>"` / `nexus resume` adds a repo-wide circuit breaker for swarms.
