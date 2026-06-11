@@ -19,7 +19,7 @@ export default function q(args) {
     const result = markLaneTaskDone({ root: config.root, agent, id });
     console.log(`Receipt written for ${id} in ${result.lane}.`);
     console.log(`Completed at: ${result.completedAt}`);
-    console.log('Master queue unchanged; run `nexus queue reconcile` when that phase lands.');
+    console.log('Master queue unchanged; run `nexus queue reconcile` to batch receipts back.');
     return;
   }
 
