@@ -582,3 +582,29 @@
 - Commit: docs(constitution): section 16 autonomy levels + checkpoint ritual; align chmod wording to advisory (autonomy-level-config)
 - Source: release
 
+## queue-git-tracking
+
+- Id: queue-git-tracking
+- Title: Decide and implement git tracking for queue and ledger
+- Agent: @claude
+- Epic: Loop readiness
+- Cost: small
+- Completed At: 2026-06-10T18:05:33.898Z
+- Files: .gitignore, src/commands/release.js, src/commands/doctor.js, test/release.test.js, README.md
+- SHA: 84b25007e15cffedfb159347018854aac982a89a
+- Commit: chore(git): track all _NEXUS_* coordination files — full audit trail incl. doctor protocol updates (queue-git-tracking)
+- Source: release
+
+## task-primitive-types
+
+- Id: task-primitive-types
+- Title: Introduce Task Primitive types for agent-native task definitions
+- Agent: @claude
+- Epic: Loop readiness
+- Cost: medium
+- Completed At: 2026-06-11T09:54:48.019Z
+- Files: src/lib/taskContract.js, src/commands/next.js, src/commands/doctor.js, src/commands/init.js, skills/nexus/SKILL.md, _NEXUS_QUEUE.md, README.md, test/next.test.js, test/doctor.test.js
+- SHA: a2211708be5b5e451772c99bfcabaf70673fd218
+- Commit: chore(queue): close task-primitive-types with outcome evidence
+- Source: release
+
