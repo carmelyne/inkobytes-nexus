@@ -51,6 +51,11 @@ When adding work to `_NEXUS_QUEUE.md`, keep tasks dashboard-parseable and immedi
   - Review: approved
   - Approved by: human
   - Notes: One practical paragraph with scope, constraints, and definition of done.
+  - Goal: Why this task exists, one line.
+  - Outcome: What must be true when the task is complete.
+  - Constraints: What the agent must not change or assume.
+  - Stop If: Conditions that require stopping for human review.
+  - Evidence: Tests, logs, or reports that prove completion.
 ```
 
 - `Files` should name the likely edit surface so other agents can spot conflicts before claiming.
@@ -58,6 +63,8 @@ When adding work to `_NEXUS_QUEUE.md`, keep tasks dashboard-parseable and immedi
 - `Auto-flow: yes` means an agent can grab it after `nexus next`; use `no` when planning or human approval is needed.
 - Auto-flow work in `Ready Queue` should include `Review: approved` and `Approved by: human`, or `doctor` will flag it and `nexus next` may skip it.
 - `Notes` should carry dashboard-useful context, not a whole design doc.
+- Task primitives (`Goal`, `Outcome`, `Constraints`, `Stop If`, `Evidence`) are advisory today and required for auto-flow at autonomy 2. `Outcome` + `Evidence` + `Stop If` are the loop contract: when an agent is finished and when it must stop.
+- Write `Evidence` prospectively when authoring (what will prove completion); update it to point at the real artifacts when the task is Done.
 
 ## Guardrails
 
