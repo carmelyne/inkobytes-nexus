@@ -473,6 +473,8 @@ Nexus checks:
 - claimed file conflicts
 - optional agent budget file
 
+The suggestion includes any declared task primitives (`Goal`, `Outcome`, `Constraints`, `Stop If`, `Evidence`) and lists missing ones as an advisory.
+
 If nothing is safe, the agent should stand by.
 
 ### `nexus status`
@@ -512,10 +514,33 @@ Nexus reads tasks from `_NEXUS_QUEUE.md`:
   - Review: approved
   - Approved by: human
   - Notes: Add a doctor section for stale locks with tests and clear fix guidance.
+  - Goal: Make lock hygiene visible in routine checkups.
+  - Outcome: Doctor lists stale locks with age and a clear fix.
+  - Constraints: Touch only the doctor command and its tests.
+  - Stop If: The fix requires changing lock file format.
+  - Evidence: test/doctor.test.js covers the stale-lock section.
 ```
 
 The queue is the executable priority surface. Standup is for comms and human context.
 Keep items dashboard-friendly: include `Id`, `Epic`, `Status`, `Depends on`, `Files`, `Affinity`, `Cost`, `Auto-flow`, and `Notes`. Use `Files` to expose conflict surfaces, `Depends on` for hard blockers, and `Auto-flow: no` when a task needs planning or human approval before an agent grabs it. Auto-flow work in `Ready Queue` should also include `Review: approved` and `Approved by: human`, or `doctor` will flag it and `nexus next` may skip it.
+
+### Task primitives
+
+Beyond the dashboard fields, tasks can declare agent-native **task primitives**:
+
+| Primitive | Answers |
+|---|---|
+| `Goal` | Why the task exists |
+| `Outcome` | What must be true when the task is complete |
+| `Constraints` | What the agent must not change or assume |
+| `Stop If` | Conditions that require stopping for human review |
+| `Evidence` | Tests, logs, or reports that prove completion |
+
+`Scope` maps onto `Files`, dependencies stay on `Depends on`, and approval gates stay on `Review`/`Approved by`, so existing tasks remain valid — primitives tier in gradually.
+
+Loop principle: `Outcome` + `Evidence` + `Stop If` are the anti-over-looping contract. They define when a loop agent is finished and when it must stop instead of compounding. Write `Evidence` prospectively when authoring (what will prove completion) and update it to point at the real artifacts once the task is Done.
+
+`nexus next` prints declared primitives with its suggestion and notes the missing ones. `nexus doctor` reports missing primitives on auto-flow tasks as advisory at autonomy 0–1 and actionable at autonomy 2, where under-specified unattended work is a bug.
 
 Add `Drills` when a task has known failure-mode guidance:
 
