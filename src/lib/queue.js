@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { basename, dirname, join } from 'path';
 
 export const LANE_AGENT_PATTERN = /^@[a-z][a-z0-9_-]*$/i;
+export const DEFAULT_LANE_AGENTS = ['@codex', '@claude', '@gemini', '@agy'];
 
 export function extractSection(content, heading) {
   const lines = content.split('\n');
@@ -53,6 +54,11 @@ export function parseReadyTasks(content) {
         constraints: '',
         stopIf: '',
         evidence: '',
+        delegatedTo: '',
+        delegatedAt: '',
+        lane: '',
+        receipt: '',
+        done: '',
       };
       continue;
     }
@@ -86,6 +92,11 @@ export function parseReadyTasks(content) {
         case 'constraints': current.constraints = val; break;
         case 'stop if': current.stopIf = val; break;
         case 'evidence': current.evidence = val; break;
+        case 'delegated to': current.delegatedTo = val; break;
+        case 'delegated at': current.delegatedAt = val; break;
+        case 'lane': current.lane = val; break;
+        case 'receipt': current.receipt = val; break;
+        case 'done': current.done = val; break;
       }
     }
   }
@@ -119,13 +130,22 @@ export function parseLaneTasks(content) {
 
   for (const block of splitBlocks(completedSection)) {
     const id = parseField(block, 'Id') || parseReceiptId(block);
-    if (id) completed.push({ id, block });
+    if (id) {
+      completed.push({
+        id,
+        agent: parseField(block, 'Agent'),
+        completedAt: parseField(block, 'Completed at'),
+        receipt: parseField(block, 'Receipt'),
+        reconciledAt: parseField(block, 'Reconciled at'),
+        block,
+      });
+    }
   }
 
   return { active, completed };
 }
 
-export function delegatedTaskIds(root, agents = ['@codex', '@claude', '@gemini', '@agy']) {
+export function delegatedTaskIds(root, agents = DEFAULT_LANE_AGENTS) {
   const ids = new Set();
   for (const agent of agents) {
     const file = lanePath(root, agent);
@@ -135,6 +155,101 @@ export function delegatedTaskIds(root, agents = ['@codex', '@claude', '@gemini',
     for (const task of lane.completed) ids.add(task.id);
   }
   return ids;
+}
+
+export function scanQueueLanes(root, queueContent, agents = DEFAULT_LANE_AGENTS, now = new Date(), staleSeconds = 24 * 60 * 60) {
+  const masterTasks = parseReadyTasks(queueContent);
+  const masterById = new Map(masterTasks.filter(t => t.id).map(t => [t.id, t]));
+  const laneStates = [];
+  const pendingReceipts = [];
+  const issues = [];
+
+  for (const agent of agents) {
+    const file = lanePath(root, agent);
+    if (!existsSync(file)) continue;
+    const content = readFileSync(file, 'utf-8');
+    const state = parseLaneTasks(content);
+    laneStates.push({ agent, lane: laneFileName(agent), path: file, content, ...state });
+
+    for (const task of state.active) {
+      const master = masterById.get(task.id);
+      if (!master) {
+        issues.push(laneIssue('lane_active_missing_master', task.id, agent, laneFileName(agent), 'active lane task has no matching master queue task'));
+      } else if (master.lane && master.lane !== laneFileName(agent)) {
+        issues.push(laneIssue('lane_active_master_mismatch', task.id, agent, laneFileName(agent), `master points at ${master.lane}`));
+      } else if (master.status !== 'Delegated') {
+        issues.push(laneIssue('lane_active_master_status', task.id, agent, laneFileName(agent), `master status is ${master.status || 'missing'}`));
+      }
+    }
+
+    for (const receipt of state.completed) {
+      if (isPendingReceipt(receipt)) {
+        pendingReceipts.push({ ...receipt, agent: receipt.agent || agent, lane: laneFileName(agent), path: file });
+      }
+    }
+  }
+
+  for (const task of masterTasks.filter(t => t.status === 'Delegated')) {
+    const laneState = laneStates.find(state => state.lane === task.lane);
+    if (!laneState) {
+      issues.push(laneIssue('master_delegated_missing_lane', task.id, task.delegatedTo, task.lane, 'master delegated task points at a missing lane file'));
+      continue;
+    }
+    const inLane = laneState.active.some(t => t.id === task.id) || laneState.completed.some(t => t.id === task.id);
+    if (!inLane) {
+      issues.push(laneIssue('master_delegated_missing_task', task.id, task.delegatedTo, task.lane, 'master delegated task is missing from its lane'));
+    }
+    if (task.delegatedAt && isOlderThan(task.delegatedAt, now, staleSeconds) && !laneState.completed.some(t => t.id === task.id)) {
+      issues.push(laneIssue('stale_delegated_task', task.id, task.delegatedTo, task.lane, `delegated at ${task.delegatedAt}`));
+    }
+  }
+
+  for (const [id, receipts] of groupById(pendingReceipts)) {
+    if (receipts.length > 1) {
+      for (const receipt of receipts) {
+        issues.push(laneIssue('duplicate_pending_receipt', id, receipt.agent, receipt.lane, 'multiple pending lane receipts share this task id'));
+      }
+    }
+  }
+
+  return { laneStates, pendingReceipts, issues, masterTasks };
+}
+
+export function reconcileQueueLanes({ root, queuePath, agents = DEFAULT_LANE_AGENTS, now = new Date() }) {
+  const queueContent = readFileSync(queuePath, 'utf-8');
+  const scan = scanQueueLanes(root, queueContent, agents, now);
+  const duplicateIds = new Set(scan.issues.filter(issue => issue.kind === 'duplicate_pending_receipt').map(issue => issue.id));
+  if (duplicateIds.size) {
+    throw new Error(`Duplicate pending receipts: ${Array.from(duplicateIds).join(', ')}. Resolve lane receipts before reconciling.`);
+  }
+
+  let nextQueue = queueContent;
+  const reconciledAt = now.toISOString();
+  const results = [];
+
+  for (const receipt of scan.pendingReceipts) {
+    const task = parseReadyTasks(nextQueue).find(t => t.id === receipt.id);
+    if (!task) {
+      results.push({ id: receipt.id, lane: receipt.lane, status: 'skipped', reason: 'missing master task' });
+      continue;
+    }
+    if (task.status === 'Done') {
+      markReceiptReconciled(receipt.path, receipt.block, reconciledAt);
+      results.push({ id: receipt.id, lane: receipt.lane, status: 'already_done' });
+      continue;
+    }
+
+    nextQueue = markQueueTaskDone(nextQueue, task, {
+      agent: receipt.agent,
+      completedAt: receipt.completedAt,
+      reconciledAt,
+    });
+    markReceiptReconciled(receipt.path, receipt.block, reconciledAt);
+    results.push({ id: receipt.id, lane: receipt.lane, status: 'reconciled' });
+  }
+
+  writeFileSync(queuePath, nextQueue, 'utf-8');
+  return { reconciledAt, results };
 }
 
 export function delegateTask({ root, queuePath, queueContent, task, agent, now = new Date() }) {
@@ -270,9 +385,64 @@ function markQueueTaskDelegated(content, task, { agent, lane, delegatedAt }) {
   return content.replace(task.block, nextLines.join('\n'));
 }
 
+function markQueueTaskDone(content, task, { agent, completedAt, reconciledAt }) {
+  const doneDate = isoDate(completedAt || reconciledAt);
+  const lines = task.block.split('\n');
+  const nextLines = [];
+  let sawStatus = false;
+  let sawDone = false;
+  let sawCompletedBy = false;
+  let sawCompletedAt = false;
+  let sawReceipt = false;
+
+  for (const line of lines) {
+    if (/^- \[[ x~>]\]/.test(line)) {
+      nextLines.push(line.replace(/^- \[[ x~>]\]/, '- [x]'));
+      continue;
+    }
+    if (/^\s+- Status:/i.test(line)) {
+      nextLines.push('  - Status: Done');
+      sawStatus = true;
+      continue;
+    }
+    if (/^\s+- Done:/i.test(line)) {
+      nextLines.push(`  - Done: ${doneDate}`);
+      sawDone = true;
+      continue;
+    }
+    if (/^\s+- Completed by:/i.test(line)) {
+      nextLines.push(`  - Completed by: ${agent}`);
+      sawCompletedBy = true;
+      continue;
+    }
+    if (/^\s+- Completed at:/i.test(line)) {
+      nextLines.push(`  - Completed at: ${completedAt || reconciledAt}`);
+      sawCompletedAt = true;
+      continue;
+    }
+    if (/^\s+- Receipt:/i.test(line)) {
+      nextLines.push(`  - Receipt: reconciled at ${reconciledAt}`);
+      sawReceipt = true;
+      continue;
+    }
+    nextLines.push(line);
+  }
+
+  if (!sawStatus) nextLines.push('  - Status: Done');
+  if (!sawDone) nextLines.push(`  - Done: ${doneDate}`);
+  if (!sawCompletedBy) nextLines.push(`  - Completed by: ${agent}`);
+  if (!sawCompletedAt) nextLines.push(`  - Completed at: ${completedAt || reconciledAt}`);
+  if (!sawReceipt) nextLines.push(`  - Receipt: reconciled at ${reconciledAt}`);
+
+  return content.replace(task.block, nextLines.join('\n'));
+}
+
 function parseLaneActive(content) {
   return splitBlocks(extractSection(content, '## Active')).map(block => ({
     id: parseField(block, 'Id'),
+    status: parseField(block, 'Status'),
+    delegatedAt: parseField(block, 'Delegated at'),
+    lane: parseField(block, 'Lane'),
     block,
   })).filter(t => t.id);
 }
@@ -321,6 +491,44 @@ function appendCompletedReceipt(content, { id, agent, completedAt }) {
   ].join('\n');
 
   return `${content.trimEnd()}\n\n${receipt}\n`;
+}
+
+function isPendingReceipt(receipt) {
+  return /pending reconciliation/i.test(receipt.receipt || '');
+}
+
+function markReceiptReconciled(path, block, reconciledAt) {
+  const content = readFileSync(path, 'utf-8');
+  let nextBlock = block.replace(/^(\s+- Receipt:).+$/im, `$1 reconciled at ${reconciledAt}`);
+  if (!/^\s+- Reconciled at:/im.test(nextBlock)) {
+    nextBlock = `${nextBlock}\n  - Reconciled at: ${reconciledAt}`;
+  }
+  writeFileSync(path, content.replace(block, nextBlock), 'utf-8');
+}
+
+function laneIssue(kind, id, agent, lane, detail) {
+  return { kind, id, agent: agent || '', lane: lane || '', detail };
+}
+
+function groupById(receipts) {
+  const groups = new Map();
+  for (const receipt of receipts) {
+    if (!groups.has(receipt.id)) groups.set(receipt.id, []);
+    groups.get(receipt.id).push(receipt);
+  }
+  return groups.entries();
+}
+
+function isOlderThan(value, now, seconds) {
+  const time = Date.parse(value);
+  if (!Number.isFinite(time)) return false;
+  return now.getTime() - time >= seconds * 1000;
+}
+
+function isoDate(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value).slice(0, 10) || new Date().toISOString().slice(0, 10);
+  return date.toISOString().slice(0, 10);
 }
 
 function writeFileEnsured(path, content) {
