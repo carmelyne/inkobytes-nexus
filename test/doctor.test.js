@@ -5,6 +5,9 @@ import { tmpdir } from 'os';
 import { join } from 'path';
 import { chdir, cwd } from 'process';
 import { spawnSync } from 'child_process';
+import { fileURLToPath } from 'url';
+
+const NEXUS_BIN = fileURLToPath(new URL('../bin/nexus.js', import.meta.url));
 import doctor from '../src/commands/doctor.js';
 import { AGENT_SCOPES } from '../src/lib/agentScopes.js';
 import { resetConfig } from '../src/lib/config.js';
@@ -723,7 +726,7 @@ test('doctor colorizes when forced', () => {
     writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
     writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
 
-    const result = spawnSync('node', ['/Users/carmelyne/dev/nexus/bin/nexus.js', 'doctor'], {
+    const result = spawnSync('node', [NEXUS_BIN, 'doctor'], {
       cwd: root,
       encoding: 'utf-8',
       env: { ...process.env, FORCE_COLOR: '1' },
