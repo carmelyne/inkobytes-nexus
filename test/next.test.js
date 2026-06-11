@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, writeFileSync } from 'fs';
+import { mkdtempSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { chdir, cwd } from 'process';
@@ -235,5 +235,111 @@ test('next surfaces obvious related drills from task metadata', () => {
     assert.match(output, /Related Drills:/);
     assert.match(output, /- data-mutation-delete-rows/);
     assert.match(output, /- task-contract/);
+  });
+});
+
+test('next --take delegates the selected task into the agent lane and marks the master stub', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), `# Nexus Queue
+
+## Ready Queue
+
+- [ ] TASK/Codex: Ship the widget
+  - Id: widget-task
+  - Epic: Loop readiness
+  - Status: Ready
+  - Depends on: none
+  - Files: src/widget.js
+  - Affinity: cli
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Build the widget.
+  - Goal: Give users a widget.
+  - Outcome: Running nexus widget prints the widget.
+  - Constraints: Touch only src/widget.js.
+  - Stop If: The widget needs a new dependency.
+  - Evidence: test/widget.test.js covers the print path.
+`, 'utf-8');
+
+    const output = captureLogs(() => next(['@codex', '--take']));
+    const lane = readFileSync(join(root, '_NEXUS_Q_CODEX.md'), 'utf-8');
+    const queue = readFileSync(join(root, '_NEXUS_QUEUE.md'), 'utf-8');
+
+    assert.match(output, /Delegated: widget-task -> _NEXUS_Q_CODEX\.md/);
+    assert.match(lane, /- \[~\] TASK\/Codex: Ship the widget/);
+    assert.match(lane, /Goal: Give users a widget\./);
+    assert.match(lane, /Outcome: Running nexus widget prints the widget\./);
+    assert.match(lane, /Constraints: Touch only src\/widget\.js\./);
+    assert.match(lane, /Stop If: The widget needs a new dependency\./);
+    assert.match(lane, /Evidence: test\/widget\.test\.js covers the print path\./);
+    assert.match(queue, /Status: Delegated/);
+    assert.match(queue, /Delegated to: @codex/);
+    assert.match(queue, /Lane: _NEXUS_Q_CODEX\.md/);
+    assert.match(queue, /Receipt: pending/);
+  });
+});
+
+test('next skips delegated lane tasks until they are reconciled', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), `# Nexus Queue
+
+## Ready Queue
+
+- [ ] TASK/Codex: First task
+  - Id: first-task
+  - Epic: Loop readiness
+  - Status: Ready
+  - Depends on: none
+  - Files: src/first.js
+  - Affinity: cli
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: First task.
+
+- [ ] TASK/Codex: Second task
+  - Id: second-task
+  - Epic: Loop readiness
+  - Status: Ready
+  - Depends on: none
+  - Files: src/second.js
+  - Affinity: cli
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Second task.
+`, 'utf-8');
+
+    captureLogs(() => next(['@codex', '--take']));
+    const output = captureLogs(() => next(['@codex']));
+
+    assert.match(output, /Task: second-task/);
+    assert.doesNotMatch(output, /Task: first-task/);
+  });
+});
+
+test('next --take at autonomy 1 refuses to delegate contract-failing tasks', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), `# Nexus Queue
+
+## Ready Queue
+
+- [ ] TASK/Codex: Under-specified task
+  - Id: vague-task
+  - Status: Ready
+  - Depends on: none
+  - Files: src/vague.js
+  - Auto-flow: yes
+`, 'utf-8');
+    writeAutonomy(root, 1);
+
+    const output = captureLogs(() => next(['@codex', '--take']));
+
+    assert.match(output, /No safe auto-flow tasks available for @codex\. Standby\./);
+    assert.throws(() => readFileSync(join(root, '_NEXUS_Q_CODEX.md'), 'utf-8'), /ENOENT/);
   });
 });
