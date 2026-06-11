@@ -93,7 +93,19 @@ If a claim appears stale, do not edit through it. Run `nexus status` or `nexus d
 6. Add a short completion note to standup if useful.
 7. Run `nexus next @Agent` or stand by.
 
-## 8. Delegated Work
+## 8. Queue Lanes And Reconciliation
+
+`_NEXUS_QUEUE.md` is the canonical task registry. It is not the active workbench for delegated work.
+
+- `nexus next @Agent --take` copies the full task block into `_NEXUS_Q_<AGENT>.md` and marks the master task `Status: Delegated`.
+- Agent lanes carry active notes and lane-local receipts.
+- `nexus q done <id> @Agent` writes a lane-local completion receipt and does not mutate `_NEXUS_QUEUE.md`.
+- `nexus queue reconcile` batches pending lane receipts back into the master queue at a human checkpoint or explicit agent checkpoint.
+- `nexus doctor` reports unreconciled receipts, duplicate receipts, stale delegated tasks, and master/lane disagreement.
+
+Done is not a master write. Done is a receipt. Reconcile is how truth returns to the registry.
+
+## 9. Delegated Work
 
 When a lead agent uses subagents, tools, or parallel workers, Nexus still treats the lead as accountable for repo state.
 
@@ -105,7 +117,7 @@ When a lead agent uses subagents, tools, or parallel workers, Nexus still treats
 
 Subagents can be an implementation detail; their repo effects cannot be invisible.
 
-## 9. Current File State
+## 10. Current File State
 
 - Treat previous chat context, cached model memory, and earlier reads as stale when file contents matter.
 - Before claiming what a file says, making edits, or judging current state, read the file from disk with a fresh command.
@@ -113,7 +125,7 @@ Subagents can be an implementation detail; their repo effects cannot be invisibl
 - If you read a shared file before claiming it, treat that read as stale after claim succeeds.
 - If another agent or tool may have touched the file since your last read, re-read it before editing.
 
-## 10. Golden Rules
+## 11. Golden Rules
 
 - Never modify shared project files without `nexus claim`.
 - Never run `git commit` manually for claimed work; use `nexus release`.
@@ -125,7 +137,7 @@ Subagents can be an implementation detail; their repo effects cannot be invisibl
 - If no safe task remains, announce `Standby` with what you are waiting for, then stop until user input, queue change, or explicit assignment.
 - A small safe change does not alter exported type signatures, public APIs, auth, billing, permissions, data schema, migrations, dependency graph, or cross-agent ownership boundaries.
 
-## 11. Root-Cause Guardrails
+## 12. Root-Cause Guardrails
 
 - Prefer root-cause fixes over workaround paths.
 - Do not create fallback systems, duplicate flows, legacy compatibility branches, or "just in case" abstractions unless Pong explicitly requests them.
@@ -148,14 +160,14 @@ Subagents can be an implementation detail; their repo effects cannot be invisibl
 - Mention a decision in `_NEXUS_STANDUP.md` only when active agents need to coordinate around it.
 - Do not use standup as the permanent decision ledger.
 
-## 12. Supply-Chain Safety
+## 13. Supply-Chain Safety
 
 - Do not install third-party packages that have existed for less than 14 days.
 - Before adding a new dependency, verify the package creation date and the specific version publish date.
 - If the package or version is younger than 14 days, or either date cannot be verified, stop and ask the human.
 - Treat install hooks and scripts with network commands, webhooks, raw sockets, SSH, or secret-looking variables as human-review only.
 
-## 13. Agent-Local Files
+## 14. Agent-Local Files
 
 Continuity and memory files are agent-local handoff state. They are exempt from claim/release unless the human says otherwise.
 
@@ -166,7 +178,7 @@ Examples:
 - `.gemini/CONTINUITY.md`
 - `.codex/memories/INDEX.md`
 
-## 14. Legacy Helper Transition
+## 15. Legacy Helper Transition
 
 Older repos may mention shell helpers:
 
@@ -178,7 +190,7 @@ Older repos may mention shell helpers:
 
 Prefer the `nexus` CLI commands. `nexus doctor` reports legacy references.
 
-## 15. promptCHMOD — File Permission Model
+## 16. promptCHMOD — File Permission Model
 
 `_NEXUS_CHMOD.md` defines the permission matrix for shared files. Format mirrors Unix rwx:
 
@@ -203,7 +215,7 @@ USER.md                   r-x    all   ← authoritative human preferences
 
 Initialise with defaults: `nexus chmod --init`
 
-## 16. Autonomy Levels
+## 17. Autonomy Levels
 
 `.nexus/config.json` declares the repo-wide `autonomy` level. Default is `0`.
 
