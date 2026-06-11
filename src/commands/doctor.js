@@ -588,7 +588,7 @@ export default function doctor(args) {
             state: primitivesRequired
               ? `auto-flow: yes in Ready Queue at autonomy ${config.autonomy}`
               : `auto-flow: yes in Ready Queue (advisory at autonomy ${config.autonomy}; required at autonomy 2)`,
-            needs: gaps.map((g) => `${g.field} (${g.describes})`).join(', '),
+            needs: gaps.map((g) => g.field).join(', '),
             impact: primitivesRequired ? 'under-specified for unattended loop work' : '',
           },
         });
@@ -786,12 +786,49 @@ function renderLockEntries(entries, markerColor, colors) {
 }
 
 function renderQueueEntries(entries, markerColor, colors) {
-  const groups = new Map();
+  // Token hygiene: entries sharing identical state/needs/impact/fix print the
+  // block once with a task id list instead of repeating it per task.
+  const bySignature = new Map();
+  const regular = [];
 
   for (const entry of entries) {
+    if (!entry.queueInfo) {
+      regular.push(entry);
+      continue;
+    }
+    const signature = JSON.stringify([
+      entry.queueInfo.state || '',
+      entry.queueInfo.needs || '',
+      entry.queueInfo.impact || '',
+      entry.fix || '',
+    ]);
+    if (!bySignature.has(signature)) bySignature.set(signature, []);
+    bySignature.get(signature).push(entry);
+  }
+
+  const compactGroups = [];
+  for (const group of bySignature.values()) {
+    if (group.length > 1) compactGroups.push(group);
+    else regular.push(group[0]);
+  }
+
+  const groups = new Map();
+
+  for (const entry of regular) {
     const taskId = entry.queueInfo?.taskId || entry.displayGroup || entry.issue;
     if (!groups.has(taskId)) groups.set(taskId, []);
     groups.get(taskId).push(entry);
+  }
+
+  for (const group of compactGroups) {
+    const sample = group[0];
+    const prefix = sample.ok ? '-' : '!';
+    const ids = group.map((entry) => entry.queueInfo.taskId || entry.displayGroup).join(', ');
+    console.log(`    ${markerColor(prefix)} ${group.length} task(s): ${sample.queueInfo.state}`);
+    if (sample.queueInfo.needs) console.log(`      ${colors.dim(`needs: ${sample.queueInfo.needs}`)}`);
+    if (sample.queueInfo.impact) console.log(`      ${colors.dim(`impact: ${sample.queueInfo.impact}`)}`);
+    if (sample.fix) console.log(`      ${colors.bold('fix:')} ${colors.dim(sample.fix)}`);
+    console.log(`      ${colors.bold(`tasks: ${ids}`)}`);
   }
 
   for (const [taskId, taskEntries] of groups) {
