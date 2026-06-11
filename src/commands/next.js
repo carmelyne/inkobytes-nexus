@@ -6,7 +6,7 @@
 import { readFileSync, existsSync } from 'fs';
 import { getConfig } from '../lib/config.js';
 import { readBoard } from '../lib/blackboard.js';
-import { contractViolations } from '../lib/taskContract.js';
+import { contractViolations, TASK_PRIMITIVES, primitiveGaps } from '../lib/taskContract.js';
 import { spawnSync } from 'child_process';
 import { refuseIfHalted } from './halt.js';
 
@@ -95,8 +95,23 @@ export default function next(args) {
   console.log(`   Files: ${pick.files.join(', ')}`);
   console.log(`   Cost: ${pick.cost || 'unspecified (treated as medium)'}`);
   console.log(`   Auto-flow: ${pick.autoFlow}`);
+  printTaskPrimitives(pick, config.autonomy);
   printRelatedDrills(pick);
   console.log('');
+}
+
+// Task primitives travel with the suggestion so the agent starts with the
+// full contract: Outcome + Evidence + Stop If say when it is finished and
+// when it must stop for a human.
+function printTaskPrimitives(task, autonomy) {
+  for (const { field, key } of TASK_PRIMITIVES) {
+    if (String(task[key] || '').trim()) console.log(`   ${field}: ${task[key]}`);
+  }
+
+  const gaps = primitiveGaps(task);
+  if (gaps.length) {
+    console.log(`   Primitives missing: ${gaps.map(g => g.field).join(', ')} (advisory at autonomy ${autonomy}; doctor requires them at autonomy 2)`);
+  }
 }
 
 const DATA_MUTATION_DRILL = `data-mutation-${'delete-rows'}`;
@@ -232,6 +247,11 @@ function parseReadyTasks(content) {
         review: '',
         approvedBy: '',
         notes: '',
+        goal: '',
+        outcome: '',
+        constraints: '',
+        stopIf: '',
+        evidence: '',
       };
       continue;
     }
@@ -257,6 +277,11 @@ function parseReadyTasks(content) {
         case 'review': current.review = val.toLowerCase(); break;
         case 'approved by': current.approvedBy = val; break;
         case 'notes': current.notes = val; break;
+        case 'goal': current.goal = val; break;
+        case 'outcome': current.outcome = val; break;
+        case 'constraints': current.constraints = val; break;
+        case 'stop if': current.stopIf = val; break;
+        case 'evidence': current.evidence = val; break;
       }
     }
   }
