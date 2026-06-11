@@ -157,6 +157,55 @@ test('next at autonomy 1 stands by with contract report when every auto-flow tas
   });
 });
 
+test('next surfaces declared task primitives in the suggestion', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), `# Nexus Queue
+
+## Ready Queue
+
+- [ ] TASK/Codex: Ship the widget
+  - Id: widget-task
+  - Epic: Loop readiness
+  - Status: Ready
+  - Depends on: none
+  - Files: src/widget.js
+  - Affinity: cli
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Build the widget.
+  - Goal: Give users a widget.
+  - Outcome: Running nexus widget prints the widget.
+  - Constraints: Touch only src/widget.js.
+  - Stop If: The widget needs a new dependency.
+  - Evidence: test/widget.test.js covers the print path.
+`, 'utf-8');
+
+    const output = captureLogs(() => next(['@codex']));
+
+    assert.match(output, /Task: widget-task/);
+    assert.match(output, /Goal: Give users a widget\./);
+    assert.match(output, /Outcome: Running nexus widget prints the widget\./);
+    assert.match(output, /Constraints: Touch only src\/widget\.js\./);
+    assert.match(output, /Stop If: The widget needs a new dependency\./);
+    assert.match(output, /Evidence: test\/widget\.test\.js covers the print path\./);
+    assert.doesNotMatch(output, /Primitives missing/);
+  });
+});
+
+test('next reports missing primitives as advisory without skipping the task', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), CONTRACT_QUEUE, 'utf-8');
+    writeAutonomy(root, 1);
+
+    const output = captureLogs(() => next(['@codex']));
+
+    assert.match(output, /Task: good-task/);
+    assert.match(output, /Primitives missing: Goal, Outcome, Constraints, Stop If, Evidence \(advisory at autonomy 1; doctor requires them at autonomy 2\)/);
+  });
+});
+
 test('next surfaces obvious related drills from task metadata', () => {
   inTempRepo((root) => {
     writeFileSync(join(root, '_NEXUS_QUEUE.md'), `# Nexus Queue
