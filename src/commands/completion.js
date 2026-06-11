@@ -47,6 +47,7 @@ commands=(
   'clean:Prune locks'
   'next:Suggest or delegate next safe task from queue'
   'q:Show an agent lane or write a lane-local completion receipt'
+  'queue:Batch lane receipts into the master queue'
   'start:Orient an agent entering this repo'
   'dashboard:Serve the local dashboard'
   'metrics:Summarize commits, releases, and queue cost'
@@ -79,6 +80,9 @@ case $words[2] in
     ;;
   q)
     _arguments '1:agent or action:(@agy @claude @codex @gemini done)' '2:task id:_message' '3:agent:(@agy @claude @codex @gemini)'
+    ;;
+  queue)
+    _arguments '1:queue action:(reconcile)'
     ;;
   claim)
     _arguments \\
