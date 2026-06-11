@@ -367,6 +367,46 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Stop If: Correct attribution would require changing the lock file format or claim flow.
   - Evidence: test/release.test.js covers lockless release with NEXUS_AGENT and task-owner fallback; test/ledger.test.js covers owner fallback and known-agent precedence; 222/222 tests pass.
 
+- [x] TASK/Claude: Replace claim full-file dump with git freshness receipt
+  - Id: claim-freshness-receipt
+  - Epic: Loop readiness
+  - Status: Done
+  - Done: 2026-06-11
+  - Created: 2026-06-11
+  - Depends on: none
+  - Files: src/lib/dump.js, src/commands/claim.js, src/lib/protocolText.js, skills/nexus/SKILL.md, README.md, test/dump.test.js, test/claim.test.js, test/init.test.js, test/security.test.js, test/doctor.test.js, _NEXUS_QUEUE.md
+  - Affinity: cli, claims, token-efficiency, protocol
+  - Cost: medium
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human (2026-06-11, human-initiated token-efficiency audit; git-based freshness was the human's design)
+  - Notes: Claim's full-file dump was the largest token bleed in the protocol — multi-KB forced reads per claim, often of files the agent already read. Replace the default with a freshness receipt: git blob hash of on-disk content (hash-object works even untracked/uncommitted, so multi-agent drift always moves it), last commit touching the path, dirty/clean state, and line count. Same blob as the agent's last read = cached content current; different = re-read. `nexus claim --show` restores the full dump. Protocol wording updated in protocolText.js (agent entrypoint blocks), SKILL.md step 8, and README; doctor --fix will sync agent entrypoint files on next human-approved run.
+  - Goal: Stop paying full-file tokens to prove freshness that a hash can prove.
+  - Outcome: Claim prints a ~6-line receipt by default; --show prints the old full dump; receipts identify content by git blob hash so agents re-read only when content actually changed.
+  - Constraints: Lock semantics, hierarchy rules, and blackboard updates unchanged; dumpState stays available for --show and other callers.
+  - Stop If: Receipt semantics would weaken the current-file-state guarantee for agents that cannot track read hashes.
+  - Evidence: test/dump.test.js covers receipt in/outside git repos, blob movement on edit, new paths, directories; test/claim.test.js covers receipt default and --show; 229/229 tests pass.
+
+- [x] TASK/Claude: Compact repeated doctor queue-authorship blocks
+  - Id: doctor-advisory-dedup
+  - Epic: Loop readiness
+  - Status: Done
+  - Done: 2026-06-11
+  - Created: 2026-06-11
+  - Depends on: task-primitive-types
+  - Files: src/commands/doctor.js, test/doctor.test.js, _NEXUS_QUEUE.md
+  - Affinity: cli, diagnostics, token-efficiency
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human (2026-06-11, human-initiated token-efficiency audit)
+  - Notes: Doctor repeated identical needs/fix/impact blocks per task — on this repo's queue that was ~1.5K tokens of duplication per run, most of it introduced by task-primitive-types advisories. Queue Authorship rendering now groups entries by identical state/needs/impact/fix signature and prints each shared block once with a task id list; mixed signatures keep per-task rendering. Primitive needs lines list field names only (descriptions live in the single fix line). JSON output shape unchanged for the dashboard.
+  - Goal: Doctor findings should cost tokens proportional to unique problems, not task count.
+  - Outcome: Identical multi-task findings render once with a task id list; on this repo Queue Authorship dropped from ~74 lines to 13.
+  - Constraints: Do not change the JSON sections structure or per-task entries; rendering only.
+  - Stop If: Compaction would hide which task a finding belongs to.
+  - Evidence: test/doctor.test.js covers multi-task compaction (needs/fix print once) and single-task rendering unchanged; 229/229 tests pass.
+
 - [ ] TASK/@claude: Design loop progress signals for stuck-but-alive agents
   - Id: loop-progress-signals
   - Epic: Loop readiness
