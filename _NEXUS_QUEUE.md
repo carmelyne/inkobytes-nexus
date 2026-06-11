@@ -407,18 +407,25 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Stop If: Compaction would hide which task a finding belongs to.
   - Evidence: test/doctor.test.js covers multi-task compaction (needs/fix print once) and single-task rendering unchanged; 229/229 tests pass.
 
-- [ ] TASK/@claude: Design loop progress signals for stuck-but-alive agents
+- [x] TASK/@claude: Design loop progress signals for stuck-but-alive agents
   - Id: loop-progress-signals
   - Epic: Loop readiness
-  - Status: Ready
+  - Status: Done
+  - Done: 2026-06-12
   - Created: 2026-06-10
   - Depends on: nexus-halt
   - Files: docs/loop-progress-signals.md
   - Affinity: research, locks, loop
   - Cost: medium
   - Auto-flow: no
-  - Review: pending
+  - Review: approved
+  - Approved by: human (2026-06-12, verbal go in session; proposal content awaits human design review before any enforcement task)
   - Notes: Stale detection assumes dead agents go quiet, but a stuck loop agent keeps its lock fresh while making no progress. Research and propose a cheap progress signal: candidates include claim metadata touch on meaningful events, releases-per-window per agent, or standup cadence analysis. Define how status and doctor would label active-but-not-progressing locks and what a human should do. Design doc only; no enforcement until the human reviews the proposal.
+  - Goal: Distinguish dead, stuck-but-alive, and alive-but-slow agents using cheap repo-state signals.
+  - Outcome: docs/loop-progress-signals.md proposes blob-hash movement + releases-per-window as primary signals, status/doctor labels, progress-aware staleness, and a human playbook; self-reported liveness rejected as gameable.
+  - Constraints: Design doc only; no code, no enforcement, no daemons.
+  - Stop If: A signal would require self-reporting or background processes.
+  - Evidence: docs/loop-progress-signals.md committed; grounded in the 2026-06-11 stale-sweep incident as the motivating case; coordinates named with stale-break-standup-log and agent-resume-packet.
 
 - [ ] TASK/Codex: Verify and document agent budget behavior for loop mode
   - Id: budget-loop-verify
