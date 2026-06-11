@@ -608,3 +608,42 @@
 - Commit: chore(queue): close task-primitive-types with outcome evidence
 - Source: release
 
+## release-attribution-fallback
+
+- Id: release-attribution-fallback
+- Title: Add release attribution fallback for missing locks
+- Agent: @claude
+- Epic: Loop readiness
+- Cost: small
+- Completed At: 2026-06-11T13:24:42.094Z
+- Files: src/commands/release.js, src/commands/ledger.js, test/release.test.js, test/ledger.test.js, _NEXUS_LEDGER.md, _NEXUS_QUEUE.md
+- SHA: 5994116f52a46e31caecf2a14c3824e09c7cad30
+- Commit: chore(queue): close release-attribution-fallback
+- Source: release
+
+## claim-freshness-receipt
+
+- Id: claim-freshness-receipt
+- Title: Replace claim full-file dump with git freshness receipt
+- Agent: @claude
+- Epic: Loop readiness
+- Cost: medium
+- Completed At: 2026-06-11T13:42:32.988Z
+- Files: src/lib/dump.js, src/commands/claim.js, src/lib/protocolText.js, skills/nexus/SKILL.md, README.md, test/dump.test.js, test/claim.test.js, test/init.test.js, test/security.test.js, test/doctor.test.js, _NEXUS_QUEUE.md
+- SHA: 9eb62c04c0bd950d590d1a358f1cd3b277668a0b
+- Commit: feat(claim): add git freshness receipt (claim-freshness-receipt)
+- Source: release
+
+## doctor-advisory-dedup
+
+- Id: doctor-advisory-dedup
+- Title: Compact repeated doctor queue-authorship blocks
+- Agent: @claude
+- Epic: Loop readiness
+- Cost: small
+- Completed At: 2026-06-11T13:43:45.415Z
+- Files: src/commands/doctor.js, test/doctor.test.js, _NEXUS_QUEUE.md
+- SHA: fcd730117b9f53e5c42fca54d1c49f375a6cb7ba
+- Commit: chore(queue): close claim-freshness-receipt and doctor-advisory-dedup
+- Source: release
+
