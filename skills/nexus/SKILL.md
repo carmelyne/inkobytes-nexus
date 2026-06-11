@@ -66,6 +66,14 @@ When adding work to `_NEXUS_QUEUE.md`, keep tasks dashboard-parseable and immedi
 - Task primitives (`Goal`, `Outcome`, `Constraints`, `Stop If`, `Evidence`) are advisory today and required for auto-flow at autonomy 2. `Outcome` + `Evidence` + `Stop If` are the loop contract: when an agent is finished and when it must stop.
 - Write `Evidence` prospectively when authoring (what will prove completion); update it to point at the real artifacts when the task is Done.
 
+## Queue Lanes
+
+- Use `nexus next @Agent --take` when the human or protocol wants the task delegated into an agent lane.
+- `--take` copies the full task block, including task primitives, into `_NEXUS_Q_<AGENT>.md` and marks the master queue task as `Status: Delegated` with a lane pointer.
+- Delegated tasks are skipped by `nexus next` until reconciliation lands, so two agents do not take the same unreconciled work.
+- Use `nexus q @Agent` to inspect the lane.
+- Use `nexus q done <id> @Agent` to write a lane-local completion receipt. This updates the agent lane only and leaves `_NEXUS_QUEUE.md` unchanged.
+
 ## Guardrails
 
 - Ask before `nexus doctor --fix` unless scaffold repair is already approved.
