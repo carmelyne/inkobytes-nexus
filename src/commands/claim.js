@@ -5,7 +5,7 @@
 
 import { appendEntry } from '../lib/blackboard.js';
 import { acquireLock } from '../lib/lockManager.js';
-import { dumpState } from '../lib/dump.js';
+import { dumpState, freshnessReceipt } from '../lib/dump.js';
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { cwd } from 'process';
@@ -51,6 +51,10 @@ export default function claim(args) {
 
   const positional = [...args];
 
+  const showIndex = positional.indexOf('--show');
+  const showFull = showIndex !== -1;
+  if (showFull) positional.splice(showIndex, 1);
+
   const agentFlag = readFlag(positional, '--agent').trim();
   const intentFlag = readFlag(positional, '--intent').trim();
   const subagents = parseInt(readFlag(positional, '--subagents'), 10) || 0;
@@ -64,7 +68,7 @@ export default function claim(args) {
   const hasIntent = Boolean(intentFlag || positional[2]);
 
   if (!target) {
-    console.error('Usage: nexus claim <filepath_or_dir> <agent> "<intent>" [--agent <agent>] [--intent <intent>] [--subagents <n>] [--model <name>] [--thinking <low|medium|high>]');
+    console.error('Usage: nexus claim <filepath_or_dir> <agent> "<intent>" [--agent <agent>] [--intent <intent>] [--subagents <n>] [--model <name>] [--thinking <low|medium|high>] [--show]');
     process.exit(1);
   }
 
@@ -119,7 +123,7 @@ export default function claim(args) {
 
   console.log(result.message);
 
-  // Dump fresh file state
-  const state = dumpState(target);
-  console.log(state);
+  // Freshness receipt by default: prove content identity instead of paying
+  // tokens for a full dump. --show restores the full fresh-state dump.
+  console.log(showFull ? dumpState(target) : freshnessReceipt(target));
 }
