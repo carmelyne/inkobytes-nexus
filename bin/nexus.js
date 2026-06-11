@@ -2,6 +2,7 @@
 
 import { argv, exit } from 'process';
 import { readFileSync } from 'fs';
+import { maybePrintUpdateNotice } from '../src/utils/update-check.js';
 
 const COMMANDS = {
   init: () => import('../src/commands/init.js'),
@@ -55,6 +56,7 @@ if (!COMMANDS[command]) {
 try {
   const mod = await COMMANDS[command]();
   await mod.default(args.slice(1));
+  await maybePrintUpdateNotice({ currentVersion: VERSION });
 } catch (err) {
   console.error(`[ERROR] ${err.message}`);
   exit(1);
