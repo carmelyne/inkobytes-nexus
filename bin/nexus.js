@@ -2,6 +2,7 @@
 
 import { argv, exit } from 'process';
 import { readFileSync } from 'fs';
+import { maybePrintUpdateNotice } from '../src/utils/update-check.js';
 
 const COMMANDS = {
   init: () => import('../src/commands/init.js'),
@@ -15,6 +16,8 @@ const COMMANDS = {
   status: () => import('../src/commands/status.js'),
   clean: () => import('../src/commands/clean.js'),
   next: () => import('../src/commands/next.js'),
+  q: () => import('../src/commands/q.js'),
+  queue: () => import('../src/commands/queue.js'),
   start: () => import('../src/commands/start.js'),
   dashboard: () => import('../src/commands/dashboard.js'),
   metrics: () => import('../src/commands/metrics.js'),
@@ -55,6 +58,7 @@ if (!COMMANDS[command]) {
 try {
   const mod = await COMMANDS[command]();
   await mod.default(args.slice(1));
+  await maybePrintUpdateNotice({ currentVersion: VERSION });
 } catch (err) {
   console.error(`[ERROR] ${err.message}`);
   exit(1);
@@ -72,7 +76,9 @@ function printHelp() {
     ['standup "<dated message>"', 'Append a validated standup line'],
     ['status', 'Show current blackboard state'],
     ['clean [--stale | <path>]', 'Prune locks (surgical, stale, or nuke)'],
-    ['next <agent>', 'Suggest next safe task from queue'],
+    ['next <agent> [--take]', 'Suggest or delegate next safe task from queue'],
+    ['q <agent> | q done <id> <agent>', 'Show an agent lane or write a lane-local completion receipt'],
+    ['queue reconcile', 'Batch lane receipts back into the master queue'],
     ['start [--agent @handle]', 'Orient an agent entering this repo'],
     ['dashboard --serve [--port <port>]', 'Serve live local Nexus dashboard'],
     ['metrics [--json]', 'Summarize commits, releases, and queue cost'],
@@ -106,6 +112,10 @@ function printHelp() {
     'nexus standup "2026-06-01 08:38 AM @codex [DONE]: Updated tests"',
     'nexus clean --stale',
     'nexus next @claude',
+    'nexus next @codex --take',
+    'nexus q @codex',
+    'nexus q done hot-file-contention @codex',
+    'nexus queue reconcile',
     'nexus halt "queue drift detected, need human review"',
   ];
 

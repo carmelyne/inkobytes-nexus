@@ -49,7 +49,7 @@ Codex knows what Claude is doing. Claude knows why Gemini claimed that directory
 Nexus is:
 
 - shared awareness for multiple SOTA coding agents on one branch
-- file claims before shared reads and edits
+- file claims before shared edits and non-orientation shared reads
 - local guard hooks that block unclaimed writes
 - a queue so agents know what is safe to pick up next
 - a release command that commits only the claimed path
@@ -79,11 +79,25 @@ npx @inkobytes/nexus help
 
 Requires Node.js 18 or newer.
 
-## What's New In 1.0.8
+## Update Notices
 
-- Shared protocol wording keeps `nexus init`, `nexus doctor`, README repair, and tests aligned.
-- Generated agent guides now require continuity/latest-memory reads at session start, `nexus start`, or resume.
-- `nexus hooks install --agent all` installs Codex, Claude, and Gemini guard hooks in one pass.
+Nexus checks the npm registry for the latest `@inkobytes/nexus` version after normal commands and prints a small stderr notice only when a newer version is available. The lookup is cached in the user OS cache directory for 24 hours, so commands do not hit the network every run.
+
+The check is skipped in CI, and you can opt out locally:
+
+```bash
+NEXUS_NO_UPDATE_CHECK=1 nexus start
+```
+
+The update check sends only the package metadata request to npm. It does not send repo paths, command names, task data, user ids, telemetry, or usage events.
+
+## What's New In 1.2.0
+
+- `nexus claim` prints a token-thin freshness receipt (git blob hash, last commit, dirty/clean) by default; `--show` restores the full file dump.
+- Delegated queue lanes: `nexus next @agent --take`, `nexus q`, `nexus q done`, and `nexus queue reconcile` move active work into per-agent lane files and batch results back to the master queue.
+- Task Primitives (`Goal`, `Outcome`, `Constraints`, `Stop If`, `Evidence`) define when a loop agent is finished and when it must stop; surfaced by `next`, checked by `doctor`.
+- Release attribution falls back to `NEXUS_AGENT` or the queue task owner when a lock is missing, instead of writing `unknown`.
+- Doctor compacts repeated queue findings, and a cached, privacy-respecting update notice flags newer npm versions.
 
 See [CHANGELOG.md](./CHANGELOG.md) for the release summary.
 
@@ -121,6 +135,8 @@ Hooks are the enforcement layer. Without hooks, Nexus is a coordination protocol
 - `_NEXUS_REPORT.md` - release receipt log
 - `_NEXUS_CONSTITUTION.md` - agent operating protocol
 - `.nexus/locks/` - local lock state, ignored by Git
+
+Track the `_NEXUS_*` coordination files in Git. The queue is the program your agents execute — tracking it gives state flips commit history, diffs, and rollback, and makes `nexus doctor --fix` protocol updates auditable. `nexus release` also needs tracked files to produce commit receipts; gitignored paths fail release and force receipt-less lock drops. If your repo is public and standup/report chatter should stay private, those two are the reasonable exceptions. The live `_NEXUS.md` blackboard will show as dirty between releases — that is lock state doing its job.
 
 It also scaffolds agent-local startup and handoff files when missing:
 
@@ -191,6 +207,7 @@ Doctor reports grouped issues:
 - grouped Git Privacy summaries for tracked private/local trees, with shared agent dirs collapsed into one concise note
 - colorized action buckets so fixes and informational lock notes are easier to scan
 - stale nexus locks
+- unreconciled queue lane receipts, duplicate receipts, stale delegated tasks, and master/lane disagreements
 - missing agent instructions specifically for nexus
 - missing continuity and memory scaffolds
 - legacy `_nexus_*.sh` helper references
@@ -375,7 +392,8 @@ Claims are hierarchy-aware:
 - stale locks older than the configured threshold are auto-broken
 - missing agent or intent fails before lock creation; missing model metadata warns
 - missing core Nexus protocol files produce a short `nexus doctor` warning
-- fresh file state is printed so the agent starts from disk truth
+- a freshness receipt is printed: the git blob hash of the file on disk, last commit, and dirty/clean state — same blob as the agent's last read means cached content is current; different means re-read
+- `--show` prints the full fresh file state instead of the receipt, for agents that want disk truth inline
 
 ### `nexus release <path> "<commit message>"`
 
@@ -404,6 +422,27 @@ When configured, `nexus release` runs the command before staging. On failure it 
 
 `--no-verify` skips the gate but is only allowed at autonomy level 0 (supervised), and the skip is logged loudly to standup. At autonomy 1 or higher, `--no-verify` is refused and `nexus doctor` warns whenever no `verifyCommand` is configured.
 
+#### Autonomy levels
+
+`.nexus/config.json` carries a repo-wide `autonomy` level (default `0`):
+
+```json
+{
+  "autonomy": 1,
+  "release": { "verifyCommand": "npm test" }
+}
+```
+
+| Level | Name | Meaning | Doctor prerequisites |
+|---|---|---|---|
+| 0 | Supervised | Human approves each significant step; `--no-verify` allowed | none |
+| 1 | Checkpointed | Agents work the queue between human checkpoints | `release.verifyCommand` configured |
+| 2 | Bounded unattended | Agents run without a human present, inside explicit volume bounds | Level 1 plus `.nexus/agent-budgets.json`; flags the missing `nexus recover` command |
+
+`nexus start` reports the level so agents know the operating mode before claiming work, and `nexus doctor` warns when a level's prerequisites are missing.
+
+Changing the level is human-only **by convention** — Nexus does not mechanically prevent an agent from editing `.nexus/config.json`. Doctor reports prerequisite gaps; the claim stops there, honestly.
+
 ### `nexus standup "<dated message>"`
 
 Append a validated standup line to `_NEXUS_STANDUP.md`.
@@ -420,12 +459,13 @@ YYYY-MM-DD HH:MM AM/PM @agent [STATUS]: message
 
 Missing agent handles, bad date/time format, missing status, or empty messages fail before writing.
 
-### `nexus next <agent>`
+### `nexus next <agent> [--take]`
 
 Suggest the next safe auto-flow task from `_NEXUS_QUEUE.md`.
 
 ```bash
 nexus next @codex
+nexus next @codex --take
 ```
 
 Nexus checks:
@@ -435,8 +475,36 @@ Nexus checks:
 - dependencies
 - claimed file conflicts
 - optional agent budget file
+- delegated lane state
+
+The suggestion includes any declared task primitives (`Goal`, `Outcome`, `Constraints`, `Stop If`, `Evidence`) and lists missing ones as an advisory.
+
+With `--take`, Nexus delegates the selected task into the agent's lane file, such as `_NEXUS_Q_CODEX.md`, and marks the master queue task as `Status: Delegated` with a lane pointer and pending receipt. The full task block travels with the copy, including task primitives, so the lane is the working contract. Delegated tasks are skipped by later `nexus next` runs until reconciliation lands.
 
 If nothing is safe, the agent should stand by.
+
+### `nexus q <agent>` and `nexus q done <id> <agent>`
+
+Inspect an agent queue lane or write a lane-local completion receipt.
+
+```bash
+nexus q @codex
+nexus q done hot-file-contention @codex
+```
+
+`nexus q done <id> <agent>` updates the agent lane file only. It removes the task from `## Active`, appends a pending receipt under `## Completed`, and leaves `_NEXUS_QUEUE.md` unchanged.
+
+### `nexus queue reconcile`
+
+Batch pending lane receipts back into the master queue registry.
+
+```bash
+nexus queue reconcile
+```
+
+Reconciliation is the bounded master write: Nexus reads pending receipts from `_NEXUS_Q_<AGENT>.md`, marks matching master queue tasks `Done`, records completion and reconciliation timestamps, and marks the lane receipts reconciled. It refuses duplicate pending receipts for the same task id so humans can resolve contradictions before the registry changes.
+
+Run this as a human checkpoint ritual, or as an explicit agent checkpoint when the repo's autonomy rules allow it. `nexus doctor` warns about unreconciled receipts, duplicate receipts, stale delegated tasks, and master/lane disagreements.
 
 ### `nexus status`
 
@@ -475,10 +543,33 @@ Nexus reads tasks from `_NEXUS_QUEUE.md`:
   - Review: approved
   - Approved by: human
   - Notes: Add a doctor section for stale locks with tests and clear fix guidance.
+  - Goal: Make lock hygiene visible in routine checkups.
+  - Outcome: Doctor lists stale locks with age and a clear fix.
+  - Constraints: Touch only the doctor command and its tests.
+  - Stop If: The fix requires changing lock file format.
+  - Evidence: test/doctor.test.js covers the stale-lock section.
 ```
 
 The queue is the executable priority surface. Standup is for comms and human context.
 Keep items dashboard-friendly: include `Id`, `Epic`, `Status`, `Depends on`, `Files`, `Affinity`, `Cost`, `Auto-flow`, and `Notes`. Use `Files` to expose conflict surfaces, `Depends on` for hard blockers, and `Auto-flow: no` when a task needs planning or human approval before an agent grabs it. Auto-flow work in `Ready Queue` should also include `Review: approved` and `Approved by: human`, or `doctor` will flag it and `nexus next` may skip it.
+
+### Task primitives
+
+Beyond the dashboard fields, tasks can declare agent-native **task primitives**:
+
+| Primitive | Answers |
+|---|---|
+| `Goal` | Why the task exists |
+| `Outcome` | What must be true when the task is complete |
+| `Constraints` | What the agent must not change or assume |
+| `Stop If` | Conditions that require stopping for human review |
+| `Evidence` | Tests, logs, or reports that prove completion |
+
+`Scope` maps onto `Files`, dependencies stay on `Depends on`, and approval gates stay on `Review`/`Approved by`, so existing tasks remain valid — primitives tier in gradually.
+
+Loop principle: `Outcome` + `Evidence` + `Stop If` are the anti-over-looping contract. They define when a loop agent is finished and when it must stop instead of compounding. Write `Evidence` prospectively when authoring (what will prove completion) and update it to point at the real artifacts once the task is Done.
+
+`nexus next` prints declared primitives with its suggestion and notes the missing ones. `nexus doctor` reports missing primitives on auto-flow tasks as advisory at autonomy 0–1 and actionable at autonomy 2, where under-specified unattended work is a bug.
 
 Add `Drills` when a task has known failure-mode guidance:
 
@@ -497,7 +588,7 @@ The agent rule of thumb:
 3. Read `USER.md` when present.
 4. Read continuity and latest memory at session start, `nexus start`, or resume.
 5. Read `_NEXUS_QUEUE.md` before taking follow-on work.
-6. Claim before touching shared project files.
+6. Claim before editing shared project files, and before reading shared non-orientation files.
 7. Release each claimed tracked file as soon as it reaches a coherent checkpoint.
 8. Use `nexus next @Agent` instead of free-roaming.
 
@@ -508,7 +599,7 @@ Use model names as lock handles so ownership stays clear:
 - `@gemini`
 - `@agy`
 
-Agent-local continuity and memory files are exempt from claim/release unless the human says otherwise.
+Agent-local continuity and memory files are exempt from claim/release unless the human says otherwise; read-only access should not take a lock.
 
 Nexus is agent-native and file-native, not human-native: optimize for concurrency and rollback, not feature-commit aesthetics. Do not hold claims to bundle related work into prettier feature commits; that blocks other agents waiting on files.
 

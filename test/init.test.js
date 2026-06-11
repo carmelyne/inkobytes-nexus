@@ -67,8 +67,8 @@ test('init creates managed agent guides that doctor accepts', () => {
     assert.equal(codexGuide.match(/NEXUS-AGENT-PROTOCOL:START/g).length, 1);
     assert.equal(codexGuide.match(/This project uses Nexus for multi-agent coordination\./g).length, 1);
     assert.match(codexGuide, /### Current File State/);
-    assert.match(codexGuide, /atomic lock-and-read boundary/);
-    assert.match(codexGuide, /read a shared file before claiming it, treat that read as stale after claim succeeds/);
+    assert.match(codexGuide, /atomic lock boundary/);
+    assert.match(codexGuide, /Same blob hash as your last read means that read is still current/);
     assert.match(codexGuide, /claim appears stale/);
     assert.match(codexGuide, /### Drills/);
     assert.match(codexGuide, /Drill guidance is defined in `_NEXUS_CONSTITUTION\.md`/);

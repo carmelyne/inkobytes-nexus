@@ -147,6 +147,8 @@
     <script>
       let currentSnapshot = null;
       let queueView = { mode: 'queue', agent: null };
+      let queueFilter = localStorage.getItem('nexusQueueFilter') || 'open';
+      let queueSort = localStorage.getItem('nexusQueueSort') || 'date';
       let reportView = '';
       let repoRoot = '';
       let lastQueueSig = '';
@@ -301,10 +303,12 @@
         });
 
         if (queueView.mode === 'queue') {
-          const openTasks = (data.queue || []).filter(task => !task.checked);
-          document.getElementById('queue-panel').innerHTML = openTasks.length
-            ? openTasks.map(renderTask).join('')
-            : '<p class="muted">No open queue tasks. Completed work is in Nexus Ledger.</p>';
+          const tasks = getVisibleQueueTasks(data.queue || []);
+          const controls = renderQueueControls(data.queue || [], tasks.length);
+          document.getElementById('queue-panel').innerHTML = controls + (tasks.length
+            ? '<div class="queue-task-list">' + tasks.map(renderTask).join('') + '</div>'
+            : '<p class="muted">No queue tasks match this view.</p>');
+          bindQueueControls();
           return;
         }
 
@@ -361,22 +365,101 @@
       }
 
       function renderNextSuggestion(task, agent) {
-        const lines = [
-          `NEXUS SUGGESTS for ${agent}:`,
-          `   Task: ${task.id || task.title || 'unknown'}`,
-          `   Epic: ${task.epic || 'unknown'}`,
-          `   Files: ${task.files || 'no files'}`,
-          `   Cost: ${task.cost || 'unknown'}`,
-          `   Auto-flow: ${task.autoFlow || 'no'}`,
-        ];
         const drills = relatedDrillsForTask(task);
-        if (drills.length) {
-          lines.push('');
-          lines.push('   Related known failure-mode guidance from drills:');
-          for (const id of drills) lines.push(`   - ${id}`);
-          lines.push('   Run `nexus drill show <id>` if the task matches that risk.');
-        }
-        return `<article class="task"><pre>${escapeHtml(lines.join('\n'))}</pre></article>`;
+        const drillChips = drills.length
+          ? '<div class="next-drill-list"><span>Drills</span>' + drills.map(id => '<code>' + escapeHtml(id) + '</code>').join('') + '</div>'
+          : '';
+        return '<div class="next-suggestion"><span class="next-suggestion-label">Suggested next for ' + escapeHtml(agent) + '</span>' + drillChips + '</div>'
+          + renderTask(task);
+      }
+
+      function getVisibleQueueTasks(tasks) {
+        const filtered = tasks.filter((task) => {
+          if (queueFilter === 'all') return true;
+          if (queueFilter === 'issues') return (task.issues || []).length > 0;
+          if (queueFilter === 'stale') return (task.issues || []).includes('stale');
+          if (queueFilter === 'pending-review') {
+            return String(task.review || '').toLowerCase() && String(task.review || '').toLowerCase() !== 'approved';
+          }
+          return !task.checked;
+        });
+        return filtered.slice().sort(compareQueueTasks);
+      }
+
+      function compareQueueTasks(a, b) {
+        if (queueSort === 'cost') return compareCost(a, b) || compareId(a, b);
+        if (queueSort === 'auto-flow') return compareText(b.autoFlow, a.autoFlow) || compareId(a, b);
+        if (queueSort === 'review') return compareReview(a, b) || compareId(a, b);
+        if (queueSort === 'id') return compareId(a, b);
+        return compareDate(a, b) || compareId(a, b);
+      }
+
+      function compareCost(a, b) {
+        const weight = { small: 1, medium: 2, large: 3 };
+        return (weight[String(a.cost || '').toLowerCase()] || 99) - (weight[String(b.cost || '').toLowerCase()] || 99);
+      }
+
+      function compareReview(a, b) {
+        const weight = { pending: 1, requested: 1, changes: 1, approved: 3 };
+        const av = weight[String(a.review || '').toLowerCase()] || 2;
+        const bv = weight[String(b.review || '').toLowerCase()] || 2;
+        return av - bv;
+      }
+
+      function compareDate(a, b) {
+        const av = Number.isFinite(a.dateTs) ? a.dateTs : 0;
+        const bv = Number.isFinite(b.dateTs) ? b.dateTs : 0;
+        return bv - av;
+      }
+
+      function compareId(a, b) {
+        return compareText(a.id || a.title, b.id || b.title);
+      }
+
+      function compareText(a, b) {
+        return String(a || '').localeCompare(String(b || ''), undefined, { sensitivity: 'base' });
+      }
+
+      function renderQueueControls(allTasks, visibleCount) {
+        const openCount = allTasks.filter(task => !task.checked).length;
+        const issueCount = allTasks.filter(task => (task.issues || []).length > 0).length;
+        const staleCount = allTasks.filter(task => (task.issues || []).includes('stale')).length;
+        return '<div class="queue-controls">'
+          + '<div class="queue-control-group"><label for="queue-filter">Show</label>'
+          + '<select id="queue-filter" class="queue-select">'
+          + renderOption('open', 'Open (' + openCount + ')', queueFilter)
+          + renderOption('all', 'All (' + allTasks.length + ')', queueFilter)
+          + renderOption('issues', 'Issues (' + issueCount + ')', queueFilter)
+          + renderOption('stale', 'Stale (' + staleCount + ')', queueFilter)
+          + renderOption('pending-review', 'Pending review', queueFilter)
+          + '</select></div>'
+          + '<div class="queue-control-group"><label for="queue-sort">Sort</label>'
+          + '<select id="queue-sort" class="queue-select">'
+          + renderOption('date', 'Date', queueSort)
+          + renderOption('id', 'Id', queueSort)
+          + renderOption('cost', 'Cost', queueSort)
+          + renderOption('auto-flow', 'Auto-flow', queueSort)
+          + renderOption('review', 'Review', queueSort)
+          + '</select></div>'
+          + '<div class="queue-count">' + visibleCount + ' shown</div>'
+          + '</div>';
+      }
+
+      function renderOption(value, label, selected) {
+        return '<option value="' + escapeHtml(value) + '"' + (value === selected ? ' selected' : '') + '>' + escapeHtml(label) + '</option>';
+      }
+
+      function bindQueueControls() {
+        document.getElementById('queue-filter')?.addEventListener('change', (event) => {
+          queueFilter = event.target.value;
+          localStorage.setItem('nexusQueueFilter', queueFilter);
+          renderQueuePanel(currentSnapshot);
+        });
+        document.getElementById('queue-sort')?.addEventListener('change', (event) => {
+          queueSort = event.target.value;
+          localStorage.setItem('nexusQueueSort', queueSort);
+          renderQueuePanel(currentSnapshot);
+        });
       }
 
       function formatNotes(text) {
@@ -401,38 +484,36 @@
 
       function renderTask(task) {
         const done = task.checked ? ' is-done' : '';
-        const popId = 'tp-' + (task.id || Math.random().toString(36).slice(2, 9));
-
-        const chips = [
-          task.epic     && metaChip('Epic',       ICONS.epic,    task.epic),
-          task.cost     && metaChip('Cost',        ICONS.cost,    task.cost),
-          task.autoFlow && metaChip('Auto-flow',   ICONS.auto,    task.autoFlow),
-          task.depends  && task.depends !== 'none' && metaChip('Depends on', ICONS.depends, task.depends),
+        const issues = (task.issueLabels || []).map(issue =>
+          '<span class="issue-chip issue-chip-' + escapeHtml(issue.id) + '">' + escapeHtml(issue.label) + '</span>'
+        ).join('');
+        const meta = [
+          task.id && '<code>' + escapeHtml(task.id) + '</code>',
+          task.date && '<span>' + escapeHtml(task.date) + '</span>',
+          task.cost && '<span>cost ' + escapeHtml(task.cost) + '</span>',
+          task.autoFlow && '<span>auto ' + escapeHtml(task.autoFlow) + '</span>',
+          task.review && '<span>review ' + escapeHtml(task.review) + '</span>',
         ].filter(Boolean).join('');
-
-        const filesRow = task.files
-          ? '<div class="pop-files"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + ICONS.files + '</svg><span>' + escapeHtml(task.files) + '</span></div>'
-          : '';
-
-        const notesRow = task.notes
-          ? '<div class="pop-notes"><div class="pop-notes-label"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + ICONS.notes + '</svg>Notes</div><div class="pop-notes-body">' + formatNotes(task.notes) + '</div></div>'
-          : '';
-
-        const popover = '<div id="' + popId + '" popover class="task-popover">'
-          + '<div class="task-pop-title">' + escapeHtml(task.title) + '</div>'
-          + (chips ? '<div class="pop-meta">' + chips + '</div>' : '')
-          + filesRow + notesRow
-          + '</div>';
-
-        return '<div class="task' + done + '">'
-          + '<div class="task-header"><div class="task-title"><strong>' + escapeHtml(task.title) + '</strong></div>'
-          + '<button class="task-peek" popovertarget="' + popId + '" title="Task details">ⓘ</button></div>'
+        return '<article class="task queue-task' + done + '">'
+          + '<div class="task-header">'
+          + '<div class="task-title"><strong>' + escapeHtml(task.title) + '</strong></div>'
           + '<span class="pill">' + escapeHtml(task.agent) + '</span>'
           + '<span class="pill">' + escapeHtml(task.status || 'unknown') + '</span>'
-          + '<span class="pill">auto ' + escapeHtml(task.autoFlow || 'no') + '</span>'
-          + '<br><code>' + escapeHtml(task.files || 'no files') + '</code>'
-          + popover
-          + '</div>';
+          + '</div>'
+          + (meta ? '<div class="queue-task-meta">' + meta + '</div>' : '')
+          + (issues ? '<div class="queue-task-issues">' + issues + '</div>' : '')
+          + '<pre class="queue-task-raw">' + formatTaskRaw(task.raw || task.title || '') + '</pre>'
+          + '</article>';
+      }
+
+      function formatTaskRaw(value) {
+        return String(value || '').split('\n').map((line) => {
+          const field = line.match(/^(\s*-\s)([^:]+:)(.*)$/);
+          if (!field) return escapeHtml(line);
+          return escapeHtml(field[1])
+            + '<span class="queue-task-raw-label">' + escapeHtml(field[2]) + '</span>'
+            + escapeHtml(field[3]);
+        }).join('\n');
       }
 
       function renderLedgerEntry(entry) {

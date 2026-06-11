@@ -1,13 +1,13 @@
 {
   "name": "@inkobytes/nexus",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Multi-agent coordination CLI for coding agents sharing a local repository",
   "type": "module",
   "bin": {
     "nexus": "bin/nexus.js"
   },
   "scripts": {
-    "test": "node --test test/**/*.test.js",
+    "test": "node --test test/*.test.js",
     "prepublishOnly": "npm test"
   },
   "keywords": [

@@ -79,13 +79,17 @@ This project uses Nexus for multi-agent coordination.
 
 - On compaction, resume, or a fresh turn, treat this file and the Nexus protocol as active requirements, not optional guidance.
 - Claim before touching shared project files: \`nexus claim <path> @Agent "intent"\`.
-- If a hook blocks reading, editing, committing, or releasing because a path is unclaimed, stop and claim the exact path. Do not bypass the hook with another tool, shell trick, cached content, or manual git command.
-- Claim first, then read/edit. No exceptions, no "I'll claim after."
+- If a hook blocks reading, editing, committing, or releasing because a shared path is unclaimed, stop and claim the exact path. Do not bypass the hook with another tool, shell trick, cached content, or manual git command.
+- Claim shared project files before editing. Claim before reading only when the file is outside the startup/orientation set or a hook explicitly requires it.
 - Nexus is agent-native and file-native, not human-native: optimize for concurrency and rollback, not feature-commit aesthetics.
 - Release each claimed file as soon as it reaches a coherent checkpoint.
 - Never hold claims just to bundle a prettier feature commit; that blocks other agents.
 - Release finished work through Nexus: \`nexus release <path> "commit message"\`.
 - Use \`nexus next @Agent\` for the next safe queue task.
+- Use \`nexus next @Agent --take\` when work should be delegated into an agent lane; it copies the full task block into \`_NEXUS_Q_<AGENT>.md\` and marks the master task delegated.
+- Use \`nexus q @Agent\` to inspect an agent lane, and \`nexus q done <id> @Agent\` to write a lane-local receipt without mutating \`_NEXUS_QUEUE.md\`.
+- Use \`nexus queue reconcile\` at a human checkpoint or explicit agent checkpoint to batch pending lane receipts back into \`_NEXUS_QUEUE.md\`.
+- Treat \`_NEXUS_QUEUE.md\` as the registry during delegated work; active notes and done receipts live in the assigned lane until batch reconciliation. If \`nexus doctor\` reports unreconciled receipts, duplicate receipts, stale delegated tasks, or master/lane disagreement, inspect before reconciling.
 - Do not free-roam into unassigned or \`Auto-flow: no\` work without user approval.
 - Direct user instruction can override queue order, but not claim/release, data, security, or approval gates.
 - If no safe task remains, announce \`Standby\` with what you are waiting for, then stop until user input, queue change, or explicit assignment.
@@ -94,11 +98,11 @@ This project uses Nexus for multi-agent coordination.
 
 - Treat previous chat context, cached model memory, and earlier reads as stale when file contents matter.
 - Unclaimed orientation reads are limited to Nexus protocol, queue, standup, human preference, continuity, and memory files named in Start Here.
-- Claim before reading implementation files, tests, docs, generated artifacts, or agent instruction files outside that orientation set.
+- Claim before reading implementation files, tests, docs, generated artifacts, or shared agent instruction files outside that orientation set.
 - Before claiming what a file says, making edits, or judging current state, read the file from disk with a fresh command.
-- Treat \`nexus claim\` as the atomic lock-and-read boundary and its output as fresh file state for the claimed path.
-- If you read a shared file before claiming it, treat that read as stale after claim succeeds.
-- If another agent or tool may have touched the file since your last read, re-read it before editing.
+- Treat \`nexus claim\` as the atomic lock boundary. It prints a freshness receipt: the git blob hash identifies the exact content on disk.
+- Same blob hash as your last read means that read is still current; different or unknown means re-read before editing. \`nexus claim --show\` prints the full file state instead.
+- If another agent or tool may have touched the file since your last read, the blob hash will have moved; re-read before editing.
 - If a claim appears stale, do not edit through it; run \`nexus status\` or \`nexus doctor\`, then clean only when ownership is clearly abandoned.
 
 ### Drills
@@ -137,8 +141,8 @@ If the situation resembles a drill, use that drill before acting.
 
 ### Agent-Local Files
 
-\`${agent.continuity}\` and \`${agent.memoryIndex}\` are agent-local handoff files.
-They are exempt from Nexus claim/release unless the user says otherwise.
+\`${agent.continuity}\`, \`${agent.memoryIndex}\`, and files under \`${agent.memoryDir}/\` are agent-local handoff files.
+They are exempt from Nexus claim/release unless the user says otherwise, and read-only access to them should not take a lock.
 
 ### Continuity Flow
 

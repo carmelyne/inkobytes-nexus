@@ -6,16 +6,24 @@
 import { readFileSync, existsSync } from 'fs';
 import { getConfig } from '../lib/config.js';
 import { readBoard } from '../lib/blackboard.js';
+import { contractViolations, TASK_PRIMITIVES, primitiveGaps } from '../lib/taskContract.js';
 import { spawnSync } from 'child_process';
 import { refuseIfHalted } from './halt.js';
+import {
+  delegatedTaskIds,
+  delegateTask,
+  extractSection,
+  parseReadyTasks,
+} from '../lib/queue.js';
 
 export default function next(args) {
   refuseIfHalted('next');
 
-  const agent = args[0];
+  const take = args.includes('--take');
+  const agent = args.find(arg => !arg.startsWith('--'));
 
   if (!agent) {
-    console.error('Usage: nexus next <agent_name>');
+    console.error('Usage: nexus next <agent_name> [--take]');
     process.exit(1);
   }
 
@@ -46,16 +54,37 @@ export default function next(args) {
 
   // Load budget if available
   const budget = loadBudget(config.budgetFile, agent);
+  const delegatedIds = delegatedTaskIds(config.root);
 
-  // Score and filter tasks — only Ready Queue, only human-approved auto-flow
+  // Score and filter tasks — only Ready Queue, only human-approved auto-flow.
+  // At autonomy 1+ the queue is the program: the full task contract applies,
+  // and skipped tasks are reported so the human can repair them.
+  const contractSkipped = [];
   const candidates = tasks
     .filter(t => t.status === 'Ready')
     .filter(t => t.autoFlow === 'yes')
-    .filter(t => t.review === 'approved')
+    .filter(t => {
+      if (config.autonomy < 1) return t.review === 'approved';
+      const violations = contractViolations(t);
+      if (violations.length) {
+        contractSkipped.push({ id: t.id || t.title, violations });
+        return false;
+      }
+      return true;
+    })
+    .filter(t => !delegatedIds.has(t.id))
     .filter(t => !hasFileConflict(t.files, claimedFiles))
     .filter(t => dependenciesMet(t.dependsOn, tasks, config.root))
     .filter(t => t.cost !== 'spiky')
     .filter(t => fitsbudget(t.cost, budget));
+
+  if (contractSkipped.length) {
+    console.log(`⚠️  Task contract (autonomy ${config.autonomy}): skipped ${contractSkipped.length} auto-flow task(s) with missing fields:`);
+    for (const { id, violations } of contractSkipped) {
+      console.log(`   - ${id}: needs ${violations.map(v => v.needs).join(', ')}`);
+    }
+    console.log('   Repair the fields in _NEXUS_QUEUE.md or move the task to ## Proposed Queue.');
+  }
 
   if (candidates.length === 0) {
     console.log(`📋 No safe auto-flow tasks available for ${agent}. Standby.`);
@@ -73,10 +102,40 @@ export default function next(args) {
   console.log(`   Task: ${pick.id}`);
   console.log(`   Epic: ${pick.epic}`);
   console.log(`   Files: ${pick.files.join(', ')}`);
-  console.log(`   Cost: ${pick.cost}`);
+  console.log(`   Cost: ${pick.cost || 'unspecified (treated as medium)'}`);
   console.log(`   Auto-flow: ${pick.autoFlow}`);
+  printTaskPrimitives(pick, config.autonomy);
   printRelatedDrills(pick);
+
+  if (take) {
+    const result = delegateTask({
+      root: config.root,
+      queuePath: config.queue,
+      queueContent,
+      task: pick,
+      agent,
+    });
+    console.log('');
+    console.log(`   Delegated: ${pick.id} -> ${result.lane}`);
+    console.log(`   Delegated at: ${result.delegatedAt}`);
+    console.log('   Receipt: pending reconciliation');
+  }
+
   console.log('');
+}
+
+// Task primitives travel with the suggestion so the agent starts with the
+// full contract: Outcome + Evidence + Stop If say when it is finished and
+// when it must stop for a human.
+function printTaskPrimitives(task, autonomy) {
+  for (const { field, key } of TASK_PRIMITIVES) {
+    if (String(task[key] || '').trim()) console.log(`   ${field}: ${task[key]}`);
+  }
+
+  const gaps = primitiveGaps(task);
+  if (gaps.length) {
+    console.log(`   Primitives missing: ${gaps.map(g => g.field).join(', ')} (advisory at autonomy ${autonomy}; doctor requires them at autonomy 2)`);
+  }
 }
 
 const DATA_MUTATION_DRILL = `data-mutation-${'delete-rows'}`;
@@ -171,78 +230,6 @@ function parseRunway(content, agent) {
     }
   }
   return [];
-}
-
-function extractSection(content, heading) {
-  const lines = content.split('\n');
-  let inSection = false;
-  const result = [];
-  for (const line of lines) {
-    if (line.startsWith('## ')) {
-      inSection = line.trim() === heading;
-      continue;
-    }
-    if (inSection) result.push(line);
-  }
-  return result.join('\n');
-}
-
-function parseReadyTasks(content) {
-  // Only read from ## Ready Queue — Proposed section is invisible to nexus next
-  const sectionContent = extractSection(content, '## Ready Queue');
-  const tasks = [];
-  const lines = sectionContent.split('\n');
-  let current = null;
-
-  for (const line of lines) {
-    const taskMatch = line.match(/^- \[[ x]\] TASK\/.+?:\s*(.+)/);
-    if (taskMatch) {
-      if (current) tasks.push(current);
-      current = {
-        title: taskMatch[1],
-        id: '',
-        epic: '',
-        status: '',
-        dependsOn: '',
-        files: [],
-        affinity: [],
-        drills: [],
-        cost: 'medium',
-        autoFlow: 'no',
-        review: '',
-        approvedBy: '',
-        notes: '',
-      };
-      continue;
-    }
-
-    if (current && line.match(/^\s+-\s/)) {
-      const kv = line.trim().replace(/^-\s*/, '');
-      const colonIdx = kv.indexOf(':');
-      if (colonIdx === -1) continue;
-
-      const key = kv.slice(0, colonIdx).trim().toLowerCase();
-      const val = kv.slice(colonIdx + 1).trim();
-
-      switch (key) {
-        case 'id': current.id = val; break;
-        case 'epic': current.epic = val; break;
-        case 'status': current.status = val; break;
-        case 'depends on': current.dependsOn = val; break;
-        case 'files': current.files = val.split(',').map(s => s.trim()); break;
-        case 'affinity': current.affinity = val.split(',').map(s => s.trim()); break;
-        case 'drills': current.drills = val.split(',').map(s => s.trim()).filter(Boolean); break;
-        case 'cost': current.cost = val; break;
-        case 'auto-flow': current.autoFlow = val; break;
-        case 'review': current.review = val.toLowerCase(); break;
-        case 'approved by': current.approvedBy = val; break;
-        case 'notes': current.notes = val; break;
-      }
-    }
-  }
-
-  if (current) tasks.push(current);
-  return tasks;
 }
 
 function parseClaimed(boardContent) {

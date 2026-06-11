@@ -38,11 +38,12 @@ test('dashboard snapshot summarizes Nexus repo state', () => {
       '- [ ] TASK/@codex: Build dashboard',
       '  - Id: dashboard-v1',
       '  - Status: Ready',
+      '  - Created: 2000-01-01',
       '  - Files: src/commands/dashboard.js',
       '  - Cost: small',
       '  - Auto-flow: yes',
-      '  - Review: approved',
-      '  - Approved by: human',
+      '  - Review: pending',
+      '  - Notes: Show the full queue task block in the dashboard.',
     ].join('\n'), 'utf-8');
     writeFileSync(join(root, '_NEXUS_STANDUP.md'), [
       '# Standup',
@@ -89,6 +90,12 @@ test('dashboard snapshot summarizes Nexus repo state', () => {
     assert.equal(snapshot.health.ok, true);
     assert.equal(snapshot.queue[0].id, 'dashboard-v1');
     assert.equal(snapshot.queue[0].autoFlow, 'yes');
+    assert.equal(snapshot.queue[0].created, '2000-01-01');
+    assert.equal(snapshot.queue[0].date, '2000-01-01');
+    assert.ok(snapshot.queue[0].raw.includes('- [ ] TASK/@codex: Build dashboard'));
+    assert.ok(snapshot.queue[0].raw.includes('  - Notes: Show the full queue task block in the dashboard.'));
+    assert.deepEqual(snapshot.queue[0].issues, ['stale', 'review', 'approval']);
+    assert.deepEqual(snapshot.queue[0].issueLabels.map(issue => issue.label), ['stale', 'review pending', 'approval needed']);
     assert.equal(snapshot.locks[0].target, 'src/app.js');
     assert.equal(snapshot.locks[0].model, 'gpt-5-codex');
     assert.equal(snapshot.locks[0].thinking, 'medium');

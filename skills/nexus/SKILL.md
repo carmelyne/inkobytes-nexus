@@ -17,14 +17,14 @@ If the user, repo, or hook says Nexus is active, treat this skill as mandatory w
 4. Read continuity and latest memory at session start, `nexus start`, or resume.
 5. Read `_NEXUS_QUEUE.md` and `_NEXUS_STANDUP.md`.
 6. Choose user-assigned work or `nexus next @Agent`; do not free-roam into `Auto-flow: no`.
-7. Claim exact shared files before reading/editing:
+7. Claim exact shared files before editing, and before reading shared non-orientation files:
 
    ```bash
    nexus claim <path> @Agent "intent"
    ```
 
-8. Treat claim output as current file state. Ignore cached file memory when contents matter.
-9. If a hook blocks access because a path is unclaimed, stop and claim that exact path. Do not work around the hook with another command, cached content, or manual git operation.
+8. Compare the claim freshness receipt with your last read: same blob hash means your cached read is current; different or unknown means re-read before editing. Use `nexus claim --show` for the full file dump.
+9. If a hook blocks access because a shared path is unclaimed, stop and claim that exact path. Do not work around the hook with another command, cached content, or manual git operation.
 10. Work only inside the claimed surface and run focused validation.
 11. Release each claimed tracked file through Nexus as soon as it reaches a coherent checkpoint:
 
@@ -51,6 +51,11 @@ When adding work to `_NEXUS_QUEUE.md`, keep tasks dashboard-parseable and immedi
   - Review: approved
   - Approved by: human
   - Notes: One practical paragraph with scope, constraints, and definition of done.
+  - Goal: Why this task exists, one line.
+  - Outcome: What must be true when the task is complete.
+  - Constraints: What the agent must not change or assume.
+  - Stop If: Conditions that require stopping for human review.
+  - Evidence: Tests, logs, or reports that prove completion.
 ```
 
 - `Files` should name the likely edit surface so other agents can spot conflicts before claiming.
@@ -58,13 +63,25 @@ When adding work to `_NEXUS_QUEUE.md`, keep tasks dashboard-parseable and immedi
 - `Auto-flow: yes` means an agent can grab it after `nexus next`; use `no` when planning or human approval is needed.
 - Auto-flow work in `Ready Queue` should include `Review: approved` and `Approved by: human`, or `doctor` will flag it and `nexus next` may skip it.
 - `Notes` should carry dashboard-useful context, not a whole design doc.
+- Task primitives (`Goal`, `Outcome`, `Constraints`, `Stop If`, `Evidence`) are advisory today and required for auto-flow at autonomy 2. `Outcome` + `Evidence` + `Stop If` are the loop contract: when an agent is finished and when it must stop.
+- Write `Evidence` prospectively when authoring (what will prove completion); update it to point at the real artifacts when the task is Done.
+
+## Queue Lanes
+
+- Use `nexus next @Agent --take` when the human or protocol wants the task delegated into an agent lane.
+- `--take` copies the full task block, including task primitives, into `_NEXUS_Q_<AGENT>.md` and marks the master queue task as `Status: Delegated` with a lane pointer.
+- Delegated tasks are skipped by `nexus next` until reconciliation lands, so two agents do not take the same unreconciled work.
+- Use `nexus q @Agent` to inspect the lane.
+- Use `nexus q done <id> @Agent` to write a lane-local completion receipt. This updates the agent lane only and leaves `_NEXUS_QUEUE.md` unchanged.
+- Use `nexus queue reconcile` at a human checkpoint or explicit agent checkpoint to batch pending lane receipts back into `_NEXUS_QUEUE.md`.
+- If `nexus doctor` reports unreconciled receipts, duplicate receipts, stale delegated tasks, or master/lane disagreement, inspect the lane and master queue before reconciling.
 
 ## Guardrails
 
 - Ask before `nexus doctor --fix` unless scaffold repair is already approved.
 - Use `nexus doctor` for audit/repair, not as the normal startup command.
 - Use CLI/model names as lock handles: `@agy`, `@claude`, `@codex`, `@gemini`.
-- Agent-local continuity and memory files are claim-exempt unless the user says otherwise.
+- Agent-local continuity and memory files are claim-exempt unless the user says otherwise; read-only access should not take a lock.
 - Continuity is the compaction-safe session ledger; latest memory is required startup/resume context.
 - Memory indexes use monthly folders and newest-first Markdown links with one-line outcomes.
 - Shared generated protocol wording is sourced from `src/lib/protocolText.js`; update that first, then run doctor/init tests.

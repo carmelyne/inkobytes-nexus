@@ -45,7 +45,9 @@ commands=(
   'standup:Append a validated standup line'
   'status:Show current blackboard state'
   'clean:Prune locks'
-  'next:Suggest next safe task from queue'
+  'next:Suggest or delegate next safe task from queue'
+  'q:Show an agent lane or write a lane-local completion receipt'
+  'queue:Batch lane receipts into the master queue'
   'start:Orient an agent entering this repo'
   'dashboard:Serve the local dashboard'
   'metrics:Summarize commits, releases, and queue cost'
@@ -70,8 +72,17 @@ case $CURRENT in
 esac
 
 case $words[2] in
-  checkin|checkout|next)
+  checkin|checkout)
     _arguments '1:agent:(@agy @claude @codex @gemini)'
+    ;;
+  next)
+    _arguments '1:agent:(@agy @claude @codex @gemini)' '--take[Delegate the selected task into the agent lane]'
+    ;;
+  q)
+    _arguments '1:agent or action:(@agy @claude @codex @gemini done)' '2:task id:_message' '3:agent:(@agy @claude @codex @gemini)'
+    ;;
+  queue)
+    _arguments '1:queue action:(reconcile)'
     ;;
   claim)
     _arguments \\

@@ -34,6 +34,10 @@ export default function release(args) {
 
   const commitMsg = positional[1] || `chore: agent updated ${target}`;
   const lock = listLocks().find((entry) => entry.target === target);
+  // Attribution fallback: a stale-broken lock must not erase who did the
+  // work. Prefer the live lock, then the NEXUS_AGENT env; the ledger adds a
+  // final queue task-owner fallback.
+  const releaseAgent = lock?.agent || (process.env.NEXUS_AGENT || '').trim();
   const config = getConfig();
   const releaseHead = readGitHead(config.root);
   const claimHead = lock?.claimHead || 'unknown';
@@ -43,10 +47,10 @@ export default function release(args) {
     console.warn(`[WARN] HEAD changed since claim for ${target}: claimed ${shortSha(claimHead)}, releasing from ${shortSha(releaseHead)}. Review interleaved commits if needed.`);
   }
 
-  runVerifyGate({ config, target, agent: lock?.agent || 'unknown', noVerify });
+  runVerifyGate({ config, target, agent: releaseAgent || 'unknown', noVerify });
 
   // Stage and commit first
-  const gitResult = stageAndCommit(target, commitMsg, lock?.agent || '');
+  const gitResult = stageAndCommit(target, commitMsg, releaseAgent);
   if (!gitResult.success && !gitResult.message?.includes('clean')) {
     console.error(`[ERROR] ${gitResult.message}`);
     process.exit(1);
@@ -71,7 +75,7 @@ export default function release(args) {
   const timestamp = formatReportTimestamp(new Date());
   const reportLine = `## [${timestamp}] ${target}
 
-- Agent: ${lock?.agent || 'unknown'}
+- Agent: ${releaseAgent || 'unknown'}
 - Target: ${target}
 - Claim HEAD: ${claimHead}
 - Release HEAD: ${releaseHead}
@@ -88,7 +92,7 @@ export default function release(args) {
   try {
     const count = appendCompletedLedgerEntries({
       target,
-      agent: lock?.agent || 'unknown',
+      agent: releaseAgent || 'unknown',
       sha: gitResult.sha || 'unknown',
       commit: commitMsg,
     });

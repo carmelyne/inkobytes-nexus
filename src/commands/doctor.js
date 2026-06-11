@@ -3,7 +3,8 @@
  */
 
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'fs';
-import { join } from 'path';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 import { cwd } from 'process';
 import { spawnSync } from 'child_process';
 import { listLocks } from '../lib/lockManager.js';
@@ -23,6 +24,8 @@ import {
   protocolBlock,
 } from '../lib/protocolText.js';
 import { HOOK_AGENT_CONFIGS, hookStatus } from './hooks.js';
+import { contractViolations, parseContractTasks, primitiveGaps } from '../lib/taskContract.js';
+import { scanQueueLanes } from '../lib/queue.js';
 
 const LOCAL_DECISIONS_TEMPLATE = `# Decisions
 
@@ -203,6 +206,7 @@ export default function doctor(args) {
     Hooks: [],
     promptCHMOD: [],
     'Queue Authorship': [],
+    'Queue Lanes': [],
     'Loop Readiness': [],
   };
   const changes = [];
@@ -524,29 +528,98 @@ export default function doctor(args) {
     }
   }
 
-  // Queue authorship gate — warn on auto-flow tasks in Ready Queue missing Review: approved
+  // Queue authorship gate — list auto-flow tasks in Ready Queue failing the
+  // task contract (Review approved, Approved by human, Notes, Files, Cost).
+  // Reported at every autonomy level; nexus next enforces it at autonomy 1+.
   const queuePath = join(root, '_NEXUS_QUEUE.md');
   if (existsSync(queuePath)) {
     const queueContent = readFileSync(queuePath, 'utf-8');
     const readySection = extractReadyQueueSection(queueContent);
-    const unapproved = findUnapprovedAutoFlow(readySection);
-    if (unapproved.length) {
-      for (const id of unapproved) {
+    const failing = parseContractTasks(readySection)
+      .filter((t) => !t.done && t.status !== 'Done' && t.autoFlow === 'yes')
+      .map((t) => ({ task: t, violations: contractViolations(t) }))
+      .filter(({ violations }) => violations.length);
+
+    if (failing.length) {
+      for (const { task, violations } of failing) {
+        const id = task.id || task.title;
+        const needsApproval = violations.some((v) => v.field === 'Review' || v.field === 'Approved by');
         sections['Queue Authorship'].push({
-          issue: `Task "${id}" is missing Review: approved`,
-          fix: 'add `Review: approved` and `Approved by: human`, or move it to `## Proposed Queue`',
+          issue: `Task "${id}" fails the auto-flow task contract (${violations.map((v) => v.field).join(', ')})`,
+          fix: needsApproval
+            ? 'add `Review: approved` and `Approved by: human`, or move it to `## Proposed Queue`'
+            : 'fill in the missing fields in `_NEXUS_QUEUE.md`, or move it to `## Proposed Queue`',
           displayGroup: id,
           queueInfo: {
             taskId: id,
             state: 'auto-flow: yes in Ready Queue',
-            needs: 'Review: approved',
+            needs: violations.map((v) => v.needs).join(', '),
             impact: 'nexus next will skip it',
           },
         });
       }
     } else {
       sections['Queue Authorship'].push({
-        issue: 'All auto-flow tasks in Ready Queue have Review: approved',
+        issue: 'All auto-flow tasks in Ready Queue satisfy the task contract',
+        fix: 'No action needed.',
+        ok: true,
+      });
+    }
+
+    // Task primitives — Outcome + Evidence + Stop If are the anti-over-looping
+    // contract: they say when a loop agent is finished and when it must stop.
+    // Missing primitives are actionable at autonomy 2, advisory below.
+    const primitivesRequired = config.autonomy >= 2;
+    const primitiveFailing = parseContractTasks(readySection)
+      .filter((t) => !t.done && t.status !== 'Done' && t.autoFlow === 'yes')
+      .map((t) => ({ task: t, gaps: primitiveGaps(t) }))
+      .filter(({ gaps }) => gaps.length);
+
+    if (primitiveFailing.length) {
+      for (const { task, gaps } of primitiveFailing) {
+        const id = task.id || task.title;
+        sections['Queue Authorship'].push({
+          issue: `Task "${id}" is missing task primitives (${gaps.map((g) => g.field).join(', ')})`,
+          fix: 'declare Goal, Outcome, Constraints, Stop If, and Evidence in `_NEXUS_QUEUE.md` — Outcome + Evidence + Stop If define when a loop agent is done and when it must stop',
+          ok: !primitivesRequired,
+          displayGroup: id,
+          queueInfo: {
+            taskId: id,
+            state: primitivesRequired
+              ? `auto-flow: yes in Ready Queue at autonomy ${config.autonomy}`
+              : `auto-flow: yes in Ready Queue (advisory at autonomy ${config.autonomy}; required at autonomy 2)`,
+            needs: gaps.map((g) => g.field).join(', '),
+            impact: primitivesRequired ? 'under-specified for unattended loop work' : '',
+          },
+        });
+      }
+    } else {
+      sections['Queue Authorship'].push({
+        issue: 'All auto-flow tasks in Ready Queue declare the task primitives',
+        fix: 'No action needed.',
+        ok: true,
+      });
+    }
+
+    const laneScan = scanQueueLanes(root, queueContent, undefined, new Date(), config.staleThreshold);
+    for (const receipt of laneScan.pendingReceipts) {
+      sections['Queue Lanes'].push({
+        issue: `Unreconciled lane receipt for ${receipt.id} in ${receipt.lane}`,
+        fix: 'Run `nexus queue reconcile` to batch lane receipts back into `_NEXUS_QUEUE.md`.',
+      });
+    }
+    for (const issue of laneScan.issues) {
+      const fix = issue.kind === 'duplicate_pending_receipt'
+        ? 'Resolve duplicate lane receipts manually, then run `nexus queue reconcile`.'
+        : 'Inspect the lane and master queue before reconciling.';
+      sections['Queue Lanes'].push({
+        issue: `${issue.kind}: ${issue.id} (${issue.lane || 'no lane'}) ${issue.detail}`,
+        fix,
+      });
+    }
+    if (!laneScan.pendingReceipts.length && !laneScan.issues.length) {
+      sections['Queue Lanes'].push({
+        issue: 'No unreconciled lane receipts or lane/master disagreements',
         fix: 'No action needed.',
         ok: true,
       });
@@ -564,6 +637,28 @@ export default function doctor(args) {
       sections['Loop Readiness'].push({
         issue: `autonomy ${config.autonomy} with release verify gate configured (${config.release.verifyCommand})`,
         ok: true,
+      });
+    }
+  }
+
+  // Level 2 — bounded unattended additionally requires volume bounds and a recovery path
+  if (config.autonomy >= 2) {
+    if (!existsSync(config.budgetFile)) {
+      sections['Loop Readiness'].push({
+        issue: `autonomy is ${config.autonomy} but no agent budget file exists (.nexus/agent-budgets.json) — unattended work has no volume bounds`,
+        fix: 'Create .nexus/agent-budgets.json with per-agent budgets, or lower autonomy to 1.',
+      });
+    } else {
+      sections['Loop Readiness'].push({
+        issue: `autonomy ${config.autonomy} with agent budget file present (.nexus/agent-budgets.json)`,
+        ok: true,
+      });
+    }
+
+    if (!existsSync(join(dirname(fileURLToPath(import.meta.url)), 'recover.js'))) {
+      sections['Loop Readiness'].push({
+        issue: `autonomy is ${config.autonomy} but this Nexus build has no \`nexus recover\` command — rollback after unattended mistakes is manual git work`,
+        fix: 'Accept manual git recovery for now, or hold Level 2 until release-recovery ships.',
       });
     }
   }
@@ -691,12 +786,49 @@ function renderLockEntries(entries, markerColor, colors) {
 }
 
 function renderQueueEntries(entries, markerColor, colors) {
-  const groups = new Map();
+  // Token hygiene: entries sharing identical state/needs/impact/fix print the
+  // block once with a task id list instead of repeating it per task.
+  const bySignature = new Map();
+  const regular = [];
 
   for (const entry of entries) {
+    if (!entry.queueInfo) {
+      regular.push(entry);
+      continue;
+    }
+    const signature = JSON.stringify([
+      entry.queueInfo.state || '',
+      entry.queueInfo.needs || '',
+      entry.queueInfo.impact || '',
+      entry.fix || '',
+    ]);
+    if (!bySignature.has(signature)) bySignature.set(signature, []);
+    bySignature.get(signature).push(entry);
+  }
+
+  const compactGroups = [];
+  for (const group of bySignature.values()) {
+    if (group.length > 1) compactGroups.push(group);
+    else regular.push(group[0]);
+  }
+
+  const groups = new Map();
+
+  for (const entry of regular) {
     const taskId = entry.queueInfo?.taskId || entry.displayGroup || entry.issue;
     if (!groups.has(taskId)) groups.set(taskId, []);
     groups.get(taskId).push(entry);
+  }
+
+  for (const group of compactGroups) {
+    const sample = group[0];
+    const prefix = sample.ok ? '-' : '!';
+    const ids = group.map((entry) => entry.queueInfo.taskId || entry.displayGroup).join(', ');
+    console.log(`    ${markerColor(prefix)} ${group.length} task(s): ${sample.queueInfo.state}`);
+    if (sample.queueInfo.needs) console.log(`      ${colors.dim(`needs: ${sample.queueInfo.needs}`)}`);
+    if (sample.queueInfo.impact) console.log(`      ${colors.dim(`impact: ${sample.queueInfo.impact}`)}`);
+    if (sample.fix) console.log(`      ${colors.bold('fix:')} ${colors.dim(sample.fix)}`);
+    console.log(`      ${colors.bold(`tasks: ${ids}`)}`);
   }
 
   for (const [taskId, taskEntries] of groups) {
@@ -800,43 +932,6 @@ function extractReadyQueueSection(content) {
     if (inSection) result.push(line);
   }
   return result.join('\n');
-}
-
-function findUnapprovedAutoFlow(sectionContent) {
-  const unapproved = [];
-  const lines = sectionContent.split('\n');
-  let currentId = '';
-  let isAutoFlow = false;
-  let hasReview = false;
-
-  for (const line of lines) {
-    const taskMatch = line.match(/^- \[[ ]\] TASK\/.+?:\s*(.+)/);
-    if (taskMatch) {
-      if (currentId && isAutoFlow && !hasReview) unapproved.push(currentId);
-      currentId = '';
-      isAutoFlow = false;
-      hasReview = false;
-      continue;
-    }
-    if (line.match(/^- \[x\]/)) {
-      if (currentId && isAutoFlow && !hasReview) unapproved.push(currentId);
-      currentId = '';
-      isAutoFlow = false;
-      hasReview = false;
-      continue;
-    }
-    if (!line.trim().startsWith('- ')) continue;
-    const kv = line.trim().replace(/^-\s*/, '');
-    const colonIdx = kv.indexOf(':');
-    if (colonIdx === -1) continue;
-    const key = kv.slice(0, colonIdx).trim().toLowerCase();
-    const val = kv.slice(colonIdx + 1).trim().toLowerCase();
-    if (key === 'id') currentId = val;
-    if (key === 'auto-flow' && val === 'yes') isAutoFlow = true;
-    if (key === 'review' && val === 'approved') hasReview = true;
-  }
-  if (currentId && isAutoFlow && !hasReview) unapproved.push(currentId);
-  return unapproved;
 }
 
 function replaceLegacyHelperCommands(content) {
@@ -1009,6 +1104,31 @@ function repairNexusSkillDoc(content) {
   const mandatoryNote = 'If the user, repo, or hook says Nexus is active, treat this skill as mandatory workflow. It is not optional advice.';
   if (!next.includes(mandatoryNote)) {
     next = next.replace('## Loop', `${mandatoryNote}\n\n## Loop`);
+  }
+
+  if (!next.includes('  - Stop If: Conditions that require stopping for human review.')) {
+    next = next.replace(
+      '  - Notes: One practical paragraph with scope, constraints, and definition of done.',
+      [
+        '  - Notes: One practical paragraph with scope, constraints, and definition of done.',
+        '  - Goal: Why this task exists, one line.',
+        '  - Outcome: What must be true when the task is complete.',
+        '  - Constraints: What the agent must not change or assume.',
+        '  - Stop If: Conditions that require stopping for human review.',
+        '  - Evidence: Tests, logs, or reports that prove completion.',
+      ].join('\n'),
+    );
+  }
+
+  if (!next.includes('are the loop contract')) {
+    next = next.replace(
+      '- `Notes` should carry dashboard-useful context, not a whole design doc.',
+      [
+        '- `Notes` should carry dashboard-useful context, not a whole design doc.',
+        '- Task primitives (`Goal`, `Outcome`, `Constraints`, `Stop If`, `Evidence`) are advisory today and required for auto-flow at autonomy 2. `Outcome` + `Evidence` + `Stop If` are the loop contract: when an agent is finished and when it must stop.',
+        '- Write `Evidence` prospectively when authoring (what will prove completion); update it to point at the real artifacts when the task is Done.',
+      ].join('\n'),
+    );
   }
 
   next = next.replace(

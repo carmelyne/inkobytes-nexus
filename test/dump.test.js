@@ -4,8 +4,9 @@ import { mkdtempSync, writeFileSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
 import { cwd, chdir } from 'process';
+import { spawnSync } from 'child_process';
 import { resetConfig, getConfig } from '../src/lib/config.js';
-import { dumpState } from '../src/lib/dump.js';
+import { dumpState, freshnessReceipt } from '../src/lib/dump.js';
 
 function inTempRepo(fn) {
   const previous = cwd();
@@ -106,5 +107,60 @@ test('dumpState on a nested directory recurses into subdirectories', () => {
     const output = dumpState('nested');
     assert.ok(output.includes('top level'));
     assert.ok(output.includes('deep content'));
+  });
+});
+
+test('freshnessReceipt outside a git repo still hashes content and marks the tree unknown', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, 'plain.txt'), 'one\ntwo\n', 'utf-8');
+    const output = freshnessReceipt('plain.txt');
+    assert.ok(output.startsWith('--- FRESHNESS RECEIPT ---'));
+    assert.ok(output.endsWith('--- END RECEIPT ---'));
+    assert.ok(output.includes('Path: plain.txt (3 lines)'));
+    assert.match(output, /Blob: [0-9a-f]{40}/);
+    assert.ok(output.includes('Working tree: unknown — not a git repo'));
+    assert.ok(!output.includes('one\ntwo'));
+  });
+});
+
+test('freshnessReceipt in a git repo prints blob hash, last commit, and clean state', () => {
+  inTempRepo((root) => {
+    spawnSync('git', ['init'], { cwd: root, stdio: 'pipe' });
+    spawnSync('git', ['config', 'user.email', 't@t.t'], { cwd: root, stdio: 'pipe' });
+    spawnSync('git', ['config', 'user.name', 'T'], { cwd: root, stdio: 'pipe' });
+    writeFileSync(join(root, 'tracked.txt'), 'hello\n', 'utf-8');
+    spawnSync('git', ['add', 'tracked.txt'], { cwd: root, stdio: 'pipe' });
+    spawnSync('git', ['commit', '-m', 'add tracked'], { cwd: root, stdio: 'pipe' });
+
+    const clean = freshnessReceipt('tracked.txt');
+    assert.match(clean, /Blob: [0-9a-f]{40}/);
+    assert.match(clean, /Last commit: [0-9a-f]+ add tracked/);
+    assert.match(clean, /Working tree: clean vs HEAD/);
+
+    const blobBefore = clean.match(/Blob: ([0-9a-f]{40})/)[1];
+    writeFileSync(join(root, 'tracked.txt'), 'hello changed\n', 'utf-8');
+    const dirty = freshnessReceipt('tracked.txt');
+    assert.match(dirty, /Working tree: dirty vs HEAD/);
+    const blobAfter = dirty.match(/Blob: ([0-9a-f]{40})/)[1];
+    assert.notEqual(blobBefore, blobAfter, 'blob hash must move when content changes');
+  });
+});
+
+test('freshnessReceipt on a new path says it does not exist yet', () => {
+  inTempRepo(() => {
+    const output = freshnessReceipt('ghost.txt');
+    assert.ok(output.includes('State: new path — does not exist yet'));
+  });
+});
+
+test('freshnessReceipt on a directory reports file count without contents', () => {
+  inTempRepo((root) => {
+    const dir = join(root, 'docs');
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, 'a.md'), 'alpha body', 'utf-8');
+    writeFileSync(join(dir, 'b.md'), 'beta body', 'utf-8');
+    const output = freshnessReceipt('docs');
+    assert.ok(output.includes('Path: docs/ (2 files)'));
+    assert.ok(!output.includes('alpha body'));
   });
 });

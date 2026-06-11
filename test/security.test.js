@@ -43,7 +43,7 @@ test('package ships bundled Nexus skill', () => {
 
   assert.ok(pkg.files.includes('skills/'));
   assert.match(skill, /^---\nname: nexus/m);
-  assert.match(skill, /current file state/);
+  assert.match(skill, /freshness receipt/);
   assert.match(skill, /## Queue Items/);
   assert.match(skill, /Id: stable-kebab-id/);
   assert.match(skill, /Auto-flow: yes/);

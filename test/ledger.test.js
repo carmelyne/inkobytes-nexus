@@ -72,6 +72,50 @@ test('appendCompletedLedgerEntries records checked queue tasks once', () => {
   });
 });
 
+test('appendCompletedLedgerEntries falls back to the queue task owner when the lock agent is unknown', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), [
+      '- [x] TASK/Claude: Orphaned release task',
+      '  - Id: orphaned-release',
+      '  - Epic: Loop readiness',
+      '  - Files: src/thing.js',
+      '  - Cost: small',
+    ].join('\n'), 'utf-8');
+
+    const count = appendCompletedLedgerEntries({
+      target: 'src/thing.js',
+      agent: 'unknown',
+      sha: 'abc123',
+      commit: 'orphaned-release: close it',
+    });
+
+    assert.equal(count, 1);
+    const entries = readLedgerEntries();
+    assert.equal(entries[0].agent, '@claude');
+  });
+});
+
+test('appendCompletedLedgerEntries keeps the release agent when it is known', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), [
+      '- [x] TASK/Claude: Reassigned task finished by another agent',
+      '  - Id: reassigned-task',
+      '  - Epic: Loop readiness',
+      '  - Files: src/thing.js',
+      '  - Cost: small',
+    ].join('\n'), 'utf-8');
+
+    appendCompletedLedgerEntries({
+      target: 'src/thing.js',
+      agent: '@codex',
+      sha: 'abc123',
+      commit: 'reassigned-task: close it',
+    });
+
+    assert.equal(readLedgerEntries()[0].agent, '@codex');
+  });
+});
+
 test('ledger --json emits entries and totals', () => {
   inTempRepo((root) => {
     writeFileSync(join(root, '_NEXUS_LEDGER.md'), [

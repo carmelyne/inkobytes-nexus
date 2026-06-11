@@ -52,7 +52,7 @@ export function appendCompletedLedgerEntries({ target, agent, sha, commit }) {
   for (const task of tasks) {
     appendFileSync(config.ledger, renderEntry({
       ...task,
-      agent,
+      agent: resolveLedgerAgent(agent, task),
       sha,
       commit,
       completedAt,
@@ -60,6 +60,15 @@ export function appendCompletedLedgerEntries({ target, agent, sha, commit }) {
   }
 
   return tasks.length;
+}
+
+// Attribution fallback when the lock is gone (e.g. stale-broken before
+// release): the queue task's TASK/<owner> header still knows whose work it was.
+function resolveLedgerAgent(agent, task) {
+  const fromRelease = String(agent || '').trim();
+  if (fromRelease && fromRelease !== 'unknown') return fromRelease;
+  if (String(task.agent || '').trim()) return normalizeAgentForLedger(task.agent);
+  return 'unknown';
 }
 
 export function readLedgerEntries() {

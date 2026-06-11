@@ -66,7 +66,34 @@ test('claim warns cheaply when Nexus protocol files are missing', () => {
 
     assert.match(output, /Missing Nexus protocol files/);
     assert.match(output, /Run `nexus doctor`/);
+    assert.match(output, /FRESHNESS RECEIPT/);
+  });
+});
+
+test('claim prints a freshness receipt by default instead of the full dump', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, 'file.txt'), 'secret file body\n', 'utf-8');
+
+    const output = capture(() => claim(['file.txt', '@codex', 'test receipt default']));
+
+    assert.match(output, /FRESHNESS RECEIPT/);
+    assert.match(output, /Path: file\.txt \(2 lines\)/);
+    assert.match(output, /Same blob as your last read = cached content is current/);
+    assert.doesNotMatch(output, /secret file body/);
+    assert.doesNotMatch(output, /START OF FRESH FILE STATE/);
+  });
+});
+
+test('claim --show prints the full fresh file state', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, 'file.txt'), 'full dump body\n', 'utf-8');
+
+    const output = capture(() => claim(['file.txt', '@codex', 'test full dump', '--show']));
+
     assert.match(output, /START OF FRESH FILE STATE/);
+    assert.match(output, /full dump body/);
+    assert.doesNotMatch(output, /FRESHNESS RECEIPT/);
+    assert.ok(listLocks().find((lock) => lock.target === 'file.txt'), '--show must not break the lock parse');
   });
 });
 

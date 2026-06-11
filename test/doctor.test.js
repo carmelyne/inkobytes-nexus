@@ -5,6 +5,9 @@ import { tmpdir } from 'os';
 import { join } from 'path';
 import { chdir, cwd } from 'process';
 import { spawnSync } from 'child_process';
+import { fileURLToPath } from 'url';
+
+const NEXUS_BIN = fileURLToPath(new URL('../bin/nexus.js', import.meta.url));
 import doctor from '../src/commands/doctor.js';
 import { AGENT_SCOPES } from '../src/lib/agentScopes.js';
 import { resetConfig } from '../src/lib/config.js';
@@ -353,11 +356,11 @@ Keep this note.
     const next = readFileSync(join(root, '.codex', 'AGENTS.md'), 'utf-8');
     assert.equal(next.match(/This project uses Nexus for multi-agent coordination\./g).length, 1);
     assert.equal(next.match(/NEXUS-AGENT-PROTOCOL:START/g).length, 1);
-    assert.match(next, /atomic lock-and-read boundary/);
+    assert.match(next, /atomic lock boundary/);
     assert.match(next, /active requirements, not optional guidance/);
     assert.match(next, /Do not bypass the hook/);
     assert.match(next, /Claim before reading implementation files/);
-    assert.match(next, /read a shared file before claiming it, treat that read as stale after claim succeeds/);
+    assert.match(next, /Same blob hash as your last read means that read is still current/);
     assert.match(next, /claim appears stale/);
     assert.match(next, /### Drills/);
     assert.match(next, /Drill guidance is defined in `_NEXUS_CONSTITUTION\.md`/);
@@ -723,7 +726,7 @@ test('doctor colorizes when forced', () => {
     writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
     writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
 
-    const result = spawnSync('node', ['/Users/carmelyne/dev/nexus/bin/nexus.js', 'doctor'], {
+    const result = spawnSync('node', [NEXUS_BIN, 'doctor'], {
       cwd: root,
       encoding: 'utf-8',
       env: { ...process.env, FORCE_COLOR: '1' },
@@ -762,6 +765,151 @@ test('doctor renders queue authorship warnings as compact task fields', () => {
   });
 });
 
+test('doctor warns about unreconciled lane receipts', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), [
+      '# Queue',
+      '',
+      '## Ready Queue',
+      '',
+      '- [ ] TASK/Codex: Build thing',
+      '  - Id: build-thing',
+      '  - Status: Delegated',
+      '  - Lane: _NEXUS_Q_CODEX.md',
+      '',
+    ].join('\n'), 'utf-8');
+    writeFileSync(join(root, '_NEXUS_Q_CODEX.md'), [
+      '# Nexus Queue Lane - @codex',
+      '',
+      '## Active',
+      '',
+      '## Completed',
+      '',
+      '- [x] build-thing',
+      '  - Id: build-thing',
+      '  - Agent: @codex',
+      '  - Completed at: 2026-06-11T09:00:00.000Z',
+      '  - Receipt: pending reconciliation',
+      '',
+    ].join('\n'), 'utf-8');
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /Queue Lanes/);
+    assert.match(output, /Unreconciled lane receipt for build-thing in _NEXUS_Q_CODEX\.md/);
+    assert.match(output, /Run `nexus queue reconcile`/);
+  });
+});
+
+test('doctor warns about duplicate receipts and stale delegated lane disagreements', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), [
+      '# Queue',
+      '',
+      '## Ready Queue',
+      '',
+      '- [ ] TASK/Codex: Build thing',
+      '  - Id: build-thing',
+      '  - Status: Delegated',
+      '  - Delegated to: @codex',
+      '  - Delegated at: 2000-01-01T00:00:00.000Z',
+      '  - Lane: _NEXUS_Q_CODEX.md',
+      '',
+      '- [ ] TASK/Codex: Missing lane task',
+      '  - Id: missing-lane-task',
+      '  - Status: Delegated',
+      '  - Delegated to: @codex',
+      '  - Delegated at: 2000-01-01T00:00:00.000Z',
+      '  - Lane: _NEXUS_Q_CODEX.md',
+      '',
+    ].join('\n'), 'utf-8');
+    writeFileSync(join(root, '_NEXUS_Q_CODEX.md'), [
+      '# Nexus Queue Lane - @codex',
+      '',
+      '## Active',
+      '',
+      '## Completed',
+      '',
+      '- [x] build-thing',
+      '  - Id: build-thing',
+      '  - Agent: @codex',
+      '  - Completed at: 2026-06-11T09:00:00.000Z',
+      '  - Receipt: pending reconciliation',
+      '',
+      '- [x] build-thing',
+      '  - Id: build-thing',
+      '  - Agent: @codex',
+      '  - Completed at: 2026-06-11T09:01:00.000Z',
+      '  - Receipt: pending reconciliation',
+      '',
+    ].join('\n'), 'utf-8');
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /duplicate_pending_receipt: build-thing/);
+    assert.match(output, /master_delegated_missing_task: missing-lane-task/);
+    assert.match(output, /stale_delegated_task: missing-lane-task|stale_delegated_task: build-thing/);
+  });
+});
+
+test('doctor lists auto-flow tasks failing the full task contract with the missing fields', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), [
+      '# Queue',
+      '',
+      '## Ready Queue',
+      '',
+      '- [ ] TASK/Codex: Approved but hollow task',
+      '  - Id: hollow-task',
+      '  - Status: Ready',
+      '  - Auto-flow: yes',
+      '  - Review: approved',
+      '  - Approved by: human',
+      '',
+    ].join('\n'), 'utf-8');
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /task: hollow-task/);
+    assert.match(output, /needs: non-empty Notes, non-empty Files, non-empty Cost/);
+    assert.match(output, /fix: fill in the missing fields in `_NEXUS_QUEUE\.md`/);
+  });
+});
+
+test('doctor reports contract ok when auto-flow tasks carry all required fields', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), [
+      '# Queue',
+      '',
+      '## Ready Queue',
+      '',
+      '- [ ] TASK/Codex: Fully specified task',
+      '  - Id: good-task',
+      '  - Status: Ready',
+      '  - Files: src/good.js',
+      '  - Cost: small',
+      '  - Auto-flow: yes',
+      '  - Review: approved',
+      '  - Approved by: human',
+      '  - Notes: Complete contract.',
+      '',
+    ].join('\n'), 'utf-8');
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /All auto-flow tasks in Ready Queue satisfy the task contract/);
+    assert.doesNotMatch(output, /fails the auto-flow task contract/);
+  });
+});
+
 test('doctor warns when autonomy is 1+ without a release verify command', () => {
   inTempRepo((root) => {
     writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
@@ -776,6 +924,67 @@ test('doctor warns when autonomy is 1+ without a release verify command', () => 
     assert.match(output, /Loop Readiness/);
     assert.match(output, /autonomy is 1 but release\.verifyCommand is not configured/);
     assert.match(output, /Set release\.verifyCommand in \.nexus\/config\.json/);
+  });
+});
+
+test('doctor warns at autonomy 2 when no agent budget file exists', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
+    mkdirSync(join(root, '.nexus'), { recursive: true });
+    writeFileSync(join(root, '.nexus', 'config.json'), JSON.stringify({
+      autonomy: 2,
+      release: { verifyCommand: 'npm test' },
+    }), 'utf-8');
+    resetConfig();
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /autonomy is 2 but no agent budget file exists/);
+    assert.match(output, /Create \.nexus\/agent-budgets\.json with per-agent budgets/);
+  });
+});
+
+test('doctor reports budget ok at autonomy 2 when budget file exists, still flags missing recover', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
+    mkdirSync(join(root, '.nexus'), { recursive: true });
+    writeFileSync(join(root, '.nexus', 'config.json'), JSON.stringify({
+      autonomy: 2,
+      release: { verifyCommand: 'npm test' },
+    }), 'utf-8');
+    writeFileSync(join(root, '.nexus', 'agent-budgets.json'), JSON.stringify({ '@claude': { maxTasks: 3 } }), 'utf-8');
+    resetConfig();
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /autonomy 2 with agent budget file present/);
+    // Intentional tripwire: when release-recovery ships src/commands/recover.js,
+    // this assertion fails and that task must update Level 2 readiness here.
+    assert.match(output, /no `nexus recover` command/);
+    assert.doesNotMatch(output, /autonomy is 2 but no agent budget file exists/);
+  });
+});
+
+test('doctor stays quiet about level 2 prerequisites at autonomy 0 and 1', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
+    mkdirSync(join(root, '.nexus'), { recursive: true });
+    writeFileSync(join(root, '.nexus', 'config.json'), JSON.stringify({
+      autonomy: 1,
+      release: { verifyCommand: 'npm test' },
+    }), 'utf-8');
+    resetConfig();
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.doesNotMatch(output, /agent budget file/);
+    assert.doesNotMatch(output, /nexus recover/);
   });
 });
 
@@ -794,5 +1003,133 @@ test('doctor reports loop readiness ok when autonomy 1+ has a verify command', (
     const output = captureLogs(() => doctor([]));
 
     assert.match(output, /autonomy 1 with release verify gate configured \(npm test\)/);
+  });
+});
+
+const PRIMITIVE_GAP_QUEUE = [
+  '# Queue',
+  '',
+  '## Ready Queue',
+  '',
+  '- [ ] TASK/Codex: Contract-complete task without primitives',
+  '  - Id: no-primitives-task',
+  '  - Status: Ready',
+  '  - Files: src/good.js',
+  '  - Cost: small',
+  '  - Auto-flow: yes',
+  '  - Review: approved',
+  '  - Approved by: human',
+  '  - Notes: Complete contract, no primitives yet.',
+  '',
+].join('\n');
+
+test('doctor reports missing task primitives as advisory below autonomy 2', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), PRIMITIVE_GAP_QUEUE, 'utf-8');
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /task: no-primitives-task/);
+    assert.match(output, /advisory at autonomy 0; required at autonomy 2/);
+    assert.match(output, /needs: Goal, Outcome, Constraints, Stop If, Evidence/);
+    assert.doesNotMatch(output, /under-specified for unattended loop work/);
+  });
+});
+
+test('doctor flags missing task primitives as actionable at autonomy 2', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), PRIMITIVE_GAP_QUEUE, 'utf-8');
+    mkdirSync(join(root, '.nexus'), { recursive: true });
+    writeFileSync(join(root, '.nexus', 'config.json'), JSON.stringify({
+      autonomy: 2,
+      release: { verifyCommand: 'npm test' },
+    }), 'utf-8');
+    writeFileSync(join(root, '.nexus', 'agent-budgets.json'), JSON.stringify({ '@claude': { maxTasks: 3 } }), 'utf-8');
+    resetConfig();
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /task: no-primitives-task/);
+    assert.match(output, /auto-flow: yes in Ready Queue at autonomy 2/);
+    assert.match(output, /impact: under-specified for unattended loop work/);
+    assert.match(output, /fix: declare Goal, Outcome, Constraints, Stop If, and Evidence/);
+    assert.doesNotMatch(output, /advisory at autonomy/);
+  });
+});
+
+test('doctor compacts identical primitive advisories across multiple tasks', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), [
+      '# Queue',
+      '',
+      '## Ready Queue',
+      '',
+      '- [ ] TASK/Codex: First task without primitives',
+      '  - Id: first-task',
+      '  - Status: Ready',
+      '  - Files: src/a.js',
+      '  - Cost: small',
+      '  - Auto-flow: yes',
+      '  - Review: approved',
+      '  - Approved by: human',
+      '  - Notes: Complete contract.',
+      '',
+      '- [ ] TASK/Codex: Second task without primitives',
+      '  - Id: second-task',
+      '  - Status: Ready',
+      '  - Files: src/b.js',
+      '  - Cost: small',
+      '  - Auto-flow: yes',
+      '  - Review: approved',
+      '  - Approved by: human',
+      '  - Notes: Complete contract.',
+      '',
+    ].join('\n'), 'utf-8');
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /2 task\(s\): auto-flow: yes in Ready Queue \(advisory at autonomy 0; required at autonomy 2\)/);
+    assert.match(output, /tasks: first-task, second-task/);
+    assert.equal(output.split('needs: Goal, Outcome').length, 2, 'needs line must print once, not per task');
+    assert.equal(output.split('fix: declare Goal').length, 2, 'fix line must print once, not per task');
+  });
+});
+
+test('doctor reports primitives ok when auto-flow tasks declare all of them', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), [
+      '# Queue',
+      '',
+      '## Ready Queue',
+      '',
+      '- [ ] TASK/Codex: Fully primitive task',
+      '  - Id: primitive-task',
+      '  - Status: Ready',
+      '  - Files: src/good.js',
+      '  - Cost: small',
+      '  - Auto-flow: yes',
+      '  - Review: approved',
+      '  - Approved by: human',
+      '  - Notes: Complete contract.',
+      '  - Goal: Prove the primitive checks.',
+      '  - Outcome: Doctor reports the primitives as declared.',
+      '  - Constraints: Touch only src/good.js.',
+      '  - Stop If: The check needs new fields.',
+      '  - Evidence: test/doctor.test.js covers the ok path.',
+      '',
+    ].join('\n'), 'utf-8');
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /All auto-flow tasks in Ready Queue declare the task primitives/);
+    assert.doesNotMatch(output, /is missing task primitives/);
   });
 });
