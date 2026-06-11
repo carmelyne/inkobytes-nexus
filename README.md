@@ -91,13 +91,13 @@ NEXUS_NO_UPDATE_CHECK=1 nexus start
 
 The update check sends only the package metadata request to npm. It does not send repo paths, command names, task data, user ids, telemetry, or usage events.
 
-## What's New In 1.1.0
+## What's New In 1.2.0
 
-- `nexus halt "<reason>"` / `nexus resume` adds a repo-wide circuit breaker for swarms.
-- Release verification can run `release.verifyCommand` before every `nexus release`.
-- Autonomy levels document supervised, checkpointed, and bounded unattended modes.
-- Dashboard exposure is localhost-only by default; LAN serving now requires `--lan`.
-- Database restore, mysql backup/restore, promptCHMOD wording, CI, and version handling were hardened.
+- `nexus claim` prints a token-thin freshness receipt (git blob hash, last commit, dirty/clean) by default; `--show` restores the full file dump.
+- Delegated queue lanes: `nexus next @agent --take`, `nexus q`, `nexus q done`, and `nexus queue reconcile` move active work into per-agent lane files and batch results back to the master queue.
+- Task Primitives (`Goal`, `Outcome`, `Constraints`, `Stop If`, `Evidence`) define when a loop agent is finished and when it must stop; surfaced by `next`, checked by `doctor`.
+- Release attribution falls back to `NEXUS_AGENT` or the queue task owner when a lock is missing, instead of writing `unknown`.
+- Doctor compacts repeated queue findings, and a cached, privacy-respecting update notice flags newer npm versions.
 
 See [CHANGELOG.md](./CHANGELOG.md) for the release summary.
 
