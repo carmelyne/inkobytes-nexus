@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.2.0 - 2026-06-11
+
+- **Changed the default `nexus claim` output**: claim now prints a freshness receipt (git blob hash of on-disk content, last commit, dirty/clean state, line count) instead of dumping the full file. Same blob hash as the agent's last read means cached content is current; different means re-read. Use `nexus claim --show` for the previous full fresh-state dump. Run `nexus doctor --fix` in consumer repos to sync the generated agent protocol wording.
+- Added delegated queue lanes: `nexus next @agent --take` copies a task (including its primitives) into `_NEXUS_Q_<AGENT>.md` and marks the master task delegated; `nexus q @agent` inspects the lane; `nexus q done <id> @agent` writes a lane-local receipt without mutating the master queue; `nexus queue reconcile` batches receipts back into `_NEXUS_QUEUE.md`; `nexus doctor` warns about unreconciled receipts, duplicates, stale delegated tasks, and master/lane disagreement.
+- Added Task Primitives to the queue format: `Goal`, `Outcome`, `Constraints`, `Stop If`, and `Evidence`. `nexus next` prints declared primitives with its suggestion and lists missing ones as an advisory; `nexus doctor` reports primitive gaps on auto-flow tasks (advisory at autonomy 0–1, actionable at autonomy 2). `Outcome` + `Evidence` + `Stop If` are the anti-over-looping contract. Backward compatible — existing tasks stay valid.
+- Added release attribution fallback: when a lock is missing at release time (for example after a stale-lock sweep), commits, report receipts, and ledger entries attribute from `NEXUS_AGENT` or the queue task's `TASK/<owner>` header instead of `unknown`.
+- Compacted `nexus doctor` queue-authorship output: findings identical across tasks print once with a task id list instead of repeating per task.
+- Added a cached npm update notice: after normal commands, Nexus prints a small stderr note when a newer version exists. Cached 24 hours, skipped in CI, opt-out with `NEXUS_NO_UPDATE_CHECK=1`. Only the package metadata request goes to npm — no repo paths, command names, task data, user ids, telemetry, or usage events.
+
 ## 1.1.0 - 2026-06-11
 
 - Added `nexus halt "<reason>"` / `nexus resume` circuit breaker: claim, release, and next refuse while `.nexus/HALT` is present, the dashboard shows a halted banner, and resume is human-gated by convention.
