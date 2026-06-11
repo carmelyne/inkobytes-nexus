@@ -23,7 +23,7 @@ If the user, repo, or hook says Nexus is active, treat this skill as mandatory w
    nexus claim <path> @Agent "intent"
    ```
 
-8. Treat claim output as current file state. Ignore cached file memory when contents matter.
+8. Compare the claim freshness receipt with your last read: same blob hash means your cached read is current; different or unknown means re-read before editing. Use `nexus claim --show` for the full file dump.
 9. If a hook blocks access because a shared path is unclaimed, stop and claim that exact path. Do not work around the hook with another command, cached content, or manual git operation.
 10. Work only inside the claimed surface and run focused validation.
 11. Release each claimed tracked file through Nexus as soon as it reaches a coherent checkpoint:
