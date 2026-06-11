@@ -86,6 +86,9 @@ This project uses Nexus for multi-agent coordination.
 - Never hold claims just to bundle a prettier feature commit; that blocks other agents.
 - Release finished work through Nexus: \`nexus release <path> "commit message"\`.
 - Use \`nexus next @Agent\` for the next safe queue task.
+- Use \`nexus next @Agent --take\` when work should be delegated into an agent lane; it copies the full task block into \`_NEXUS_Q_<AGENT>.md\` and marks the master task delegated.
+- Use \`nexus q @Agent\` to inspect an agent lane, and \`nexus q done <id> @Agent\` to write a lane-local receipt without mutating \`_NEXUS_QUEUE.md\`.
+- Treat \`_NEXUS_QUEUE.md\` as the registry during delegated work; active notes and done receipts live in the assigned lane until batch reconciliation.
 - Do not free-roam into unassigned or \`Auto-flow: no\` work without user approval.
 - Direct user instruction can override queue order, but not claim/release, data, security, or approval gates.
 - If no safe task remains, announce \`Standby\` with what you are waiting for, then stop until user input, queue change, or explicit assignment.
