@@ -392,7 +392,8 @@ Claims are hierarchy-aware:
 - stale locks older than the configured threshold are auto-broken
 - missing agent or intent fails before lock creation; missing model metadata warns
 - missing core Nexus protocol files produce a short `nexus doctor` warning
-- fresh file state is printed so the agent starts from disk truth
+- a freshness receipt is printed: the git blob hash of the file on disk, last commit, and dirty/clean state — same blob as the agent's last read means cached content is current; different means re-read
+- `--show` prints the full fresh file state instead of the receipt, for agents that want disk truth inline
 
 ### `nexus release <path> "<commit message>"`
 
