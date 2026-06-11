@@ -100,9 +100,9 @@ This project uses Nexus for multi-agent coordination.
 - Unclaimed orientation reads are limited to Nexus protocol, queue, standup, human preference, continuity, and memory files named in Start Here.
 - Claim before reading implementation files, tests, docs, generated artifacts, or shared agent instruction files outside that orientation set.
 - Before claiming what a file says, making edits, or judging current state, read the file from disk with a fresh command.
-- Treat \`nexus claim\` as the atomic lock-and-read boundary and its output as fresh file state for the claimed path.
-- If you read a shared file before claiming it, treat that read as stale after claim succeeds.
-- If another agent or tool may have touched the file since your last read, re-read it before editing.
+- Treat \`nexus claim\` as the atomic lock boundary. It prints a freshness receipt: the git blob hash identifies the exact content on disk.
+- Same blob hash as your last read means that read is still current; different or unknown means re-read before editing. \`nexus claim --show\` prints the full file state instead.
+- If another agent or tool may have touched the file since your last read, the blob hash will have moved; re-read before editing.
 - If a claim appears stale, do not edit through it; run \`nexus status\` or \`nexus doctor\`, then clean only when ownership is clearly abandoned.
 
 ### Drills
