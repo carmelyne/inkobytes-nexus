@@ -235,6 +235,22 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Review: pending
   - Notes: Add Created and Done date fields to the queue task template (init scaffold, skill docs). Add `nexus ledger archive` to move [x] tasks from _NEXUS_QUEUE.md into .nexus/archive/queue/YYYY-Month.md by completion month, newest-first, with an INDEX.md mirroring the agent memory index convention. Resolve Done dates from ledger or report timestamps; use `Done: unknown` when unrecoverable. Doctor warns when done tasks in the live queue exceed a threshold. Archiving must not touch Ready, In Progress, or Proposed tasks. The 2026-06-10 manual archive pass in .nexus/archive/queue/ is the reference layout. Principle: the queue is the program; history lives in ledger and archive, not in the hot file.
 
+- [ ] TASK/Codex: Add delegated queue lanes with batch reconciliation
+  - Id: delegated-queue-lanes-batch-reconcile
+  - Epic: Queue architecture and flow control
+  - Status: Ready
+  - Created: 2026-06-11
+  - Depends on: none
+  - Files: _NEXUS_QUEUE.md, _NEXUS_Q_CODEX.md, _NEXUS_Q_CLAUDE.md, _NEXUS_Q_GEMINI.md, _NEXUS_LEDGER.md, src/commands/next.js, src/commands/q.js, src/commands/queue.js, src/lib/queue.js, src/lib/receipts.js, test/next.test.js, test/q.test.js, test/queue.test.js, README.md
+  - Affinity: queue, flow-control, concurrency, protocol, receipts
+  - Cost: large
+  - Auto-flow: no
+  - Review: approved
+  - Approved by: human
+  - Outcome: `_NEXUS_QUEUE.md` becomes the canonical task registry while active mutable work moves into per-agent queue lanes. Agents emit lane-local receipts, and Nexus reconciles completed, blocked, or delegated state back to the master registry in controlled batches.
+  - Evidence: `nexus next @agent --take` delegates a task into `_NEXUS_Q_<AGENT>.md`; `nexus q @agent` shows lane state; `nexus q done <id>` writes a lane-local completion receipt without mutating `_NEXUS_QUEUE.md`; `nexus queue reconcile` batches receipts back into the master registry; `nexus doctor` warns about unreconciled receipts; tests cover delegation, local done receipts, reconciliation, duplicate receipts, stale delegated tasks, and master/lane disagreement.
+  - Notes: Copy, do not move. The master queue keeps task id, status, delegation pointer, lane, and reconciliation state. Agent lanes carry active notes, blockers, local substeps, and done receipts. `_NEXUS_QUEUE.md` should not be mutated by agents during active work. Reconciliation is explicit, batchable, and recoverable. Done is not a master write; done is a receipt. This absorbs the core assignment-state goals of `task-state-commands` while avoiding a new completion bottleneck.
+
 ### Loop readiness 2026-06-10 (source: docs-priv/loop-readiness-plan-2026-06-10.md)
 
 - [x] TASK/Claude: Add release verification gate
