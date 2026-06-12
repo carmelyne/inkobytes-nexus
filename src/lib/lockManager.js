@@ -86,6 +86,9 @@ const LOCK_METADATA_FILES = [
   'verified',
   'trust-source',
   'claim-head',
+  'blob',
+  'path-type',
+  'progress-check',
 ];
 
 export function readGitHead(root) {
@@ -96,6 +99,18 @@ export function readGitHead(root) {
   });
   const head = result.stdout?.trim();
   return result.status === 0 && head ? head : 'unknown';
+}
+
+// hash-object is pure content identity — it works even for untracked files
+// and outside commits, so any edit moves it.
+export function readGitBlob(target, root) {
+  const result = spawnSync('git', ['hash-object', target], {
+    cwd: root,
+    encoding: 'utf-8',
+    stdio: ['ignore', 'pipe', 'ignore'],
+  });
+  const blob = result.stdout?.trim();
+  return result.status === 0 && blob ? blob : '';
 }
 
 function breakLock(lockPath) {
@@ -171,6 +186,22 @@ export function acquireLock(target, agentName, intent, subagents = 0, metadata =
       writeFileSync(join(lockPath, 'verified'), verified ? 'true' : 'false', 'utf-8');
       writeFileSync(join(lockPath, 'trust-source'), trustSource, 'utf-8');
       writeFileSync(join(lockPath, 'claim-head'), readGitHead(config.root), 'utf-8');
+
+      // Progress-signal metadata (loop-progress-signals): record what the
+      // claimed content looked like so progress checks can detect movement.
+      // Advisory only — a failure here must not invalidate the lock.
+      try {
+        if (!existsSync(normalizedTarget)) {
+          writeFileSync(join(lockPath, 'path-type'), 'new', 'utf-8');
+        } else if (statSync(normalizedTarget).isDirectory()) {
+          writeFileSync(join(lockPath, 'path-type'), 'directory', 'utf-8');
+          writeFileSync(join(lockPath, 'progress-check'), 'git-status-porcelain', 'utf-8');
+        } else {
+          writeFileSync(join(lockPath, 'path-type'), 'file', 'utf-8');
+          const blob = readGitBlob(normalizedTarget, config.root);
+          if (blob) writeFileSync(join(lockPath, 'blob'), blob, 'utf-8');
+        }
+      } catch { /* progress metadata is best-effort */ }
 
       return {
         success: true,
@@ -258,6 +289,9 @@ export function listLocks() {
       verified: readMeta('verified') === 'true',
       trustSource: readMeta('trust-source') || 'unverified',
       claimHead: readMeta('claim-head') || 'unknown',
+      blob: readMeta('blob'),
+      pathType: readMeta('path-type'),
+      progressCheck: readMeta('progress-check'),
     });
   }
 
