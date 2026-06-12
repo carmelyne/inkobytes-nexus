@@ -4,6 +4,7 @@
 
 import { readBoard } from '../lib/blackboard.js';
 import { listLocks } from '../lib/lockManager.js';
+import { evaluateLocksProgress } from '../lib/agentTrace.js';
 import { getConfig } from '../lib/config.js';
 import { spawnSync } from 'child_process';
 
@@ -26,6 +27,10 @@ export default function status(args) {
   const board = readBoard();
   const boardLines = board.split('\n').filter(l => l.includes('🔒'));
 
+  // Progress labels for non-stale locks: repo-state deltas only, advisory.
+  const activeLocks = locks.filter(l => l.age === null || l.age < config.staleThreshold);
+  const progressByTarget = evaluateLocksProgress(activeLocks);
+
   for (const lock of locks) {
     const ageStr = lock.age !== null ? formatAge(lock.age) : '??';
     const stale = lock.age !== null && lock.age >= config.staleThreshold;
@@ -40,6 +45,15 @@ export default function status(args) {
     console.log(`     Agent: ${agent} | Age: ${ageStr}${staleTag}`);
     if (stale) {
       console.log(`     Warning: ${FILE_FLOW_WARNING}`);
+      continue;
+    }
+
+    const progress = progressByTarget.get(lock.target);
+    if (progress) {
+      const label = progress.progressing
+        ? `active — progressing (${progress.signals[0]})`
+        : `active — no progress signal (${lock.age !== null ? `${lock.age}s` : 'unknown age'})`;
+      console.log(`     ${label}`);
     }
   }
 
