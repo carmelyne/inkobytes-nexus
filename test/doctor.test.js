@@ -11,6 +11,7 @@ const NEXUS_BIN = fileURLToPath(new URL('../bin/nexus.js', import.meta.url));
 import doctor from '../src/commands/doctor.js';
 import { AGENT_SCOPES } from '../src/lib/agentScopes.js';
 import { resetConfig } from '../src/lib/config.js';
+import { acquireLock } from '../src/lib/lockManager.js';
 import {
   CONTINUITY_TEMPLATE,
   MEMORY_INDEX_TEMPLATE,
@@ -1131,5 +1132,92 @@ test('doctor reports primitives ok when auto-flow tasks declare all of them', ()
 
     assert.match(output, /All auto-flow tasks in Ready Queue declare the task primitives/);
     assert.doesNotMatch(output, /is missing task primitives/);
+  });
+});
+
+test('doctor flags an active lock past the progress window with no progress signal', () => {
+  inTempRepo((root) => {
+    spawnSync('git', ['init'], { cwd: root, stdio: 'pipe' });
+    mkdirSync(join(root, '.nexus'), { recursive: true });
+    writeFileSync(join(root, '.nexus', 'config.json'), '{ "progressWindow": 120 }', 'utf-8');
+    writeFileSync(join(root, 'file.txt'), 'v1\n', 'utf-8');
+
+    acquireLock('file.txt', '@claude', 'looping work');
+    const lockDir = join(root, '.nexus', 'locks', 'file.txt.lock');
+    writeFileSync(join(lockDir, 'ts'), String(Math.floor(Date.now() / 1000) - 150), 'utf-8');
+
+    const report = JSON.parse(captureLogs(() => doctor(['--json'])));
+    const entry = report.sections.Locks.find((e) => e.lockInfo?.kind === 'no_progress');
+
+    assert.ok(entry, 'expected a no_progress lock entry');
+    assert.equal(entry.ok, true, 'no_progress entries are informational');
+    assert.match(entry.issue, /held 1\d\ds with no progress signal — possible stuck loop/);
+    assert.match(entry.fix, /nexus halt/);
+  });
+});
+
+test('doctor does not flag a lock past the progress window when the blob moved', () => {
+  inTempRepo((root) => {
+    spawnSync('git', ['init'], { cwd: root, stdio: 'pipe' });
+    mkdirSync(join(root, '.nexus'), { recursive: true });
+    writeFileSync(join(root, '.nexus', 'config.json'), '{ "progressWindow": 120 }', 'utf-8');
+    writeFileSync(join(root, 'file.txt'), 'v1\n', 'utf-8');
+
+    acquireLock('file.txt', '@claude', 'looping work');
+    const lockDir = join(root, '.nexus', 'locks', 'file.txt.lock');
+    writeFileSync(join(lockDir, 'ts'), String(Math.floor(Date.now() / 1000) - 150), 'utf-8');
+    writeFileSync(join(root, 'file.txt'), 'v2 — actual work happened\n', 'utf-8');
+
+    const report = JSON.parse(captureLogs(() => doctor(['--json'])));
+    const entry = report.sections.Locks.find((e) => e.lockInfo?.kind === 'no_progress');
+
+    assert.equal(entry, undefined, 'progressing locks must not be flagged');
+  });
+});
+
+test('doctor reports a claim/release imbalance when an agent holds claims with no releases', () => {
+  inTempRepo((root) => {
+    spawnSync('git', ['init'], { cwd: root, stdio: 'pipe' });
+    writeFileSync(join(root, 'a.txt'), 'a\n', 'utf-8');
+    writeFileSync(join(root, 'b.txt'), 'b\n', 'utf-8');
+
+    acquireLock('a.txt', '@claude', 'work a');
+    acquireLock('b.txt', '@claude', 'work b');
+
+    const report = JSON.parse(captureLogs(() => doctor(['--json'])));
+    const entry = report.sections.Locks.find((e) => e.lockInfo?.kind === 'claim_imbalance');
+
+    assert.ok(entry, 'expected a claim_imbalance entry');
+    assert.equal(entry.ok, true, 'imbalance entries are informational');
+    assert.match(entry.issue, /Agent @claude: 2 claims, 0 releases in last 900s/);
+  });
+});
+
+test('doctor reports stuck-with-effort on repeated verify failures for the same target', () => {
+  inTempRepo((root) => {
+    spawnSync('git', ['init'], { cwd: root, stdio: 'pipe' });
+    const stamp = (date) => {
+      const yyyy = date.getFullYear();
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const dd = String(date.getDate()).padStart(2, '0');
+      const rawHour = date.getHours();
+      const hour = String(rawHour % 12 || 12).padStart(2, '0');
+      const minute = String(date.getMinutes()).padStart(2, '0');
+      const period = rawHour < 12 ? 'AM' : 'PM';
+      return `${yyyy}-${mm}-${dd} ${hour}:${minute} ${period}`;
+    };
+    const recent = stamp(new Date(Date.now() - 60 * 1000));
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), [
+      `${recent} @claude [BLOCKED]: release file.txt refused — verify failed (npm test)`,
+      `${recent} @claude [BLOCKED]: release file.txt refused — verify failed (npm test)`,
+      `${recent} @claude [BLOCKED]: release once.txt refused — verify failed (npm test)`,
+    ].join('\n'), 'utf-8');
+
+    const report = JSON.parse(captureLogs(() => doctor(['--json'])));
+    const entries = report.sections.Locks.filter((e) => e.lockInfo?.kind === 'stuck_with_effort');
+
+    assert.equal(entries.length, 1, 'only repeated failures are stuck-with-effort');
+    assert.equal(entries[0].ok, true, 'stuck-with-effort entries are informational');
+    assert.match(entries[0].issue, /Release verify failed 2 times for file\.txt/);
   });
 });
