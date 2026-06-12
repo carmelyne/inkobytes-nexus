@@ -66,6 +66,36 @@ test('status reports generated-looking artifacts that need ownership', () => {
   });
 });
 
+test('status labels an active lock as progressing when the claimed blob moved', () => {
+  inTempRepo((root) => {
+    spawnSync('git', ['init'], { cwd: root, stdio: 'pipe' });
+    writeFileSync(join(root, 'file.txt'), 'v1\n', 'utf-8');
+
+    acquireLock('file.txt', '@claude', 'implement feature');
+    writeFileSync(join(root, 'file.txt'), 'v2\n', 'utf-8');
+
+    const output = captureLogs(() => status([]));
+
+    assert.match(output, /active — progressing/);
+    assert.match(output, /blob moved/);
+    assert.doesNotMatch(output, /no progress signal/);
+  });
+});
+
+test('status labels an active lock with no repo-state delta as no progress signal', () => {
+  inTempRepo((root) => {
+    spawnSync('git', ['init'], { cwd: root, stdio: 'pipe' });
+    writeFileSync(join(root, 'file.txt'), 'v1\n', 'utf-8');
+
+    acquireLock('file.txt', '@claude', 'implement feature');
+
+    const output = captureLogs(() => status([]));
+
+    assert.match(output, /active — no progress signal \(\d+s\)/);
+    assert.doesNotMatch(output, /active — progressing/);
+  });
+});
+
 test('status warns when a claim has gone stale and needs file-level release', () => {
   inTempRepo((root) => {
     spawnSync('git', ['init'], { cwd: root, stdio: 'pipe' });
