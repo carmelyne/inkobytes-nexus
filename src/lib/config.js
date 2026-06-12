@@ -41,6 +41,11 @@ export function getConfig(fromDir) {
     autonomy: Number.isInteger(localConfig.autonomy) && localConfig.autonomy >= 0 && localConfig.autonomy <= 2
       ? localConfig.autonomy
       : 0,
+    // Progress-signal window in seconds. Global only — per-agent/per-cost
+    // overrides deferred until the default proves noisy (decision 2, 2026-06-12).
+    progressWindow: Number.isInteger(localConfig.progressWindow) && localConfig.progressWindow > 0
+      ? localConfig.progressWindow
+      : 900,
   };
 
   return _config;
