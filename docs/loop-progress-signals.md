@@ -1,6 +1,7 @@
 # Loop Progress Signals — Design Proposal
 
-Status: proposal, design only. No enforcement until the human reviews this doc.
+Status: reviewed 2026-06-12 by Pong — approved for implementation (see Review
+decisions). Enforcement gate lifted per decision 1.
 Task: `loop-progress-signals` | Epic: Loop readiness | Author: @claude, 2026-06-12
 
 ## Problem
@@ -103,15 +104,51 @@ matter its age. This single change would have prevented the 2026-06-11 sweep.
 - No self-reported progress API. If an agent wants to look alive, it must
   actually change the world.
 
-## Open questions for review
+## Review decisions (2026-06-12, Pong)
 
-1. Should progress-aware staleness (§4) change auto-break behavior, or only
-   labels, in the first shipped version? (Recommend labels + auto-break change
-   together; the label without the behavior fix repeats incident #2.)
-2. `progressWindow` default: 900s assumes medium-cost tasks. Per-agent or
-   per-cost overrides?
-3. Directory claims: blob movement is per-file; cheapest correct check is
-   `git status --porcelain -- <dir>` non-empty vs claim time. Good enough?
-4. Coordinates with `agent-resume-packet` (Gate G): the same involuntary
-   receipts that prove progress are the ones `whereami` would replay on
-   reconnect. Build the shared reader once?
+### 1. Auto-break behavior changes now, guarded by config
+
+Progress-aware staleness (§4) ships with the behavior change immediately —
+labels and auto-break together. The behavior change is gated behind a config
+flag so it can be disabled if it misfires:
+
+```json
+{ "progressAwareStale": true }
+```
+
+### 2. `progressWindow` ships global-only
+
+Default stays `900`. Per-agent and per-cost overrides are deferred — useful,
+but config glitter until real usage proves the default is noisy. Two override
+shapes sketched for that future moment (do not build yet):
+
+- Per-agent: `"agents": { "codex": { "progressWindow": 1800 }, ... }`
+- Per-cost: low → 300s, medium → 900s, high → 1800s
+
+### 3. Directory check: `git status --porcelain` is good enough for v1
+
+One caveat: directory claims must record how they will be progress-checked in
+lock metadata, e.g.:
+
+```json
+{ "pathType": "directory", "progressCheck": "git-status-porcelain" }
+```
+
+This keeps the check self-describing and leaves room for a better
+per-directory signal later without ambiguity about old locks.
+
+### 4. Build the shared trace reader once
+
+Approved — the same involuntary receipts that prove progress are what
+`whereami` (`agent-resume-packet`, Gate G) replays on reconnect. One shared
+reader avoids duplicated parsing and future drift; otherwise one command says
+"agent is progressing" while another says "no recent work found," and Nexus
+becomes a haunted filing cabinet. Sketch:
+
+```
+readAgentTrace(agent)
+readRecentReceipts(agent, window)
+readClaimState(agent)
+readLaneNotes(agent)
+readVerifyFailures(agent)
+```
