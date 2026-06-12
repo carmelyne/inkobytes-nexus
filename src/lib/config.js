@@ -46,6 +46,9 @@ export function getConfig(fromDir) {
     progressWindow: Number.isInteger(localConfig.progressWindow) && localConfig.progressWindow > 0
       ? localConfig.progressWindow
       : 900,
+    // Decision 1 (2026-06-12): stale = age AND no progress signal, so working
+    // locks survive sweeps regardless of age. Set false for age-only staleness.
+    progressAwareStale: localConfig.progressAwareStale !== false,
   };
 
   return _config;
