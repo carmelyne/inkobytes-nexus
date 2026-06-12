@@ -3,7 +3,7 @@
  */
 
 import { readBoard } from '../lib/blackboard.js';
-import { listLocks } from '../lib/lockManager.js';
+import { isSweepEligible, listLocks } from '../lib/lockManager.js';
 import { evaluateLocksProgress } from '../lib/agentTrace.js';
 import { getConfig } from '../lib/config.js';
 import { spawnSync } from 'child_process';
@@ -27,13 +27,13 @@ export default function status(args) {
   const board = readBoard();
   const boardLines = board.split('\n').filter(l => l.includes('🔒'));
 
-  // Progress labels for non-stale locks: repo-state deltas only, advisory.
-  const activeLocks = locks.filter(l => l.age === null || l.age < config.staleThreshold);
-  const progressByTarget = evaluateLocksProgress(activeLocks);
+  // One progress evaluation per lock, shared with the stale split so status
+  // never calls a lock STALE that `clean --stale` would refuse to sweep.
+  const progressByTarget = evaluateLocksProgress(locks);
 
   for (const lock of locks) {
     const ageStr = lock.age !== null ? formatAge(lock.age) : '??';
-    const stale = lock.age !== null && lock.age >= config.staleThreshold;
+    const stale = isSweepEligible(lock, progressByTarget.get(lock.target));
 
     // Find matching board line for agent info
     const boardLine = boardLines.find(l => l.includes(lock.target));
