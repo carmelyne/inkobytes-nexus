@@ -7,7 +7,7 @@ import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { cwd } from 'process';
 import { spawnSync } from 'child_process';
-import { listLocks } from '../lib/lockManager.js';
+import { isSweepEligible, listLocks } from '../lib/lockManager.js';
 import { evaluateLocksProgress, readRecentReceipts, readVerifyFailures } from '../lib/agentTrace.js';
 import { getConfig } from '../lib/config.js';
 import { AGENT_SCOPE_LIST } from '../lib/agentScopes.js';
@@ -412,8 +412,12 @@ export default function doctor(args) {
   }
 
   const locks = listLocks();
-  const staleLocks = locks.filter((lock) => lock.age !== null && lock.age >= config.staleThreshold);
-  const freshLocks = locks.filter((lock) => lock.age === null || lock.age < config.staleThreshold);
+  // One progress evaluation per lock, shared by the stale split and the
+  // loop-progress entries below so doctor never disagrees with itself.
+  const lockProgress = evaluateLocksProgress(locks);
+  const staleLocks = locks.filter((lock) => isSweepEligible(lock, lockProgress.get(lock.target)));
+  const staleTargets = new Set(staleLocks.map((lock) => lock.target));
+  const freshLocks = locks.filter((lock) => !staleTargets.has(lock.target));
 
   if (staleLocks.length) {
     for (const lock of staleLocks) {
@@ -478,9 +482,8 @@ export default function doctor(args) {
   // Loop progress signals — repo-state deltas, not self-reports. Informational
   // only: staleness behavior is unchanged here (that is loop-progress-stale-break).
   if (freshLocks.length) {
-    const progressByTarget = evaluateLocksProgress(freshLocks);
     for (const lock of freshLocks) {
-      const progress = progressByTarget.get(lock.target);
+      const progress = lockProgress.get(lock.target);
       if (!progress || progress.progressing) continue;
       if (lock.age === null || lock.age < progress.window) continue;
       sections.Locks.push({
@@ -690,6 +693,14 @@ export default function doctor(args) {
       });
     }
   }
+
+  // Staleness mode — humans should know which sweep rule is live.
+  sections['Loop Readiness'].push({
+    issue: config.progressAwareStale
+      ? `progress-aware staleness on — stale = age >= ${config.staleThreshold}s AND no progress signal within ${config.progressWindow}s`
+      : `progress-aware staleness off — stale = age >= ${config.staleThreshold}s (age-only)`,
+    ok: true,
+  });
 
   // Loop readiness — autonomy above supervised requires a release verify gate
   if (config.autonomy >= 1) {
