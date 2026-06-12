@@ -427,6 +427,44 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Stop If: A signal would require self-reporting or background processes.
   - Evidence: docs/loop-progress-signals.md committed; grounded in the 2026-06-11 stale-sweep incident as the motivating case; coordinates named with stale-break-standup-log and agent-resume-packet.
 
+- [ ] TASK/@claude: Implement loop progress signals (shared trace reader, claim blob metadata, labels)
+  - Id: loop-progress-impl
+  - Epic: Loop readiness
+  - Status: Ready
+  - Created: 2026-06-12
+  - Depends on: loop-progress-signals
+  - Files: src/lib/agentTrace.js, src/lib/lockManager.js, src/commands/claim.js, src/commands/status.js, src/commands/doctor.js, src/lib/config.js, test/agentTrace.test.js, test/status.test.js, test/doctor.test.js, README.md
+  - Affinity: cli, locks, loop, observability
+  - Cost: medium
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human (2026-06-12, design review decisions recorded in docs/loop-progress-signals.md)
+  - Goal: Make stuck-but-alive loop agents observable from repo-state deltas, not self-reports.
+  - Outcome: Claim stores a claim-time blob hash (directories: pathType + progressCheck git-status-porcelain metadata per decision 3); a shared trace reader module (readAgentTrace, readRecentReceipts, readClaimState, readLaneNotes, readVerifyFailures) evaluates progress; status shows active — progressing / active — no progress signal (Ns); doctor adds the stuck-loop, claim/release-imbalance, and stuck-with-effort informational entries; progressWindow config global-only, default 900 (decision 2 — no per-agent/per-cost overrides yet).
+  - Constraints: Labels and advisories only — no staleness behavior change in this task (that is loop-progress-stale-break); no daemons, timers, or self-reported progress API; the trace reader must be the single parsing path agent-resume-packet (whereami) later consumes (decision 4).
+  - Stop If: A signal would require self-reporting, background processes, or a lock file format change that breaks existing locks.
+  - Evidence: Tests cover blob recording at claim (file + directory), progress detection via blob movement / release receipts / lane appends, status labels both states, doctor entries, and trace reader functions; README documents progressWindow.
+  - Notes: Implements §1–3 of docs/loop-progress-signals.md per the 2026-06-12 review decisions. Build src/lib/agentTrace.js first; everything else reads through it. Coordinates with: agent-resume-packet (shared reader consumer), delegated-queue-lanes receipts (lane cadence signal).
+
+- [ ] TASK/@claude: Progress-aware staleness — gate auto-break on no-progress
+  - Id: loop-progress-stale-break
+  - Epic: Loop readiness
+  - Status: Ready
+  - Created: 2026-06-12
+  - Depends on: loop-progress-impl
+  - Files: src/lib/lockManager.js, src/lib/config.js, src/commands/doctor.js, test/lockManager.test.js, test/doctor.test.js, README.md
+  - Affinity: cli, locks, safety, loop
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human (2026-06-12, decision 1 in docs/loop-progress-signals.md: change auto-break behavior immediately, guarded by config)
+  - Goal: Stop sweeping locks that are old but demonstrably working (the 2026-06-11 incident).
+  - Outcome: With progressAwareStale: true (config, default true), stale = age >= staleThreshold AND no progress signal within progressWindow; setting it false restores pure age-based staleness; doctor reports which mode is active.
+  - Constraints: Guarded by the progressAwareStale flag per decision 1; no other lock lifecycle changes; reuse loop-progress-impl's trace reader — no second progress-evaluation path.
+  - Stop If: The guard cannot cleanly fall back to age-only behavior, or progress evaluation inside the staleness check measurably slows claim/status hot paths.
+  - Evidence: Tests cover old-but-progressing lock survives sweep, old-and-silent lock still sweeps, flag false restores age-only, and the 2026-06-11 incident shape (75-min session vs 600s threshold with moving blob) as a regression case.
+  - Notes: Implements §4 of docs/loop-progress-signals.md. Coordinates with: stale-break-standup-log (sweep visibility — complements, does not depend).
+
 - [ ] TASK/Codex: Verify and document agent budget behavior for loop mode
   - Id: budget-loop-verify
   - Epic: Loop readiness
