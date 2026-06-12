@@ -443,6 +443,18 @@ When configured, `nexus release` runs the command before staging. On failure it 
 
 Changing the level is human-only **by convention** — Nexus does not mechanically prevent an agent from editing `.nexus/config.json`. Doctor reports prerequisite gaps; the claim stops there, honestly.
 
+#### Loop progress signals
+
+Stale detection assumes dead agents go quiet, but a stuck loop agent keeps its lock fresh while making no progress — and a long, legitimate work session can look stale by age alone. Nexus therefore labels locks by **observable repo-state deltas**, never self-reports: the claimed file's git blob hash moving since claim time (recorded in lock metadata), a release receipt in `_NEXUS_REPORT.md`, or a lane receipt append within the progress window. Directory claims are checked with `git status --porcelain` and record `path-type` / `progress-check` metadata so the check is self-describing.
+
+```json
+{
+  "progressWindow": 900
+}
+```
+
+`progressWindow` (seconds, default `900`, global only) sets how recent a signal must be. `nexus status` labels each active lock `active — progressing` or `active — no progress signal (Ns)`. `nexus doctor` adds informational Locks entries for possible stuck loops (lock held past the window with no signal), claim/release imbalances (many claims, zero releases in the window), and stuck-with-effort (repeated release verify failures for the same path — the agent is trying, the work is failing). Labels and advisories only: staleness behavior is unchanged. Design and review decisions live in `docs/loop-progress-signals.md`.
+
 ### `nexus standup "<dated message>"`
 
 Append a validated standup line to `_NEXUS_STANDUP.md`.
