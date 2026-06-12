@@ -1135,6 +1135,61 @@ test('doctor reports primitives ok when auto-flow tasks declare all of them', ()
   });
 });
 
+test('doctor reports the active staleness mode', () => {
+  inTempRepo((root) => {
+    spawnSync('git', ['init'], { cwd: root, stdio: 'pipe' });
+
+    const onReport = JSON.parse(captureLogs(() => doctor(['--json'])));
+    const onEntry = onReport.sections['Loop Readiness'].find((e) => /progress-aware staleness/.test(e.issue));
+    assert.ok(onEntry, 'expected a staleness mode entry');
+    assert.equal(onEntry.ok, true);
+    assert.match(onEntry.issue, /progress-aware staleness on — stale = age >= 600s AND no progress signal within 900s/);
+
+    resetConfig();
+    mkdirSync(join(root, '.nexus'), { recursive: true });
+    writeFileSync(join(root, '.nexus', 'config.json'), '{ "progressAwareStale": false }', 'utf-8');
+    const offReport = JSON.parse(captureLogs(() => doctor(['--json'])));
+    const offEntry = offReport.sections['Loop Readiness'].find((e) => /progress-aware staleness/.test(e.issue));
+    assert.match(offEntry.issue, /progress-aware staleness off — stale = age >= 600s \(age-only\)/);
+  });
+});
+
+test('doctor lists an old-but-progressing lock as active, not stale', () => {
+  inTempRepo((root) => {
+    spawnSync('git', ['init'], { cwd: root, stdio: 'pipe' });
+    writeFileSync(join(root, 'working.txt'), 'v1\n', 'utf-8');
+
+    acquireLock('working.txt', '@claude', 'long session');
+    const lockDir = join(root, '.nexus', 'locks', 'working.txt.lock');
+    writeFileSync(join(lockDir, 'ts'), String(Math.floor(Date.now() / 1000) - 700), 'utf-8');
+    writeFileSync(join(root, 'working.txt'), 'v2 — work in flight\n', 'utf-8');
+
+    const report = JSON.parse(captureLogs(() => doctor(['--json'])));
+    const stale = report.sections.Locks.find((e) => e.lockInfo?.kind === 'stale');
+    const active = report.sections.Locks.find((e) => e.lockInfo?.kind === 'active');
+
+    assert.equal(stale, undefined, 'progressing lock must not be reported stale');
+    assert.ok(active, 'progressing lock is reported active');
+  });
+});
+
+test('doctor reports an old silent lock as stale in both modes', () => {
+  inTempRepo((root) => {
+    spawnSync('git', ['init'], { cwd: root, stdio: 'pipe' });
+    writeFileSync(join(root, 'silent.txt'), 'v1\n', 'utf-8');
+
+    acquireLock('silent.txt', '@claude', 'abandoned');
+    const lockDir = join(root, '.nexus', 'locks', 'silent.txt.lock');
+    writeFileSync(join(lockDir, 'ts'), String(Math.floor(Date.now() / 1000) - 700), 'utf-8');
+
+    const report = JSON.parse(captureLogs(() => doctor(['--json'])));
+    const stale = report.sections.Locks.find((e) => e.lockInfo?.kind === 'stale');
+
+    assert.ok(stale, 'silent old lock stays stale');
+    assert.match(stale.issue, /Stale lock on silent\.txt/);
+  });
+});
+
 test('doctor flags an active lock past the progress window with no progress signal', () => {
   inTempRepo((root) => {
     spawnSync('git', ['init'], { cwd: root, stdio: 'pipe' });
