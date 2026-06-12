@@ -30,10 +30,10 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Files: /Users/carmelyne/dev/inkobytes/.codex/AGENTS.md, /Users/carmelyne/dev/inkobytes/.claude/CLAUDE.md, /Users/carmelyne/dev/inkobytes/.gemini/GEMINI.md, /Users/carmelyne/dev/inkobytes/_NEXUS_QUEUE.md
   - Affinity: protocol, docs, cleanup
   - Cost: medium
-  - Auto-flow: yes
+  - Auto-flow: no
   - Review: approved
   - Approved by: human
-  - Notes: After hook installation is documented/implemented, clean duplicated generated and hand-written Nexus protocol text in the Inkobytes agent instruction files. Preserve project-specific rules, keep agent-local continuity/memory guidance correct, and avoid broad doctor rewrites unless explicitly approved.
+  - Notes: Human hold 2026-06-13: skip implementation for now because Pong wants more time to think about the dedup direction. When this resumes, preserve project-specific rules, keep agent-local continuity/memory guidance correct, and avoid broad doctor rewrites unless explicitly approved. Also review the human-facing language preference before editing: explain design decisions in Taglish-friendly plain English; no academic phrasing or compressed architecture jargon; define project terms before using them; after abstract claims, give concrete examples; prefer "what this does" and "why it matters"; use short sentences; if the wording might trigger "huh ano pinagsasabi mo," rewrite it first.
 
 - [ ] TASK/Codex: Create Nexus dynamic/governed loops graphic
   - Id: nexus-dynamic-governed-loops-graphic
@@ -427,10 +427,10 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Stop If: A signal would require self-reporting or background processes.
   - Evidence: docs/loop-progress-signals.md committed; grounded in the 2026-06-11 stale-sweep incident as the motivating case; coordinates named with stale-break-standup-log and agent-resume-packet.
 
-- [ ] TASK/@claude: Implement loop progress signals (shared trace reader, claim blob metadata, labels)
+- [x] TASK/@claude: Implement loop progress signals (shared trace reader, claim blob metadata, labels)
   - Id: loop-progress-impl
   - Epic: Loop readiness
-  - Status: Ready
+  - Status: Done
   - Created: 2026-06-12
   - Depends on: loop-progress-signals
   - Files: src/lib/agentTrace.js, src/lib/lockManager.js, src/commands/claim.js, src/commands/status.js, src/commands/doctor.js, src/lib/config.js, test/agentTrace.test.js, test/status.test.js, test/doctor.test.js, README.md
@@ -445,11 +445,18 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Stop If: A signal would require self-reporting, background processes, or a lock file format change that breaks existing locks.
   - Evidence: Tests cover blob recording at claim (file + directory), progress detection via blob movement / release receipts / lane appends, status labels both states, doctor entries, and trace reader functions; README documents progressWindow.
   - Notes: Implements §1–3 of docs/loop-progress-signals.md per the 2026-06-12 review decisions. Build src/lib/agentTrace.js first; everything else reads through it. Coordinates with: agent-resume-packet (shared reader consumer), delegated-queue-lanes receipts (lane cadence signal).
+  - Delegated to: @claude
+  - Delegated at: 2026-06-12T16:13:09.033Z
+  - Lane: _NEXUS_Q_CLAUDE.md
+  - Receipt: reconciled at 2026-06-12T16:59:48.818Z
+  - Done: 2026-06-12
+  - Completed by: @claude
+  - Completed at: 2026-06-12T16:59:08.544Z
 
 - [ ] TASK/@claude: Progress-aware staleness — gate auto-break on no-progress
   - Id: loop-progress-stale-break
   - Epic: Loop readiness
-  - Status: Ready
+  - Status: Delegated
   - Created: 2026-06-12
   - Depends on: loop-progress-impl
   - Files: src/lib/lockManager.js, src/lib/config.js, src/commands/doctor.js, test/lockManager.test.js, test/doctor.test.js, README.md
@@ -464,6 +471,10 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Stop If: The guard cannot cleanly fall back to age-only behavior, or progress evaluation inside the staleness check measurably slows claim/status hot paths.
   - Evidence: Tests cover old-but-progressing lock survives sweep, old-and-silent lock still sweeps, flag false restores age-only, and the 2026-06-11 incident shape (75-min session vs 600s threshold with moving blob) as a regression case.
   - Notes: Implements §4 of docs/loop-progress-signals.md. Coordinates with: stale-break-standup-log (sweep visibility — complements, does not depend).
+  - Delegated to: @claude
+  - Delegated at: 2026-06-12T16:59:49.424Z
+  - Lane: _NEXUS_Q_CLAUDE.md
+  - Receipt: pending
 
 - [ ] TASK/Codex: Verify and document agent budget behavior for loop mode
   - Id: budget-loop-verify
