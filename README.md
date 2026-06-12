@@ -449,11 +449,14 @@ Stale detection assumes dead agents go quiet, but a stuck loop agent keeps its l
 
 ```json
 {
-  "progressWindow": 900
+  "progressWindow": 900,
+  "progressAwareStale": true
 }
 ```
 
-`progressWindow` (seconds, default `900`, global only) sets how recent a signal must be. `nexus status` labels each active lock `active — progressing` or `active — no progress signal (Ns)`. `nexus doctor` adds informational Locks entries for possible stuck loops (lock held past the window with no signal), claim/release imbalances (many claims, zero releases in the window), and stuck-with-effort (repeated release verify failures for the same path — the agent is trying, the work is failing). Labels and advisories only: staleness behavior is unchanged. Design and review decisions live in `docs/loop-progress-signals.md`.
+`progressWindow` (seconds, default `900`, global only) sets how recent a signal must be. `nexus status` labels each active lock `active — progressing` or `active — no progress signal (Ns)`. `nexus doctor` adds informational Locks entries for possible stuck loops (lock held past the window with no signal), claim/release imbalances (many claims, zero releases in the window), and stuck-with-effort (repeated release verify failures for the same path — the agent is trying, the work is failing).
+
+`progressAwareStale` (default `true`) makes staleness itself progress-aware: a lock is stale only when it is past `staleThreshold` **and** shows no progress signal within the window, so a long legitimate work session with moving content survives claim-time auto-breaks and `nexus clean --stale`. A silent old lock sweeps exactly as before. Set it to `false` to restore pure age-based staleness; `nexus doctor` always reports which mode is live. Design and review decisions live in `docs/loop-progress-signals.md`.
 
 ### `nexus standup "<dated message>"`
 
