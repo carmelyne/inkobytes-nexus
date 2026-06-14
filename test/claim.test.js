@@ -97,6 +97,18 @@ test('claim --show prints the full fresh file state', () => {
   });
 });
 
+test('claim --help prints claim-specific help without creating a lock', () => {
+  inTempRepo(() => {
+    const output = capture(() => claim(['--help']));
+
+    assert.match(output, /Usage: nexus claim/);
+    assert.match(output, /freshness receipt/);
+    assert.match(output, /Same blob as your last read/);
+    assert.match(output, /Use --show/);
+    assert.equal(listLocks().length, 0);
+  });
+});
+
 test('claim nudges non-canonical shared model lock handles', () => {
   inTempRepo((root) => {
     writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
