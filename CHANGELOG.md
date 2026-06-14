@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Fixed `nexus claim --help` so it prints claim-specific usage instead of failing as a malformed claim, and updated top-level help to mention the default freshness receipt plus `--show` for full contents.
+
 ## 1.2.0 - 2026-06-11
 
 - **Changed the default `nexus claim` output**: claim now prints a freshness receipt (git blob hash of on-disk content, last commit, dirty/clean state, line count) instead of dumping the full file. Same blob hash as the agent's last read means cached content is current; different means re-read. Use `nexus claim --show` for the previous full fresh-state dump. Run `nexus doctor --fix` in consumer repos to sync the generated agent protocol wording.
