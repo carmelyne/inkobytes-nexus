@@ -1,6 +1,6 @@
 /**
  * nexus claim <path> <agent> "<intent>"
- * Lock a file or directory, update blackboard, dump fresh state.
+ * Lock a file or directory, update blackboard, print a freshness receipt.
  */
 
 import { appendEntry } from '../lib/blackboard.js';
@@ -19,6 +19,7 @@ const CORE_FILES = [
   '_NEXUS_STANDUP.md',
 ];
 const THINKING_LEVELS = new Set(['low', 'medium', 'high']);
+const USAGE = 'Usage: nexus claim <filepath_or_dir> <agent> "<intent>" [--agent <agent>] [--intent <intent>] [--subagents <n>] [--model <name>] [--thinking <low|medium|high>] [--show]';
 
 function missingCoreFiles() {
   const root = cwd();
@@ -47,6 +48,11 @@ function readFlag(args, name) {
 }
 
 export default function claim(args) {
+  if (args.includes('--help') || args.includes('-h')) {
+    printClaimHelp();
+    return;
+  }
+
   refuseIfHalted('claim');
 
   const positional = [...args];
@@ -68,7 +74,7 @@ export default function claim(args) {
   const hasIntent = Boolean(intentFlag || positional[2]);
 
   if (!target) {
-    console.error('Usage: nexus claim <filepath_or_dir> <agent> "<intent>" [--agent <agent>] [--intent <intent>] [--subagents <n>] [--model <name>] [--thinking <low|medium|high>] [--show]');
+    console.error(USAGE);
     process.exit(1);
   }
 
@@ -126,4 +132,26 @@ export default function claim(args) {
   // Freshness receipt by default: prove content identity instead of paying
   // tokens for a full dump. --show restores the full fresh-state dump.
   console.log(showFull ? dumpState(target) : freshnessReceipt(target));
+}
+
+function printClaimHelp() {
+  console.log([
+    USAGE,
+    '',
+    'Locks a file or directory for one agent.',
+    '',
+    'By default, claim prints a freshness receipt instead of full contents:',
+    '- git blob hash for the on-disk content',
+    '- last commit touching the path',
+    '- clean/dirty working-tree state',
+    '- line count when available',
+    '',
+    'Same blob as your last read means cached content is current. Different or unknown means re-read before editing.',
+    'Use --show to print the full fresh file state after the lock is acquired.',
+    '',
+    'Examples:',
+    '  nexus claim src/lib/foo.js @codex "Fix parser edge case"',
+    '  nexus claim src/lib/foo.js --agent @codex --intent "Fix parser edge case"',
+    '  nexus claim src/lib/foo.js @codex "Review current contents" --show',
+  ].join('\n'));
 }
