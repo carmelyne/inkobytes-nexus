@@ -3,7 +3,8 @@
  */
 
 import { readBoard } from '../lib/blackboard.js';
-import { listLocks } from '../lib/lockManager.js';
+import { isSweepEligible, listLocks } from '../lib/lockManager.js';
+import { evaluateLocksProgress } from '../lib/agentTrace.js';
 import { getConfig } from '../lib/config.js';
 import { spawnSync } from 'child_process';
 
@@ -26,9 +27,13 @@ export default function status(args) {
   const board = readBoard();
   const boardLines = board.split('\n').filter(l => l.includes('🔒'));
 
+  // One progress evaluation per lock, shared with the stale split so status
+  // never calls a lock STALE that `clean --stale` would refuse to sweep.
+  const progressByTarget = evaluateLocksProgress(locks);
+
   for (const lock of locks) {
     const ageStr = lock.age !== null ? formatAge(lock.age) : '??';
-    const stale = lock.age !== null && lock.age >= config.staleThreshold;
+    const stale = isSweepEligible(lock, progressByTarget.get(lock.target));
 
     // Find matching board line for agent info
     const boardLine = boardLines.find(l => l.includes(lock.target));
@@ -40,6 +45,15 @@ export default function status(args) {
     console.log(`     Agent: ${agent} | Age: ${ageStr}${staleTag}`);
     if (stale) {
       console.log(`     Warning: ${FILE_FLOW_WARNING}`);
+      continue;
+    }
+
+    const progress = progressByTarget.get(lock.target);
+    if (progress) {
+      const label = progress.progressing
+        ? `active — progressing (${progress.signals[0]})`
+        : `active — no progress signal (${lock.age !== null ? `${lock.age}s` : 'unknown age'})`;
+      console.log(`     ${label}`);
     }
   }
 

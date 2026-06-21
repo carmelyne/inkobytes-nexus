@@ -8,6 +8,9 @@ import { mkdirSync, rmdirSync, existsSync, readFileSync, writeFileSync, readdirS
 import { join, dirname } from 'path';
 import { getConfig } from './config.js';
 import { lockNameToTarget, normalizeTarget, targetToLockName } from './pathSafety.js';
+// Circular at module level (agentTrace reads listLocks) but safe: both sides
+// only call each other at runtime, after both modules are fully evaluated.
+import { evaluateLockProgress } from './agentTrace.js';
 
 export function getLockPath(target) {
   const config = getConfig();
@@ -58,9 +61,9 @@ function checkChildLocks(target, lockDir) {
 }
 
 /**
- * Check if a lock is stale (older than threshold)
+ * Check if a lock is stale: past the age threshold AND sweep-eligible.
  */
-function isStale(lockPath) {
+function isStale(lockPath, target) {
   const config = getConfig();
   const tsFile = join(lockPath, 'ts');
 
@@ -69,8 +72,41 @@ function isStale(lockPath) {
   const lockTs = parseInt(readFileSync(tsFile, 'utf-8').trim(), 10);
   const now = Math.floor(Date.now() / 1000);
   const age = now - lockTs;
+  if (age < config.staleThreshold) return false;
 
-  return age >= config.staleThreshold ? age : false;
+  const readMeta = (name) => {
+    try { return readFileSync(join(lockPath, name), 'utf-8').trim(); } catch { return ''; }
+  };
+  const lock = {
+    target,
+    age,
+    lockPath,
+    agent: readMeta('agent'),
+    blob: readMeta('blob'),
+    pathType: readMeta('path-type'),
+    progressCheck: readMeta('progress-check'),
+  };
+
+  return isSweepEligible(lock) ? age : false;
+}
+
+/**
+ * Sweep eligibility shared by claim-time auto-break, `clean --stale`, and
+ * doctor, so no two commands disagree about what stale means.
+ * Decision 1 (2026-06-12): with progressAwareStale on (default), a lock with
+ * an observable progress signal is working, not stale, no matter its age.
+ */
+export function isSweepEligible(lock, progress) {
+  const config = getConfig();
+  if (lock.age === null || lock.age === undefined || lock.age < config.staleThreshold) return false;
+  if (!config.progressAwareStale) return true;
+  try {
+    const result = progress ?? evaluateLockProgress(lock);
+    return !result.progressing;
+  } catch {
+    // Progress evaluation is advisory; on failure keep the age-only behavior.
+    return true;
+  }
 }
 
 /**
@@ -86,6 +122,9 @@ const LOCK_METADATA_FILES = [
   'verified',
   'trust-source',
   'claim-head',
+  'blob',
+  'path-type',
+  'progress-check',
 ];
 
 export function readGitHead(root) {
@@ -96,6 +135,18 @@ export function readGitHead(root) {
   });
   const head = result.stdout?.trim();
   return result.status === 0 && head ? head : 'unknown';
+}
+
+// hash-object is pure content identity — it works even for untracked files
+// and outside commits, so any edit moves it.
+export function readGitBlob(target, root) {
+  const result = spawnSync('git', ['hash-object', target], {
+    cwd: root,
+    encoding: 'utf-8',
+    stdio: ['ignore', 'pipe', 'ignore'],
+  });
+  const blob = result.stdout?.trim();
+  return result.status === 0 && blob ? blob : '';
 }
 
 function breakLock(lockPath) {
@@ -147,7 +198,7 @@ export function acquireLock(target, agentName, intent, subagents = 0, metadata =
 
   // Stale lock detection
   if (existsSync(lockPath)) {
-    const staleAge = isStale(lockPath);
+    const staleAge = isStale(lockPath, normalizedTarget);
     if (staleAge) {
       console.log(`[WARN] Stale lock detected (${staleAge}s old). Auto-breaking.`);
       breakLock(lockPath);
@@ -171,6 +222,22 @@ export function acquireLock(target, agentName, intent, subagents = 0, metadata =
       writeFileSync(join(lockPath, 'verified'), verified ? 'true' : 'false', 'utf-8');
       writeFileSync(join(lockPath, 'trust-source'), trustSource, 'utf-8');
       writeFileSync(join(lockPath, 'claim-head'), readGitHead(config.root), 'utf-8');
+
+      // Progress-signal metadata (loop-progress-signals): record what the
+      // claimed content looked like so progress checks can detect movement.
+      // Advisory only — a failure here must not invalidate the lock.
+      try {
+        if (!existsSync(normalizedTarget)) {
+          writeFileSync(join(lockPath, 'path-type'), 'new', 'utf-8');
+        } else if (statSync(normalizedTarget).isDirectory()) {
+          writeFileSync(join(lockPath, 'path-type'), 'directory', 'utf-8');
+          writeFileSync(join(lockPath, 'progress-check'), 'git-status-porcelain', 'utf-8');
+        } else {
+          writeFileSync(join(lockPath, 'path-type'), 'file', 'utf-8');
+          const blob = readGitBlob(normalizedTarget, config.root);
+          if (blob) writeFileSync(join(lockPath, 'blob'), blob, 'utf-8');
+        }
+      } catch { /* progress metadata is best-effort */ }
 
       return {
         success: true,
@@ -258,6 +325,9 @@ export function listLocks() {
       verified: readMeta('verified') === 'true',
       trustSource: readMeta('trust-source') || 'unverified',
       claimHead: readMeta('claim-head') || 'unknown',
+      blob: readMeta('blob'),
+      pathType: readMeta('path-type'),
+      progressCheck: readMeta('progress-check'),
     });
   }
 
@@ -268,11 +338,10 @@ export function listLocks() {
  * Find and break all stale locks. Returns array of broken lock targets.
  */
 export function breakStaleLocks() {
-  const config = getConfig();
   const broken = [];
 
   for (const lock of listLocks()) {
-    if (lock.age !== null && lock.age >= config.staleThreshold) {
+    if (isSweepEligible(lock)) {
       breakLock(lock.lockPath);
       broken.push({ target: lock.target, age: lock.age });
     }

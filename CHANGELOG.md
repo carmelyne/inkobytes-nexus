@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.3.0 - 2026-06-21
+
+- Added observable loop progress signals built from repo-state changes rather than agent self-reports. Nexus now detects claimed-file blob movement, recent release receipts, and delegated-lane receipts through a shared agent trace reader.
+- Made stale-lock handling progress-aware by default: old locks are sweepable only when they are past `staleThreshold` and show no progress within `progressWindow`. Set `progressAwareStale` to `false` to restore age-only behavior.
+- Updated `nexus status` to label active locks as progressing or showing no progress signal, and aligned its `STALE` result with `nexus clean --stale`.
+- Added informational `nexus doctor` diagnostics for possible stuck loops, claim/release imbalance, repeated release-verification failures, and the active staleness mode.
+- Fixed `nexus claim --help` so it prints claim-specific usage instead of failing as a malformed claim, and updated top-level help to mention the default freshness receipt plus `--show` for full contents.
+- Added the loop-progress design and review decisions to `docs/loop-progress-signals.md`.
+
 ## 1.2.0 - 2026-06-11
 
 - **Changed the default `nexus claim` output**: claim now prints a freshness receipt (git blob hash of on-disk content, last commit, dirty/clean state, line count) instead of dumping the full file. Same blob hash as the agent's last read means cached content is current; different means re-read. Use `nexus claim --show` for the previous full fresh-state dump. Run `nexus doctor --fix` in consumer repos to sync the generated agent protocol wording.

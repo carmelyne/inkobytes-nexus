@@ -7,11 +7,13 @@ import { chdir, cwd } from 'process';
 import { spawnSync } from 'child_process';
 import {
   acquireLock,
+  breakStaleLocks,
   getLockPath,
+  isSweepEligible,
   listLocks,
   releaseLock,
 } from '../src/lib/lockManager.js';
-import { resetConfig } from '../src/lib/config.js';
+import { getConfig, resetConfig } from '../src/lib/config.js';
 
 function inTempRepo(fn) {
   const previous = cwd();
@@ -97,6 +99,86 @@ test('listLocks reads lock metadata and defaults missing subagents to zero', () 
     assert.equal(locks[0].thinking, 'medium');
     assert.equal(locks[0].claimHead, 'unknown');
     assert.equal(typeof locks[0].age, 'number');
+  });
+});
+
+function backdateLock(target, seconds) {
+  const tsFile = join(getLockPath(target), 'ts');
+  writeFileSync(tsFile, String(Math.floor(Date.now() / 1000) - seconds), 'utf-8');
+}
+
+test('progressAwareStale defaults to true and honors an explicit false', () => {
+  inTempRepo((root) => {
+    assert.equal(getConfig().progressAwareStale, true);
+
+    resetConfig();
+    writeFileSync(join(root, 'placeholder.txt'), 'x\n', 'utf-8');
+    spawnSync('mkdir', ['-p', join(root, '.nexus')], { stdio: 'pipe' });
+    writeFileSync(join(root, '.nexus', 'config.json'), '{ "progressAwareStale": false }', 'utf-8');
+    assert.equal(getConfig().progressAwareStale, false);
+  });
+});
+
+test('breakStaleLocks spares an old lock whose claimed blob moved', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, 'working.txt'), 'v1\n', 'utf-8');
+    writeFileSync(join(root, 'silent.txt'), 'v1\n', 'utf-8');
+    acquireLock('working.txt', '@claude', 'long implementation session');
+    acquireLock('silent.txt', '@claude', 'abandoned work');
+    backdateLock('working.txt', 700);
+    backdateLock('silent.txt', 700);
+    writeFileSync(join(root, 'working.txt'), 'v2 — real work happened\n', 'utf-8');
+
+    const broken = breakStaleLocks();
+
+    assert.deepEqual(broken.map((b) => b.target), ['silent.txt']);
+    assert.deepEqual(listLocks().map((l) => l.target), ['working.txt']);
+  });
+});
+
+test('breakStaleLocks sweeps by age alone when progressAwareStale is false', () => {
+  inTempRepo((root) => {
+    spawnSync('mkdir', ['-p', join(root, '.nexus')], { stdio: 'pipe' });
+    writeFileSync(join(root, '.nexus', 'config.json'), '{ "progressAwareStale": false }', 'utf-8');
+    writeFileSync(join(root, 'working.txt'), 'v1\n', 'utf-8');
+    acquireLock('working.txt', '@claude', 'long implementation session');
+    backdateLock('working.txt', 700);
+    writeFileSync(join(root, 'working.txt'), 'v2 — progress does not matter in age-only mode\n', 'utf-8');
+
+    const broken = breakStaleLocks();
+
+    assert.deepEqual(broken.map((b) => b.target), ['working.txt']);
+    assert.equal(listLocks().length, 0);
+  });
+});
+
+test('acquireLock still auto-breaks an old lock with no progress signal', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, 'silent.txt'), 'v1\n', 'utf-8');
+    acquireLock('silent.txt', '@codex', 'crashed session');
+    backdateLock('silent.txt', 700);
+
+    const result = acquireLock('silent.txt', '@claude', 'taking over');
+
+    assert.equal(result.success, true);
+    assert.equal(listLocks()[0].agent, '@claude');
+  });
+});
+
+test('regression: the 2026-06-11 incident shape survives the sweep', () => {
+  inTempRepo((root) => {
+    // 75-minute session against the 600s threshold, blob moving = working.
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue v1\n', 'utf-8');
+    acquireLock('_NEXUS_QUEUE.md', '@claude', 'mid-release chain');
+    backdateLock('_NEXUS_QUEUE.md', 75 * 60);
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue v2 — task flipped during session\n', 'utf-8');
+
+    const lock = listLocks()[0];
+    assert.equal(isSweepEligible(lock), false, 'a working lock must not be sweep-eligible');
+
+    const broken = breakStaleLocks();
+    assert.equal(broken.length, 0);
+    assert.equal(listLocks()[0].agent, '@claude', 'attribution survives — no Agent: unknown');
   });
 });
 

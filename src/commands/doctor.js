@@ -7,7 +7,8 @@ import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { cwd } from 'process';
 import { spawnSync } from 'child_process';
-import { listLocks } from '../lib/lockManager.js';
+import { isSweepEligible, listLocks } from '../lib/lockManager.js';
+import { evaluateLocksProgress, readRecentReceipts, readVerifyFailures } from '../lib/agentTrace.js';
 import { getConfig } from '../lib/config.js';
 import { AGENT_SCOPE_LIST } from '../lib/agentScopes.js';
 import { DEFAULT_MATRIX, loadPermissions, getChmodPath } from '../lib/permissions.js';
@@ -411,8 +412,12 @@ export default function doctor(args) {
   }
 
   const locks = listLocks();
-  const staleLocks = locks.filter((lock) => lock.age !== null && lock.age >= config.staleThreshold);
-  const freshLocks = locks.filter((lock) => lock.age === null || lock.age < config.staleThreshold);
+  // One progress evaluation per lock, shared by the stale split and the
+  // loop-progress entries below so doctor never disagrees with itself.
+  const lockProgress = evaluateLocksProgress(locks);
+  const staleLocks = locks.filter((lock) => isSweepEligible(lock, lockProgress.get(lock.target)));
+  const staleTargets = new Set(staleLocks.map((lock) => lock.target));
+  const freshLocks = locks.filter((lock) => !staleTargets.has(lock.target));
 
   if (staleLocks.length) {
     for (const lock of staleLocks) {
@@ -472,6 +477,69 @@ export default function doctor(args) {
         });
       }
     }
+  }
+
+  // Loop progress signals — repo-state deltas, not self-reports. Informational
+  // only: staleness behavior is unchanged here (that is loop-progress-stale-break).
+  if (freshLocks.length) {
+    for (const lock of freshLocks) {
+      const progress = lockProgress.get(lock.target);
+      if (!progress || progress.progressing) continue;
+      if (lock.age === null || lock.age < progress.window) continue;
+      sections.Locks.push({
+        issue: `Active lock on ${lock.target} held ${lock.age}s with no progress signal — possible stuck loop`,
+        fix: 'Read the agent\'s standup lines and lane notes; if a runaway loop is suspected run `nexus halt "<reason>"`, then `nexus clean <path>` surgically.',
+        ok: true,
+        displayGroup: lock.target,
+        lockInfo: {
+          target: lock.target,
+          agent: lock.agent || '',
+          kind: 'no_progress',
+          age: `${lock.age}s`,
+          window: `${progress.window}s`,
+        },
+      });
+    }
+
+    // Claim/release imbalance: many held claims, nothing released in the window.
+    const locksByAgent = new Map();
+    for (const lock of freshLocks) {
+      const key = (lock.agent || 'unknown').toLowerCase();
+      if (!locksByAgent.has(key)) locksByAgent.set(key, []);
+      locksByAgent.get(key).push(lock);
+    }
+    for (const agentLocks of locksByAgent.values()) {
+      if (agentLocks.length < 2) continue;
+      const agent = agentLocks[0].agent || 'unknown';
+      if (readRecentReceipts(agent, config.progressWindow).length) continue;
+      const detail = `Agent ${agent}: ${agentLocks.length} claims, 0 releases in last ${config.progressWindow}s`;
+      sections.Locks.push({
+        issue: detail,
+        fix: 'Release claimed files as they reach coherent checkpoints so other agents are not blocked.',
+        ok: true,
+        displayGroup: agent,
+        lockInfo: { target: agent, agent, kind: 'claim_imbalance', detail },
+      });
+    }
+  }
+
+  // Stuck-with-effort: repeated verify failures mean the agent is trying and
+  // the work is failing — distinct from the silent stuck loop.
+  const verifyFailuresByTarget = new Map();
+  for (const failure of readVerifyFailures('')) {
+    if (!verifyFailuresByTarget.has(failure.target)) verifyFailuresByTarget.set(failure.target, []);
+    verifyFailuresByTarget.get(failure.target).push(failure);
+  }
+  for (const [target, failures] of verifyFailuresByTarget) {
+    if (failures.length < 2) continue;
+    const detail = `Release verify failed ${failures.length} times for ${target} in the last 24h — agent is stuck-with-effort`;
+    sections.Locks.push({
+      issue: detail,
+      fix: 'Inspect the failing verify output and the file before more loop iterations.',
+      ok: true,
+      displayGroup: target,
+      lockInfo: { target, agent: failures[failures.length - 1].agent, kind: 'stuck_with_effort', detail },
+    });
   }
 
   // Orphan presence — agent checked in but crashed without checking out
@@ -625,6 +693,14 @@ export default function doctor(args) {
       });
     }
   }
+
+  // Staleness mode — humans should know which sweep rule is live.
+  sections['Loop Readiness'].push({
+    issue: config.progressAwareStale
+      ? `progress-aware staleness on — stale = age >= ${config.staleThreshold}s AND no progress signal within ${config.progressWindow}s`
+      : `progress-aware staleness off — stale = age >= ${config.staleThreshold}s (age-only)`,
+    ok: true,
+  });
 
   // Loop readiness — autonomy above supervised requires a release verify gate
   if (config.autonomy >= 1) {
@@ -865,6 +941,11 @@ function formatLockState(entry) {
       return 'missing --model metadata';
     case 'unverified':
       return `unverified claim (trust: ${info.trustSource || 'unknown'})`;
+    case 'no_progress':
+      return `active ${info.age} with no progress signal (window ${info.window}) — possible stuck loop`;
+    case 'claim_imbalance':
+    case 'stuck_with_effort':
+      return info.detail || entry.issue;
     default:
       return entry.issue;
   }
@@ -883,6 +964,12 @@ function compactLockFix(entry) {
       return 'use `nexus claim ... --model <name>` on future claims';
     case 'unverified':
       return 'set `NEXUS_AGENT=@handle` for local claims, or inspect the lock';
+    case 'no_progress':
+      return 'read standup/lane notes; `nexus halt "<reason>"` if runaway, then surgical `nexus clean <path>`';
+    case 'claim_imbalance':
+      return 'release files at coherent checkpoints';
+    case 'stuck_with_effort':
+      return 'inspect the failing verify output before more iterations';
     default:
       return entry.fix;
   }
