@@ -611,7 +611,7 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
 - [ ] TASK/Codex: Make scaffolded sample tasks inert (issue 4)
   - Id: sample-task-safety
   - Epic: Dogfooding fixes
-  - Status: Ready
+  - Status: Delegated
   - Created: 2026-07-12
   - Depends on: none
   - Files: src/commands/init.js, src/commands/next.js, src/commands/doctor.js, test/next.test.js, test/doctor.test.js
@@ -626,6 +626,10 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Constraints: Keep the samples as documentation of the task format — do not delete them.
   - Stop If: Status parsing treats unknown statuses as errors elsewhere — reconcile that first.
   - Evidence: next/doctor test output in the release note.
+  - Delegated to: @codex
+  - Delegated at: 2026-07-12T11:58:41.659Z
+  - Lane: _NEXUS_Q_CODEX.md
+  - Receipt: pending
 
 - [ ] TASK/Codex: Make next/next --take explain queue decisions (issues 8, 11)
   - Id: next-explainability
@@ -677,9 +681,9 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Auto-flow: yes
   - Review: approved
   - Approved by: human
-  - Notes: Mooncrafting's _NEXUS_REPORT.md hit 10,231 lines; every orientation read pays for it forever, and it sat dirty for days unnoticed. Add `nexus report rotate` (move entries to _NEXUS_REPORT-YYYY-MM.md archives, keep current month live), done-task archival out of the live queue (this repo already has the monthly-archive task queued — coordinate, don't duplicate), and doctor warnings for oversized (line-count threshold in config) or long-dirty coordination files.
+  - Notes: Mooncrafting's _NEXUS_REPORT.md hit 10,231 lines; every orientation read pays for it forever, and it sat dirty for days unnoticed. Add `nexus report rotate` (move entries to _NEXUS_REPORT-YYYY-MM.md archives, keep current month live), done-task archival out of the live queue (this repo already has the monthly-archive task queued — coordinate, don't duplicate), and doctor warnings for oversized (line-count threshold in config) or long-dirty coordination files. Scope extended 2026-07-12 per human: the standup comms log rotates too — archive comms entries older than the current month into _NEXUS_STANDUP-YYYY-MM.md, keeping Board/Runways/format rules plus the current month live; one `nexus rotate` entry point may cover report+queue+standup rather than per-file commands.
   - Goal: Orientation reads stop growing without bound; dirty coordination files get noticed by tooling, not luck.
-  - Outcome: rotate moves prior-month report entries to archive files; doctor warns on oversized or uncommitted-for-days coordination files with the exact command to fix.
+  - Outcome: rotate moves prior-month report and standup-comms entries to archive files; doctor warns on oversized or uncommitted-for-days coordination files with the exact command to fix.
   - Constraints: Rotation must be a claim/release-honest operation (archives committed atomically with the trim). Never rewrite entry content while moving it.
   - Stop If: Overlap with the queued archive-completed-tasks-by-month task is nontrivial — reconcile the two scopes in standup first.
   - Evidence: Rotation round-trip test and doctor-warning test output in the release note.
