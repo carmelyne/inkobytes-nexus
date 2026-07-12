@@ -169,7 +169,7 @@ def main() -> None:
             'hookSpecificOutput': {
                 'hookEventName': 'PreToolUse',
                 'permissionDecision': 'deny',
-                'permissionDecisionReason': 'Use \`nexus trash <path>\` instead of irreversible delete.',
+                'permissionDecisionReason': 'Use nexus trash.',
             }
         }))
 
