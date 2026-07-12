@@ -496,10 +496,10 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
 
 ### Dogfooding issues batch 2026-07-12 (source: docs/nexus-issues.md)
 
-- [ ] TASK/Codex: Fix CLI papercuts from dogfooding (issues 1, 5, 7, 9)
+- [x] TASK/Codex: Fix CLI papercuts from dogfooding (issues 1, 5, 7, 9)
   - Id: dogfood-papercut-batch
   - Epic: Dogfooding fixes
-  - Status: Delegated
+  - Status: Done
   - Created: 2026-07-12
   - Depends on: none
   - Files: src/commands/claim.js, src/commands/release.js, src/commands/help.js, src/commands/standup.js, src/lib/lockManager.js
@@ -517,7 +517,10 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Delegated to: @codex
   - Delegated at: 2026-07-12T12:19:57.360Z
   - Lane: _NEXUS_Q_CODEX.md
-  - Receipt: pending
+  - Receipt: reconciled at 2026-07-12T14:48:45.726Z
+  - Done: 2026-07-12
+  - Completed by: @codex
+  - Completed at: 2026-07-12T12:28:13.376Z
 
 - [x] TASK/@claude: Guard release against sweeping unrelated uncommitted changes (issue 6)
   - Id: release-sweep-guard
@@ -542,10 +545,10 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Evidence: Regression test output and a demo transcript of the abort + override in the release note.
   - Receipt: Shipped 2026-07-12. Lock records `dirty-at-claim` (porcelain snapshot, additive metadata — no migration); claim warns immediately on pre-claim dirt; release prints [DIFF] diffstat (incl. untracked) on every release, refuses pre-claim-dirty releases keeping the claim + standup [BLOCKED] line, `--include-preexisting` overrides with loud warning. 3 new tests incl. 2026-07-06 regression; 4 existing tests reordered to claim-before-edit; suite 265/265. E2E smoke in temp repo verified refuse + override. Guard fired on real work same session (queue file dirty from @codex delegation) — working as designed. Pre-feature locks (no dirty-at-claim) behave as before.
 
-- [ ] TASK/@claude: Add `nexus trash` and init security options (rm -rf replacement)
+- [x] TASK/@claude: Add `nexus trash` and init security options (rm -rf replacement)
   - Id: trash-security-init
   - Epic: Dogfooding fixes
-  - Status: Delegated
+  - Status: Done
   - Created: 2026-07-12
   - Depends on: none
   - Files: src/commands/trash.js, src/commands/init.js, src/commands/doctor.js, src/commands/help.js, test/trash.test.js
@@ -563,7 +566,10 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Delegated to: @codex
   - Delegated at: 2026-07-12T12:06:41.769Z
   - Lane: _NEXUS_Q_CODEX.md
-  - Receipt: pending
+  - Receipt: reconciled at 2026-07-12T14:48:45.726Z
+  - Done: 2026-07-12
+  - Completed by: @codex
+  - Completed at: 2026-07-12T12:13:28.729Z
 
 - [x] TASK/@claude: Design doc — claim semantics rework: free reads, read leases, batch claim (issues 2, 3, 16)
   - Id: claim-semantics-design
@@ -634,10 +640,10 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Evidence: Test output covering overdue-flagging and the no-progress auto-release gate in the release note.
   - Receipt: Shipped 2026-07-12. `claimTtl` (default 7200s) + `claimTtlAutoRelease` (default off) in config; status tags ⏰ OVERDUE past TTL; doctor raises non-ok Locks finding naming the owner. Key insight: agent-level progress signals (release elsewhere) keep all an agent's locks alive forever — TTL auto-release therefore keys on *path-local* idleness (claim blob unchanged); blob-moved, directory, and new-path locks are never TTL-swept. No lock-format migration (reuses existing blob metadata). 11 new tests across lockManager/config/status/doctor (scope note: test/config.test.js, test/status.test.js, test/doctor.test.js, README.md touched beyond declared Files); 2026-06-11 regression stays green; suite 286/286. Per-claim TTL override deferred until the global default proves wrong.
 
-- [ ] TASK/Codex: Make scaffolded sample tasks inert (issue 4)
+- [x] TASK/Codex: Make scaffolded sample tasks inert (issue 4)
   - Id: sample-task-safety
   - Epic: Dogfooding fixes
-  - Status: Delegated
+  - Status: Done
   - Created: 2026-07-12
   - Depends on: none
   - Files: src/commands/init.js, src/commands/next.js, src/commands/doctor.js, test/next.test.js, test/doctor.test.js
@@ -655,12 +661,15 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Delegated to: @codex
   - Delegated at: 2026-07-12T11:58:41.659Z
   - Lane: _NEXUS_Q_CODEX.md
-  - Receipt: pending
+  - Receipt: reconciled at 2026-07-12T14:48:45.726Z
+  - Done: 2026-07-12
+  - Completed by: @codex
+  - Completed at: 2026-07-12T12:02:42.289Z
 
-- [ ] TASK/Codex: Make next/next --take explain queue decisions (issues 8, 11)
+- [x] TASK/Codex: Make next/next --take explain queue decisions (issues 8, 11)
   - Id: next-explainability
   - Epic: Dogfooding fixes
-  - Status: Delegated
+  - Status: Done
   - Created: 2026-07-12
   - Depends on: none
   - Files: src/commands/next.js, test/next.test.js, README.md
@@ -678,7 +687,10 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Delegated to: @codex
   - Delegated at: 2026-07-12T12:32:11.206Z
   - Lane: _NEXUS_Q_CODEX.md
-  - Receipt: pending
+  - Receipt: reconciled at 2026-07-12T14:48:45.726Z
+  - Done: 2026-07-12
+  - Completed by: @codex
+  - Completed at: 2026-07-12T12:36:13.902Z
 
 - [ ] TASK/Codex: Add `nexus verify <task-id>` receipt checker (issue 13)
   - Id: receipt-verify-command
@@ -744,6 +756,23 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
 ## Proposed Queue
 
 *(Agent-suggested tasks awaiting human review. nexus next ignores this section.)*
+
+- [ ] TASK/@claude: Scope the release verify gate so foreign WIP cannot block unrelated releases (issue 17)
+  - Id: verify-gate-scope
+  - Epic: Dogfooding fixes
+  - Status: Proposed
+  - Created: 2026-07-12
+  - Depends on: none
+  - Files: src/commands/release.js, src/lib/config.js, test/release.test.js, README.md, docs/nexus-issues.md
+  - Affinity: release, verify, parallel-throughput
+  - Cost: medium
+  - Auto-flow: no
+  - Notes: Observed live 2026-07-12 (docs/nexus-issues.md issue 17): the verify gate runs repo-wide `npm test`, so one agent's legitimately red in-flight test blocks every other agent's release. Candidate designs to evaluate: (a) name the failing test files in the refusal so the blocked agent can see the failure is foreign; (b) per-scope verify commands in config; (c) verify against committed state + released path only (stash-others/worktree — highest fidelity, most machinery). Recommend starting with (a), it is cheap and purely additive.
+  - Goal: A release is refused for failures the releasing agent can act on, or the refusal clearly says the failure is foreign.
+  - Outcome: Blocked releases print which test files failed; if scoped verify ships, a foreign red test no longer refuses an unrelated release.
+  - Constraints: Never weaken the gate silently — any bypass stays explicit and logged.
+  - Stop If: Scoped verify requires mutating the working tree (stash) in ways that could interact with other agents' uncommitted work — stop at (a) and redesign.
+  - Evidence: Refusal-output test with a foreign failing test; transcript in the release note.
 
 - [ ] TASK/Codex: Add atomic task state commands (take/done)
   - Id: task-state-commands
