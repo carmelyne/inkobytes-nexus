@@ -58,6 +58,26 @@ function captureExit(fn) {
   return lines.join('\n');
 }
 
+test('claim only prints one missing model metadata warning while missing-metadata locks exist', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, 'one.txt'), 'one\n', 'utf-8');
+    writeFileSync(join(root, 'two.txt'), 'two\n', 'utf-8');
+    writeFileSync(join(root, 'three.txt'), 'three\n', 'utf-8');
+
+    const output = capture(() => {
+      claim(['one.txt', '@codex', 'first claim']);
+      claim(['two.txt', '@codex', 'second claim']);
+      claim(['three.txt', '@codex', 'third claim']);
+    });
+
+    const warnings = output.match(/Claim has no model metadata/g) || [];
+    assert.equal(warnings.length, 1);
+  });
+});
+
 test('claim warns cheaply when Nexus protocol files are missing', () => {
   inTempRepo((root) => {
     writeFileSync(join(root, 'file.txt'), 'hello\n', 'utf-8');

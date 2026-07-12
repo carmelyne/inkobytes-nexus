@@ -25,6 +25,7 @@ import {
   protocolBlock,
 } from '../lib/protocolText.js';
 import { HOOK_AGENT_CONFIGS, hookStatus } from './hooks.js';
+import { trashSize } from './trash.js';
 import { contractViolations, parseContractTasks, primitiveGaps } from '../lib/taskContract.js';
 import { scanQueueLanes } from '../lib/queue.js';
 
@@ -205,6 +206,7 @@ export default function doctor(args) {
     Locks: [],
     'Generated Artifacts': [],
     Hooks: [],
+    Trash: [],
     promptCHMOD: [],
     'Queue Authorship': [],
     'Queue Lanes': [],
@@ -436,20 +438,39 @@ export default function doctor(args) {
   }
 
   if (freshLocks.length) {
+    const config = getConfig();
     for (const lock of freshLocks) {
       const age = lock.age === null ? 'unknown age' : `${lock.age}s old`;
-      sections.Locks.push({
-        issue: `Active lock on ${lock.target} (${age})`,
-        fix: 'No action if the agent is still working. Use `nexus status` to inspect.',
-        ok: true,
-        displayGroup: lock.target,
-        lockInfo: {
-          target: lock.target,
-          agent: lock.agent || '',
-          kind: 'active',
-          age,
-        },
-      });
+      // Overdue = past the soft claim TTL but not stale (still progressing).
+      // Loud on purpose: other agents should see a hogged path without going
+      // looking — the 2026-07-07 landmarks.js gap (claim-ttl-escalation).
+      const overdue = lock.age !== null && lock.age > config.claimTtl;
+      if (overdue) {
+        sections.Locks.push({
+          issue: `OVERDUE lock on ${lock.target} held by ${lock.agent || 'unknown'} (${age}, soft TTL ${config.claimTtl}s)`,
+          fix: 'Owner should release or announce in standup. If path-idle abandonment is confirmed, `claimTtlAutoRelease: true` lets sweeps break it.',
+          displayGroup: lock.target,
+          lockInfo: {
+            target: lock.target,
+            agent: lock.agent || '',
+            kind: 'overdue',
+            age,
+          },
+        });
+      } else {
+        sections.Locks.push({
+          issue: `Active lock on ${lock.target} (${age})`,
+          fix: 'No action if the agent is still working. Use `nexus status` to inspect.',
+          ok: true,
+          displayGroup: lock.target,
+          lockInfo: {
+            target: lock.target,
+            agent: lock.agent || '',
+            kind: 'active',
+            age,
+          },
+        });
+      }
       if (!lock.model) {
         sections.Locks.push({
           issue: `Active lock on ${lock.target} has no --model metadata`,
@@ -604,7 +625,7 @@ export default function doctor(args) {
     const queueContent = readFileSync(queuePath, 'utf-8');
     const readySection = extractReadyQueueSection(queueContent);
     const failing = parseContractTasks(readySection)
-      .filter((t) => !t.done && t.status !== 'Done' && t.autoFlow === 'yes')
+      .filter((t) => isExecutableQueueTask(t) && t.autoFlow === 'yes')
       .map((t) => ({ task: t, violations: contractViolations(t) }))
       .filter(({ violations }) => violations.length);
 
@@ -639,7 +660,7 @@ export default function doctor(args) {
     // Missing primitives are actionable at autonomy 2, advisory below.
     const primitivesRequired = config.autonomy >= 2;
     const primitiveFailing = parseContractTasks(readySection)
-      .filter((t) => !t.done && t.status !== 'Done' && t.autoFlow === 'yes')
+      .filter((t) => isExecutableQueueTask(t) && t.autoFlow === 'yes')
       .map((t) => ({ task: t, gaps: primitiveGaps(t) }))
       .filter(({ gaps }) => gaps.length);
 
@@ -669,6 +690,16 @@ export default function doctor(args) {
       });
     }
 
+    const sampleTasks = parseContractTasks(readySection)
+      .filter((t) => String(t.status || '').toLowerCase() === 'sample');
+    if (sampleTasks.length && hasGitCommits(root)) {
+      sections['Queue Authorship'].push({
+        issue: `Sample queue tasks remain in a repo with commits (${sampleTasks.map((t) => t.id || t.title).join(', ')})`,
+        fix: 'Keep them as documentation, or remove them once real queue work exists.',
+        ok: true,
+      });
+    }
+
     const laneScan = scanQueueLanes(root, queueContent, undefined, new Date(), config.staleThreshold);
     for (const receipt of laneScan.pendingReceipts) {
       sections['Queue Lanes'].push({
@@ -693,6 +724,15 @@ export default function doctor(args) {
       });
     }
   }
+
+  // Trash visibility — rollback payloads should be visible before they pile up.
+  const bytes = trashSize(root);
+  sections.Trash.push({
+    issue: bytes
+      ? `.nexus/trash uses ${formatBytes(bytes)}`
+      : '.nexus/trash is empty',
+    ok: true,
+  });
 
   // Staleness mode — humans should know which sweep rule is live.
   sections['Loop Readiness'].push({
@@ -1019,6 +1059,26 @@ function extractReadyQueueSection(content) {
     if (inSection) result.push(line);
   }
   return result.join('\n');
+}
+
+function isExecutableQueueTask(task) {
+  const status = String(task.status || '').toLowerCase();
+  return !task.done && status !== 'done' && status !== 'sample';
+}
+
+function hasGitCommits(root) {
+  const result = spawnSync('git', ['rev-parse', '--verify', 'HEAD'], {
+    cwd: root,
+    encoding: 'utf-8',
+    stdio: 'pipe',
+  });
+  return result.status === 0;
+}
+
+function formatBytes(bytes) {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 function replaceLegacyHelperCommands(content) {

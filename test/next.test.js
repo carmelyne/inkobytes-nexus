@@ -6,6 +6,7 @@ import { join } from 'path';
 import { chdir, cwd } from 'process';
 import { spawnSync } from 'child_process';
 import next from '../src/commands/next.js';
+import init from '../src/commands/init.js';
 import { resetConfig } from '../src/lib/config.js';
 
 function inTempRepo(fn) {
@@ -72,6 +73,121 @@ test('next prints manually pinned related drills from queue', () => {
     assert.match(output, /- data-mutation-delete-rows/);
     assert.match(output, /- task-contract/);
     assert.match(output, /nexus drill show <id>/);
+  });
+});
+
+test('next in a freshly initialized repo stands by and points to sample tasks', () => {
+  inTempRepo(() => {
+    captureLogs(() => init([]));
+
+    const output = captureLogs(() => next(['@Agent-1']));
+
+    assert.match(output, /No safe auto-flow tasks available for @Agent-1\. Standby\./);
+    assert.match(output, /Sample tasks found: hello-main, hello-utils/);
+    assert.match(output, /documentation only/);
+    assert.match(output, /Status: Ready and Auto-flow: yes after human approval/);
+    assert.doesNotMatch(output, /Task: hello-main/);
+  });
+});
+
+test('next never suggests done tasks and labels ambiguous task state', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), `# Nexus Queue
+
+## Ready Queue
+
+- [ ] TASK/Codex: Already shipped
+  - Id: done-task
+  - Epic: Loop readiness
+  - Status: Done
+  - Done: 2026-07-12
+  - Depends on: none
+  - Files: src/done.js
+  - Affinity: cli
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: This task is already complete.
+
+- [x] TASK/Codex: Conflicting state
+  - Id: ambiguous-task
+  - Epic: Loop readiness
+  - Status: Ready
+  - Depends on: none
+  - Files: src/ambiguous.js
+  - Affinity: cli
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Checkbox and status disagree.
+`, 'utf-8');
+
+    const output = captureLogs(() => next(['@codex']));
+
+    assert.match(output, /No safe auto-flow tasks available for @codex\. Standby\./);
+    assert.match(output, /Skipped candidates:/);
+    assert.match(output, /done-task: done/);
+    assert.match(output, /ambiguous-task: ambiguous task state/);
+    assert.doesNotMatch(output, /Task: done-task/);
+    assert.doesNotMatch(output, /Task: ambiguous-task/);
+  });
+});
+
+test('next standby output lists compact skip reasons for every candidate', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), `# Nexus Queue
+
+## Ready Queue
+
+- [ ] TASK/Codex: Manual task
+  - Id: manual-task
+  - Epic: Loop readiness
+  - Status: Ready
+  - Depends on: none
+  - Files: src/manual.js
+  - Affinity: cli
+  - Cost: small
+  - Auto-flow: no
+  - Review: approved
+  - Approved by: human
+  - Notes: Needs a person.
+
+- [ ] TASK/Codex: Waiting task
+  - Id: waiting-task
+  - Epic: Loop readiness
+  - Status: Ready
+  - Depends on: missing-dependency
+  - Files: src/waiting.js
+  - Affinity: cli
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Depends on unfinished work.
+
+- [ ] TASK/Codex: Conflicting task
+  - Id: conflicting-task
+  - Epic: Loop readiness
+  - Status: Ready
+  - Depends on: none
+  - Files: src/claimed.js
+  - Affinity: cli
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: File is already claimed.
+`, 'utf-8');
+    writeFileSync(join(root, '_NEXUS.md'), '- 🔒 **src/claimed.js** - Locked by **@claude**: work\n', 'utf-8');
+
+    const output = captureLogs(() => next(['@codex']));
+
+    assert.match(output, /Skipped candidates:/);
+    assert.match(output, /manual-task: auto-flow no/);
+    assert.match(output, /waiting-task: dependency missing-dependency not met/);
+    assert.match(output, /conflicting-task: claimed file conflict/);
   });
 });
 

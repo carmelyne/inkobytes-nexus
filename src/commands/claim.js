@@ -4,7 +4,7 @@
  */
 
 import { appendEntry } from '../lib/blackboard.js';
-import { acquireLock } from '../lib/lockManager.js';
+import { acquireLock, listLocks } from '../lib/lockManager.js';
 import { dumpState, freshnessReceipt } from '../lib/dump.js';
 import { existsSync } from 'fs';
 import { join } from 'path';
@@ -104,6 +104,7 @@ export default function claim(args) {
     process.exit(1);
   }
 
+  const alreadyHasMissingModelMetadata = listLocks().some((entry) => !entry.model);
   const result = acquireLock(target, agent, intent, subagents, { model, thinking });
 
   if (!result.success) {
@@ -120,8 +121,12 @@ export default function claim(args) {
     console.warn(`[WARN] Use CLI/model names as lock handles: ${CANONICAL_MODEL_HANDLES_TEXT}.`);
   }
 
-  if (!model) {
+  if (!model && !alreadyHasMissingModelMetadata) {
     console.warn('[WARN] Claim has no model metadata. Add `--model <name>` when available.');
+  }
+
+  if (result.dirtyAtClaim) {
+    console.warn(`[WARN] ${target} already has uncommitted changes that predate this claim. Release will refuse to sweep them unless run with --include-preexisting; consider resolving ownership in standup first.`);
   }
 
   // Update blackboard

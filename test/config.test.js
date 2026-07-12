@@ -47,6 +47,44 @@ test('getConfig() returns numeric defaults at expected values', () => {
   });
 });
 
+test('getConfig() defaults claimTtl to 7200 and claimTtlAutoRelease to false', () => {
+  inTempRepo(() => {
+    const cfg = getConfig();
+    assert.equal(cfg.claimTtl, 7200);
+    assert.equal(cfg.claimTtlAutoRelease, false);
+  });
+});
+
+test('getConfig() reads claimTtl and claimTtlAutoRelease from local config', () => {
+  inTempRepo((root) => {
+    mkdirSync(join(root, '.nexus'), { recursive: true });
+    writeFileSync(join(root, '.nexus', 'config.json'), JSON.stringify({
+      claimTtl: 1800,
+      claimTtlAutoRelease: true,
+    }), 'utf-8');
+    resetConfig();
+
+    const cfg = getConfig();
+    assert.equal(cfg.claimTtl, 1800);
+    assert.equal(cfg.claimTtlAutoRelease, true);
+  });
+});
+
+test('getConfig() falls back to claimTtl default on invalid values', () => {
+  inTempRepo((root) => {
+    mkdirSync(join(root, '.nexus'), { recursive: true });
+    writeFileSync(join(root, '.nexus', 'config.json'), JSON.stringify({
+      claimTtl: -5,
+      claimTtlAutoRelease: 'yes',
+    }), 'utf-8');
+    resetConfig();
+
+    const cfg = getConfig();
+    assert.equal(cfg.claimTtl, 7200);
+    assert.equal(cfg.claimTtlAutoRelease, false, 'non-boolean must not enable auto-release');
+  });
+});
+
 test('getConfig() caches — second call returns same object reference', () => {
   inTempRepo(() => {
     const first = getConfig();

@@ -5077,3 +5077,1033 @@ Structured release receipts.
 - SHA: 78d15c0f37287f14b8860f8a799b38856e45b4ad
 - Commit: fix(ci): use portable test glob — node --test never ran on Node 18/20
 
+## [2026-06-11 11:06:38 PM] _NEXUS.md
+
+- Agent: @claude
+- Target: _NEXUS.md
+- Claim HEAD: 26fd4190996d0c65f913252deae3e2ad4455a218
+- Release HEAD: 26fd4190996d0c65f913252deae3e2ad4455a218
+- Drift: no
+- SHA: e649831e164205929f9211b8f29cfebe8924ffaf
+- Commit: chore(blackboard): idle state
+
+## [2026-06-11 11:12:13 PM] test/doctor.test.js
+
+- Agent: @claude
+- Target: test/doctor.test.js
+- Claim HEAD: e649831e164205929f9211b8f29cfebe8924ffaf
+- Release HEAD: e649831e164205929f9211b8f29cfebe8924ffaf
+- Drift: no
+- SHA: e4bca456429aa21abc2468130635dc524363490b
+- Commit: fix(test): resolve nexus bin relative to test file, not hardcoded path
+
+## [2026-06-12 01:42:13 AM] docs/loop-progress-signals.md
+
+- Agent: @claude
+- Target: docs/loop-progress-signals.md
+- Claim HEAD: e4bca456429aa21abc2468130635dc524363490b
+- Release HEAD: e4bca456429aa21abc2468130635dc524363490b
+- Drift: no
+- SHA: d856ccaeec9397f6f521e01fefc12b11f806212a
+- Commit: docs(loop): progress signals design proposal (loop-progress-signals)
+
+## [2026-06-12 01:42:48 AM] _NEXUS_QUEUE.md
+
+- Agent: @claude
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: e4bca456429aa21abc2468130635dc524363490b
+- Release HEAD: d856ccaeec9397f6f521e01fefc12b11f806212a
+- Drift: yes
+- SHA: f66f11230357ee789de6e795f7cb41647ceaa718
+- Commit: chore(queue): close loop-progress-signals with outcome evidence
+
+## [2026-06-12 01:43:44 AM] _NEXUS_LEDGER.md
+
+- Agent: @claude
+- Target: _NEXUS_LEDGER.md
+- Claim HEAD: f66f11230357ee789de6e795f7cb41647ceaa718
+- Release HEAD: f66f11230357ee789de6e795f7cb41647ceaa718
+- Drift: no
+- SHA: c028f8f9cc17c6e504fc85f3e903cff54aa2d0a2
+- Commit: chore(ledger): backfill 13 missing completed task entries
+
+## [2026-06-12 11:27:45 PM] docs/loop-progress-signals.md
+
+- Agent: @claude
+- Target: docs/loop-progress-signals.md
+- Claim HEAD: c028f8f9cc17c6e504fc85f3e903cff54aa2d0a2
+- Release HEAD: c028f8f9cc17c6e504fc85f3e903cff54aa2d0a2
+- Drift: no
+- SHA: 4b5783a311539970ea54cfbcdd91bc6f1833e7f2
+- Commit: docs(loop): record Pong's review decisions — approved for implementation (loop-progress-signals)
+
+## [2026-06-12 11:28:52 PM] _NEXUS_QUEUE.md
+
+- Agent: @claude
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: 4b5783a311539970ea54cfbcdd91bc6f1833e7f2
+- Release HEAD: 4b5783a311539970ea54cfbcdd91bc6f1833e7f2
+- Drift: no
+- SHA: 175cb470319ad111d23299bb0ac0b609d92ef7ca
+- Commit: chore(queue): add loop-progress-impl + loop-progress-stale-break from review decisions
+
+## [2026-06-13 12:45:21 AM] src/lib/agentTrace.js
+
+- Agent: @claude
+- Target: src/lib/agentTrace.js
+- Claim HEAD: 175cb470319ad111d23299bb0ac0b609d92ef7ca
+- Release HEAD: 175cb470319ad111d23299bb0ac0b609d92ef7ca
+- Drift: no
+- SHA: 32382bcd0109ac841b92b4f54bff7a2b6ad5493c
+- Commit: feat(trace): shared agent trace reader — single parsing path for progress + resume (loop-progress-impl)
+
+## [2026-06-13 12:45:36 AM] src/lib/lockManager.js
+
+- Agent: @claude
+- Target: src/lib/lockManager.js
+- Claim HEAD: 175cb470319ad111d23299bb0ac0b609d92ef7ca
+- Release HEAD: 32382bcd0109ac841b92b4f54bff7a2b6ad5493c
+- Drift: yes
+- SHA: 022945df0cfcba63644dec6b9b78db39984cc4d1
+- Commit: feat(locks): record claim-time blob hash and path-type progress metadata (loop-progress-impl)
+
+## [2026-06-13 12:45:47 AM] src/lib/config.js
+
+- Agent: @claude
+- Target: src/lib/config.js
+- Claim HEAD: 175cb470319ad111d23299bb0ac0b609d92ef7ca
+- Release HEAD: 022945df0cfcba63644dec6b9b78db39984cc4d1
+- Drift: yes
+- SHA: d69ffc888a9e4468aedb6b99498bf9900b7be5c8
+- Commit: feat(config): progressWindow setting, global-only default 900s (loop-progress-impl)
+
+## [2026-06-13 12:46:04 AM] src/commands/status.js
+
+- Agent: @claude
+- Target: src/commands/status.js
+- Claim HEAD: 175cb470319ad111d23299bb0ac0b609d92ef7ca
+- Release HEAD: d69ffc888a9e4468aedb6b99498bf9900b7be5c8
+- Drift: yes
+- SHA: f591820759ef25f7b50dc904a23e25977d655ade
+- Commit: feat(status): label active locks progressing / no progress signal (loop-progress-impl)
+
+## [2026-06-13 12:46:14 AM] src/commands/doctor.js
+
+- Agent: @claude
+- Target: src/commands/doctor.js
+- Claim HEAD: 175cb470319ad111d23299bb0ac0b609d92ef7ca
+- Release HEAD: f591820759ef25f7b50dc904a23e25977d655ade
+- Drift: yes
+- SHA: 51fb5ca473bcb7a9e00668c368edd7118bdf6653
+- Commit: feat(doctor): stuck-loop, claim/release-imbalance, stuck-with-effort informational entries (loop-progress-impl)
+
+## [2026-06-13 12:46:32 AM] test/agentTrace.test.js
+
+- Agent: @claude
+- Target: test/agentTrace.test.js
+- Claim HEAD: 175cb470319ad111d23299bb0ac0b609d92ef7ca
+- Release HEAD: 51fb5ca473bcb7a9e00668c368edd7118bdf6653
+- Drift: yes
+- SHA: f2ff177dff903df2fcdafa014d4d7182267bf164
+- Commit: test(trace): cover blob/dir/new-path recording, receipts, lanes, verify failures, progress evaluation (loop-progress-impl)
+
+## [2026-06-13 12:46:43 AM] test/status.test.js
+
+- Agent: @claude
+- Target: test/status.test.js
+- Claim HEAD: 175cb470319ad111d23299bb0ac0b609d92ef7ca
+- Release HEAD: f2ff177dff903df2fcdafa014d4d7182267bf164
+- Drift: yes
+- SHA: 65180522d93090923bd9281e6e3e26cc3a0712f9
+- Commit: test(status): progressing and no-progress-signal labels (loop-progress-impl)
+
+## [2026-06-13 12:46:52 AM] test/doctor.test.js
+
+- Agent: @claude
+- Target: test/doctor.test.js
+- Claim HEAD: 175cb470319ad111d23299bb0ac0b609d92ef7ca
+- Release HEAD: 65180522d93090923bd9281e6e3e26cc3a0712f9
+- Drift: yes
+- SHA: 4e906e878404107046bcea0d027d988f1040169a
+- Commit: test(doctor): no_progress, claim_imbalance, stuck_with_effort entries (loop-progress-impl)
+
+## [2026-06-13 12:47:00 AM] README.md
+
+- Agent: @claude
+- Target: README.md
+- Claim HEAD: 175cb470319ad111d23299bb0ac0b609d92ef7ca
+- Release HEAD: 4e906e878404107046bcea0d027d988f1040169a
+- Drift: yes
+- SHA: 96538b45be1f640b0748ff42a02c818059899be6
+- Commit: docs(readme): loop progress signals and progressWindow (loop-progress-impl)
+
+## [2026-06-13 02:41:17 AM] src/lib/config.js
+
+- Agent: @claude
+- Target: src/lib/config.js
+- Claim HEAD: 96538b45be1f640b0748ff42a02c818059899be6
+- Release HEAD: 96538b45be1f640b0748ff42a02c818059899be6
+- Drift: no
+- SHA: 99f80af23708bd87cabeb1287e41ae30ecc4fbaf
+- Commit: feat(config): progressAwareStale flag, default on (loop-progress-stale-break)
+
+## [2026-06-13 02:41:34 AM] src/lib/lockManager.js
+
+- Agent: @claude
+- Target: src/lib/lockManager.js
+- Claim HEAD: 96538b45be1f640b0748ff42a02c818059899be6
+- Release HEAD: 99f80af23708bd87cabeb1287e41ae30ecc4fbaf
+- Drift: yes
+- SHA: 511e5e61bd4fdcd8528e54f57dce443763c08f55
+- Commit: feat(locks): progress-aware staleness — shared isSweepEligible spares working locks (loop-progress-stale-break)
+
+## [2026-06-13 02:41:54 AM] src/commands/doctor.js
+
+- Agent: @claude
+- Target: src/commands/doctor.js
+- Claim HEAD: 96538b45be1f640b0748ff42a02c818059899be6
+- Release HEAD: 511e5e61bd4fdcd8528e54f57dce443763c08f55
+- Drift: yes
+- SHA: 1ea6989a53a3a612db2222b24894b4b2324e8c5f
+- Commit: feat(doctor): progress-aware stale split and staleness mode report (loop-progress-stale-break)
+
+## [2026-06-13 02:42:13 AM] test/lockManager.test.js
+
+- Agent: @claude
+- Target: test/lockManager.test.js
+- Claim HEAD: 96538b45be1f640b0748ff42a02c818059899be6
+- Release HEAD: 1ea6989a53a3a612db2222b24894b4b2324e8c5f
+- Drift: yes
+- SHA: 56094dfdeffb5fd5bc31fe71902b227ff2dacbab
+- Commit: test(locks): progress-aware sweep, age-only fallback, 2026-06-11 incident regression (loop-progress-stale-break)
+
+## [2026-06-13 02:42:25 AM] _NEXUS_QUEUE.md
+
+- Agent: @codex
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: 96538b45be1f640b0748ff42a02c818059899be6
+- Release HEAD: 56094dfdeffb5fd5bc31fe71902b227ff2dacbab
+- Drift: yes
+- SHA: 46706e7939ebe1262be78fab2d8e09e84aac8fec
+- Commit: chore(queue): pause inkobytes agents dedup
+
+## [2026-06-13 02:42:30 AM] test/doctor.test.js
+
+- Agent: @claude
+- Target: test/doctor.test.js
+- Claim HEAD: 96538b45be1f640b0748ff42a02c818059899be6
+- Release HEAD: 56094dfdeffb5fd5bc31fe71902b227ff2dacbab
+- Drift: yes
+- SHA: 5ccf656ebf73812ef67ae3309f14465785c02577
+- Commit: test(doctor): staleness mode line, progressing-lock-not-stale, silent-lock-stale (loop-progress-stale-break)
+
+## [2026-06-13 02:42:45 AM] README.md
+
+- Agent: @claude
+- Target: README.md
+- Claim HEAD: 96538b45be1f640b0748ff42a02c818059899be6
+- Release HEAD: 5ccf656ebf73812ef67ae3309f14465785c02577
+- Drift: yes
+- SHA: 14945daa45c1027b6bb7bfbe44d72314a920f048
+- Commit: docs(readme): progressAwareStale — progress-aware staleness behavior (loop-progress-stale-break)
+
+## [2026-06-13 02:44:03 AM] src/commands/status.js
+
+- Agent: @claude
+- Target: src/commands/status.js
+- Claim HEAD: 14945daa45c1027b6bb7bfbe44d72314a920f048
+- Release HEAD: 14945daa45c1027b6bb7bfbe44d72314a920f048
+- Drift: no
+- SHA: 7d13451086c3f32b54410a644d3e9fc86144bb02
+- Commit: fix(status): STALE tag uses shared isSweepEligible so status and clean --stale agree (loop-progress-stale-break)
+
+## [2026-06-14 12:30:45 PM] src/commands/claim.js
+
+- Agent: @codex
+- Target: src/commands/claim.js
+- Claim HEAD: 7d13451086c3f32b54410a644d3e9fc86144bb02
+- Release HEAD: 7d13451086c3f32b54410a644d3e9fc86144bb02
+- Drift: no
+- SHA: 8483bbf59c5c413c00e0648509903172a95e3b1c
+- Commit: fix(claim): show help before validating claim args
+
+## [2026-06-14 12:31:00 PM] test/claim.test.js
+
+- Agent: @codex
+- Target: test/claim.test.js
+- Claim HEAD: 7d13451086c3f32b54410a644d3e9fc86144bb02
+- Release HEAD: 8483bbf59c5c413c00e0648509903172a95e3b1c
+- Drift: yes
+- SHA: 399ef6ef39f08f582f497e74d0991c34f77249b0
+- Commit: test(claim): cover help without creating lock
+
+## [2026-06-14 12:33:10 PM] bin/nexus.js
+
+- Agent: @codex
+- Target: bin/nexus.js
+- Claim HEAD: 7d13451086c3f32b54410a644d3e9fc86144bb02
+- Release HEAD: 399ef6ef39f08f582f497e74d0991c34f77249b0
+- Drift: yes
+- SHA: dce04853828ec1d928fb311126fab2b6ea216262
+- Commit: docs(help): mention claim receipt and show flag
+
+## [2026-06-14 12:33:23 PM] CHANGELOG.md
+
+- Agent: @codex
+- Target: CHANGELOG.md
+- Claim HEAD: 7d13451086c3f32b54410a644d3e9fc86144bb02
+- Release HEAD: dce04853828ec1d928fb311126fab2b6ea216262
+- Drift: yes
+- SHA: 585b4e2db027c74c0a40f42337f68189bff44401
+- Commit: docs(changelog): note claim help fix
+
+## [2026-06-14 12:33:37 PM] _NEXUS_Q_CODEX.md
+
+- Agent: @codex
+- Target: _NEXUS_Q_CODEX.md
+- Claim HEAD: 399ef6ef39f08f582f497e74d0991c34f77249b0
+- Release HEAD: 585b4e2db027c74c0a40f42337f68189bff44401
+- Drift: yes
+- SHA: 2be7eb8f923f28ae74a104b8baf894a9372634a6
+- Commit: chore(queue): record codex claim help receipt
+
+## [2026-06-21 12:16:30 AM] CHANGELOG.md
+
+- Agent: @codex
+- Target: CHANGELOG.md
+- Claim HEAD: 2be7eb8f923f28ae74a104b8baf894a9372634a6
+- Release HEAD: 2be7eb8f923f28ae74a104b8baf894a9372634a6
+- Drift: no
+- SHA: 5ab0da31025f9cd90e11eb04e04ef674a5b64644
+- Commit: docs(changelog): add 1.3.0 release notes
+
+## [2026-06-21 12:16:49 AM] package.json
+
+- Agent: @codex
+- Target: package.json
+- Claim HEAD: 2be7eb8f923f28ae74a104b8baf894a9372634a6
+- Release HEAD: 5ab0da31025f9cd90e11eb04e04ef674a5b64644
+- Drift: yes
+- SHA: ad964737a76a39b448d43cf715fa34bced7deb63
+- Commit: chore(release): bump version to 1.3.0
+
+## [2026-07-12 04:18:46 PM] docs/nexus-issues.md
+
+- Agent: @claude
+- Target: docs/nexus-issues.md
+- Claim HEAD: ad964737a76a39b448d43cf715fa34bced7deb63
+- Release HEAD: ad964737a76a39b448d43cf715fa34bced7deb63
+- Drift: no
+- SHA: 0d54151059fb50c58bcc50400512ac9f985a89ae
+- Commit: docs: import dogfooding issues from mooncrafting sessions
+
+## [2026-07-12 07:53:49 PM] _NEXUS_QUEUE.md
+
+- Agent: @claude
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: 0d54151059fb50c58bcc50400512ac9f985a89ae
+- Release HEAD: 0d54151059fb50c58bcc50400512ac9f985a89ae
+- Drift: no
+- SHA: 7f58da3486e23d90cb1027d2f7133add69c58300
+- Commit: queue: add dogfooding fixes batch (papercuts, release sweep guard, nexus trash security init); includes pending loop-progress-stale-break receipt reconcile
+
+## [2026-07-12 07:54:51 PM] _NEXUS_STANDUP.md
+
+- Agent: @claude
+- Target: _NEXUS_STANDUP.md
+- Claim HEAD: 7f58da3486e23d90cb1027d2f7133add69c58300
+- Release HEAD: 7f58da3486e23d90cb1027d2f7133add69c58300
+- Drift: no
+- SHA: ff291157ccb99be503f91d62250b6ba3db133bec
+- Commit: standup: dogfooding batch note (timestamp corrected)
+
+## [2026-07-12 07:58:10 PM] _NEXUS_QUEUE.md
+
+- Agent: @claude
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: ff291157ccb99be503f91d62250b6ba3db133bec
+- Release HEAD: ff291157ccb99be503f91d62250b6ba3db133bec
+- Drift: no
+- SHA: e6d55ddcb0a41ac6ff409a9a6bf9b24af0058aa3
+- Commit: queue: add remaining dogfooding issues wave 2 — claim semantics design, write-path binding, claim TTL, sample-task safety, next explainability, receipt verify, file rotation, session brief
+
+## [2026-07-12 07:59:29 PM] _NEXUS_QUEUE.md
+
+- Agent: @claude
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: e6d55ddcb0a41ac6ff409a9a6bf9b24af0058aa3
+- Release HEAD: e6d55ddcb0a41ac6ff409a9a6bf9b24af0058aa3
+- Drift: no
+- SHA: 607145fd632d97218fcbd4e99da1a275b651e492
+- Commit: queue: extend coordination-file-rotation to rotate standup comms log too
+
+## [2026-07-12 08:01:49 PM] src/commands/init.js
+
+- Agent: @codex
+- Target: src/commands/init.js
+- Claim HEAD: e6d55ddcb0a41ac6ff409a9a6bf9b24af0058aa3
+- Release HEAD: 607145fd632d97218fcbd4e99da1a275b651e492
+- Drift: yes
+- SHA: 41527f87d68f3ececaa9327224e7e8ae9ed6455c
+- Commit: fix(init): make scaffold sample tasks inert
+
+## [2026-07-12 08:02:02 PM] src/commands/next.js
+
+- Agent: @codex
+- Target: src/commands/next.js
+- Claim HEAD: e6d55ddcb0a41ac6ff409a9a6bf9b24af0058aa3
+- Release HEAD: 41527f87d68f3ececaa9327224e7e8ae9ed6455c
+- Drift: yes
+- SHA: d6f4bf77ff0749fde039e3e495a6b2d186dbca99
+- Commit: fix(next): stand by on scaffold sample tasks
+
+## [2026-07-12 08:02:13 PM] src/commands/doctor.js
+
+- Agent: @codex
+- Target: src/commands/doctor.js
+- Claim HEAD: e6d55ddcb0a41ac6ff409a9a6bf9b24af0058aa3
+- Release HEAD: d6f4bf77ff0749fde039e3e495a6b2d186dbca99
+- Drift: yes
+- SHA: 38a6d2b7245da5605e45b94f692a9d9d43a76e5c
+- Commit: fix(doctor): treat sample tasks as non-executable
+
+## [2026-07-12 08:02:25 PM] test/next.test.js
+
+- Agent: @codex
+- Target: test/next.test.js
+- Claim HEAD: e6d55ddcb0a41ac6ff409a9a6bf9b24af0058aa3
+- Release HEAD: 38a6d2b7245da5605e45b94f692a9d9d43a76e5c
+- Drift: yes
+- SHA: 96f384106afeda7bce5e9f98be0a8b9d6f321420
+- Commit: test(next): cover inert scaffold samples
+
+## [2026-07-12 08:02:36 PM] test/doctor.test.js
+
+- Agent: @codex
+- Target: test/doctor.test.js
+- Claim HEAD: e6d55ddcb0a41ac6ff409a9a6bf9b24af0058aa3
+- Release HEAD: 96f384106afeda7bce5e9f98be0a8b9d6f321420
+- Drift: yes
+- SHA: c1eb6352254c6d42e87e67138ec5e314f55bdfac
+- Commit: test(doctor): cover sample task advisory
+
+## [2026-07-12 08:03:25 PM] _NEXUS_Q_CODEX.md
+
+- Agent: @codex
+- Target: _NEXUS_Q_CODEX.md
+- Claim HEAD: c1eb6352254c6d42e87e67138ec5e314f55bdfac
+- Release HEAD: c1eb6352254c6d42e87e67138ec5e314f55bdfac
+- Drift: no
+- SHA: 34d1c0d05a80252f7e5e081a797c966716a62805
+- Commit: chore(queue): record sample task safety receipt
+
+## [2026-07-12 08:07:22 PM] src/lib/lockManager.js
+
+- Agent: @claude
+- Target: src/lib/lockManager.js
+- Claim HEAD: 607145fd632d97218fcbd4e99da1a275b651e492
+- Release HEAD: 34d1c0d05a80252f7e5e081a797c966716a62805
+- Drift: yes
+- SHA: b3e3d55fdbe1b9efca403cf610ae3d400756e84d
+- Commit: feat(locks): record dirty-at-claim snapshot for release sweep guard (release-sweep-guard)
+
+## [2026-07-12 08:07:32 PM] src/commands/release.js
+
+- Agent: @claude
+- Target: src/commands/release.js
+- Claim HEAD: 607145fd632d97218fcbd4e99da1a275b651e492
+- Release HEAD: b3e3d55fdbe1b9efca403cf610ae3d400756e84d
+- Drift: yes
+- SHA: a3d762695b778d6552ff4c01ea8428a86d019d32
+- Commit: feat(release): refuse sweeping pre-claim changes without --include-preexisting; print diffstat (release-sweep-guard)
+
+## [2026-07-12 08:07:42 PM] src/commands/claim.js
+
+- Agent: @claude
+- Target: src/commands/claim.js
+- Claim HEAD: 607145fd632d97218fcbd4e99da1a275b651e492
+- Release HEAD: a3d762695b778d6552ff4c01ea8428a86d019d32
+- Drift: yes
+- SHA: b92714d34079f426c0fa63aca7c6b70fa538149c
+- Commit: feat(claim): warn when claimed path has pre-claim uncommitted changes (release-sweep-guard)
+
+## [2026-07-12 08:07:51 PM] test/release.test.js
+
+- Agent: @claude
+- Target: test/release.test.js
+- Claim HEAD: 607145fd632d97218fcbd4e99da1a275b651e492
+- Release HEAD: b92714d34079f426c0fa63aca7c6b70fa538149c
+- Drift: yes
+- SHA: 0d64ac0f6b8ca156d87ddf82b338e3b5e30e8bb5
+- Commit: test(release): sweep-guard regression for 2026-07-06 incident; claim-before-edit ordering (release-sweep-guard)
+
+## [2026-07-12 08:08:01 PM] README.md
+
+- Agent: @claude
+- Target: README.md
+- Claim HEAD: 607145fd632d97218fcbd4e99da1a275b651e492
+- Release HEAD: 0d64ac0f6b8ca156d87ddf82b338e3b5e30e8bb5
+- Drift: yes
+- SHA: 28e6df42fd56b5231efb457c25b91e4dd070ee90
+- Commit: docs(readme): document release sweep guard and --include-preexisting (release-sweep-guard)
+
+## [2026-07-12 08:12:01 PM] src/commands/trash.js
+
+- Agent: @codex
+- Target: src/commands/trash.js
+- Claim HEAD: 34d1c0d05a80252f7e5e081a797c966716a62805
+- Release HEAD: 28e6df42fd56b5231efb457c25b91e4dd070ee90
+- Drift: yes
+- SHA: 0607c4efacffd7edfe33d57ba837eadcf510b62d
+- Commit: feat(trash): add rollback-friendly trash command
+
+## [2026-07-12 08:12:16 PM] bin/nexus.js
+
+- Agent: @codex
+- Target: bin/nexus.js
+- Claim HEAD: 34d1c0d05a80252f7e5e081a797c966716a62805
+- Release HEAD: 0607c4efacffd7edfe33d57ba837eadcf510b62d
+- Drift: yes
+- SHA: 30d9eb94816fe425d56bdd6c9c64b90afbab4d5a
+- Commit: feat(cli): expose trash command
+
+## [2026-07-12 08:12:30 PM] src/commands/init.js
+
+- Agent: @codex
+- Target: src/commands/init.js
+- Claim HEAD: 34d1c0d05a80252f7e5e081a797c966716a62805
+- Release HEAD: 30d9eb94816fe425d56bdd6c9c64b90afbab4d5a
+- Drift: yes
+- SHA: f3b1bf56f6599cd74d76644a3492efe7dfdf3119
+- Commit: feat(init): scaffold trash safety guidance
+
+## [2026-07-12 08:12:43 PM] src/commands/doctor.js
+
+- Agent: @codex
+- Target: src/commands/doctor.js
+- Claim HEAD: 34d1c0d05a80252f7e5e081a797c966716a62805
+- Release HEAD: f3b1bf56f6599cd74d76644a3492efe7dfdf3119
+- Drift: yes
+- SHA: 0b578968afcbecf9f51ae93f4e9263fe4b925676
+- Commit: feat(doctor): report trash directory usage
+
+## [2026-07-12 08:13:08 PM] src/commands/help.js
+
+- Agent: @codex
+- Target: src/commands/help.js
+- Claim HEAD: 34d1c0d05a80252f7e5e081a797c966716a62805
+- Release HEAD: 0b578968afcbecf9f51ae93f4e9263fe4b925676
+- Drift: yes
+- SHA: fd4d7349e80addabe2210d3aa4c890da99c8aa61
+- Commit: docs(help): mention trash help
+
+## [2026-07-12 08:13:21 PM] test/trash.test.js
+
+- Agent: @codex
+- Target: test/trash.test.js
+- Claim HEAD: 34d1c0d05a80252f7e5e081a797c966716a62805
+- Release HEAD: fd4d7349e80addabe2210d3aa4c890da99c8aa61
+- Drift: yes
+- SHA: 72378a75a9ff51e138e456aea1f43137afb6e3f9
+- Commit: test(trash): cover trash round trip and scaffolds
+
+## [2026-07-12 08:13:50 PM] _NEXUS_Q_CODEX.md
+
+- Agent: @codex
+- Target: _NEXUS_Q_CODEX.md
+- Claim HEAD: 72378a75a9ff51e138e456aea1f43137afb6e3f9
+- Release HEAD: 72378a75a9ff51e138e456aea1f43137afb6e3f9
+- Drift: no
+- SHA: 4bc714f14ff58c5de2be9b99209a35dcb11de56c
+- Commit: chore(queue): record trash security receipt
+
+## [2026-07-12 08:18:53 PM] src/commands/trash.js
+
+- Agent: @codex
+- Target: src/commands/trash.js
+- Claim HEAD: 4bc714f14ff58c5de2be9b99209a35dcb11de56c
+- Release HEAD: 4bc714f14ff58c5de2be9b99209a35dcb11de56c
+- Drift: no
+- SHA: c3a4515aa4eff572a8ba5cb09684fe71c249076d
+- Commit: fix(trash): shorten hook warning
+
+## [2026-07-12 08:19:08 PM] test/trash.test.js
+
+- Agent: @codex
+- Target: test/trash.test.js
+- Claim HEAD: 4bc714f14ff58c5de2be9b99209a35dcb11de56c
+- Release HEAD: c3a4515aa4eff572a8ba5cb09684fe71c249076d
+- Drift: yes
+- SHA: 6910338ab4213c258a44317ec190e300cff0cd56
+- Commit: test(trash): expect short hook warning
+
+## [2026-07-12 08:20:16 PM] _NEXUS_QUEUE.md
+
+- Agent: @claude
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: 28e6df42fd56b5231efb457c25b91e4dd070ee90
+- Release HEAD: 6910338ab4213c258a44317ec190e300cff0cd56
+- Drift: yes
+- SHA: e39b4e6a9163a6bd37d4d4169142a0a66f84f2bc
+- Commit: queue: release-sweep-guard done with receipt; includes @codex trash-security-init delegation registry update
+
+## [2026-07-12 08:21:15 PM] docs/nexus-issues.md
+
+- Agent: @claude
+- Target: docs/nexus-issues.md
+- Claim HEAD: 6910338ab4213c258a44317ec190e300cff0cd56
+- Release HEAD: e39b4e6a9163a6bd37d4d4169142a0a66f84f2bc
+- Drift: yes
+- SHA: 4be1b546f71df49332b4b693e885dab4efe0a4d4
+- Commit: docs(issues): log issue 17 — repo-global verify gate blocks unrelated releases
+
+## [2026-07-12 08:22:24 PM] docs/claim-semantics-rework.md
+
+- Agent: @claude
+- Target: docs/claim-semantics-rework.md
+- Claim HEAD: 6910338ab4213c258a44317ec190e300cff0cd56
+- Release HEAD: 4be1b546f71df49332b4b693e885dab4efe0a4d4
+- Drift: yes
+- SHA: f53369a6f0dbd2ebe6ff42fe9f08bb2857d56429
+- Commit: docs(design): claim semantics rework — free reads, no leases for now, batch claim (claim-semantics-design)
+
+## [2026-07-12 08:23:11 PM] _NEXUS_QUEUE.md
+
+- Agent: @claude
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: f53369a6f0dbd2ebe6ff42fe9f08bb2857d56429
+- Release HEAD: f53369a6f0dbd2ebe6ff42fe9f08bb2857d56429
+- Drift: no
+- SHA: 8f5e32e93800f391bbc35badf614524cf419c2f2
+- Commit: queue: claim-semantics-design done — design doc awaits human review
+
+## [2026-07-12 08:25:27 PM] src/commands/claim.js
+
+- Agent: @codex
+- Target: src/commands/claim.js
+- Claim HEAD: 6910338ab4213c258a44317ec190e300cff0cd56
+- Release HEAD: 8f5e32e93800f391bbc35badf614524cf419c2f2
+- Drift: yes
+- SHA: aba1f088dff0faf1a9bbff0814027c4641832856
+- Commit: dogfood-papercut-batch: dedupe claim model warnings
+
+## [2026-07-12 08:25:42 PM] test/claim.test.js
+
+- Agent: @codex
+- Target: test/claim.test.js
+- Claim HEAD: e39b4e6a9163a6bd37d4d4169142a0a66f84f2bc
+- Release HEAD: aba1f088dff0faf1a9bbff0814027c4641832856
+- Drift: yes
+- SHA: 94a636903fb8c3483f95a42af5cbbc45a5e6dd98
+- Commit: dogfood-papercut-batch: cover claim warning dedupe
+
+## [2026-07-12 08:25:58 PM] src/commands/release.js
+
+- Agent: @codex
+- Target: src/commands/release.js
+- Claim HEAD: 6910338ab4213c258a44317ec190e300cff0cd56
+- Release HEAD: 94a636903fb8c3483f95a42af5cbbc45a5e6dd98
+- Drift: yes
+- SHA: db73d9969ad2dd9e64c342ee1aa4b52b3a2c97df
+- Commit: dogfood-papercut-batch: make release warnings actionable
+
+## [2026-07-12 08:26:14 PM] test/release.test.js
+
+- Agent: @codex
+- Target: test/release.test.js
+- Claim HEAD: e39b4e6a9163a6bd37d4d4169142a0a66f84f2bc
+- Release HEAD: db73d9969ad2dd9e64c342ee1aa4b52b3a2c97df
+- Drift: yes
+- SHA: a6cf38b720999f8386e6ebbd590757cabf3db052
+- Commit: dogfood-papercut-batch: cover release help and drift
+
+## [2026-07-12 08:26:30 PM] src/commands/standup.js
+
+- Agent: @codex
+- Target: src/commands/standup.js
+- Claim HEAD: 6910338ab4213c258a44317ec190e300cff0cd56
+- Release HEAD: a6cf38b720999f8386e6ebbd590757cabf3db052
+- Drift: yes
+- SHA: ae089e86cfaae461333d0b2014065e95196c33c8
+- Commit: dogfood-papercut-batch: accept unpadded standup hours
+
+## [2026-07-12 08:26:46 PM] test/standup.test.js
+
+- Agent: @codex
+- Target: test/standup.test.js
+- Claim HEAD: e39b4e6a9163a6bd37d4d4169142a0a66f84f2bc
+- Release HEAD: ae089e86cfaae461333d0b2014065e95196c33c8
+- Drift: yes
+- SHA: 74a1a8eaa755ab68ff52777d349d0d63f70ac7a5
+- Commit: dogfood-papercut-batch: cover unpadded standup hours
+
+## [2026-07-12 08:27:06 PM] src/commands/help.js
+
+- Agent: @codex
+- Target: src/commands/help.js
+- Claim HEAD: 6910338ab4213c258a44317ec190e300cff0cd56
+- Release HEAD: 74a1a8eaa755ab68ff52777d349d0d63f70ac7a5
+- Drift: yes
+- SHA: unknown
+- Commit: dogfood-papercut-batch: release unchanged help claim
+
+## [2026-07-12 08:27:31 PM] src/lib/lockManager.js
+
+- Agent: @codex
+- Target: src/lib/lockManager.js
+- Claim HEAD: 6910338ab4213c258a44317ec190e300cff0cd56
+- Release HEAD: 74a1a8eaa755ab68ff52777d349d0d63f70ac7a5
+- Drift: yes
+- SHA: unknown
+- Commit: dogfood-papercut-batch: release unchanged lock manager claim
+
+## [2026-07-12 08:27:52 PM] test/help.test.js
+
+- Agent: @codex
+- Target: test/help.test.js
+- Claim HEAD: e39b4e6a9163a6bd37d4d4169142a0a66f84f2bc
+- Release HEAD: 74a1a8eaa755ab68ff52777d349d0d63f70ac7a5
+- Drift: yes
+- SHA: unknown
+- Commit: dogfood-papercut-batch: release unchanged help tests claim
+
+## [2026-07-12 08:28:32 PM] _NEXUS_Q_CODEX.md
+
+- Agent: @codex
+- Target: _NEXUS_Q_CODEX.md
+- Claim HEAD: 74a1a8eaa755ab68ff52777d349d0d63f70ac7a5
+- Release HEAD: 74a1a8eaa755ab68ff52777d349d0d63f70ac7a5
+- Drift: no
+- SHA: f2b84312f53219c3c37785d5cac959730cf7260f
+- Commit: dogfood-papercut-batch: record lane receipt
+
+## [2026-07-12 08:35:04 PM] src/commands/next.js
+
+- Agent: @codex
+- Target: src/commands/next.js
+- Claim HEAD: f2b84312f53219c3c37785d5cac959730cf7260f
+- Release HEAD: f2b84312f53219c3c37785d5cac959730cf7260f
+- Drift: no
+- SHA: 90cefd81e65e2a8ad132b60641f47fb0e1862fc5
+- Commit: next-explainability: explain skipped candidates
+
+## [2026-07-12 08:35:21 PM] test/next.test.js
+
+- Agent: @codex
+- Target: test/next.test.js
+- Claim HEAD: f2b84312f53219c3c37785d5cac959730cf7260f
+- Release HEAD: 90cefd81e65e2a8ad132b60641f47fb0e1862fc5
+- Drift: yes
+- SHA: 3b7e8e43595f121a926b5b9343356e357ace5f2d
+- Commit: next-explainability: cover standby reasons
+
+## [2026-07-12 08:35:39 PM] README.md
+
+- Agent: @codex
+- Target: README.md
+- Claim HEAD: f2b84312f53219c3c37785d5cac959730cf7260f
+- Release HEAD: 3b7e8e43595f121a926b5b9343356e357ace5f2d
+- Drift: yes
+- SHA: 9286385b6099d6785681f0e1c354b6161368cfce
+- Commit: next-explainability: document standby reasons
+
+## [2026-07-12 08:36:03 PM] src/lib/queue.js
+
+- Agent: @codex
+- Target: src/lib/queue.js
+- Claim HEAD: f2b84312f53219c3c37785d5cac959730cf7260f
+- Release HEAD: 9286385b6099d6785681f0e1c354b6161368cfce
+- Drift: yes
+- SHA: unknown
+- Commit: next-explainability: release unchanged queue helper claim
+
+## [2026-07-12 08:36:30 PM] _NEXUS_Q_CODEX.md
+
+- Agent: @codex
+- Target: _NEXUS_Q_CODEX.md
+- Claim HEAD: 9286385b6099d6785681f0e1c354b6161368cfce
+- Release HEAD: 9286385b6099d6785681f0e1c354b6161368cfce
+- Drift: no
+- SHA: 8c85ef5a30f8321726f25406cb3dc6a6cca561a9
+- Commit: next-explainability: record lane receipt
+
+## [2026-07-12 09:12:00 PM] src/lib/config.js
+
+- Agent: @claude
+- Target: src/lib/config.js
+- Claim HEAD: 8f5e32e93800f391bbc35badf614524cf419c2f2
+- Release HEAD: 8c85ef5a30f8321726f25406cb3dc6a6cca561a9
+- Drift: yes
+- SHA: a844e6800f45308156b7f9dbb12113633513fd23
+- Commit: feat(config): claimTtl soft TTL + claimTtlAutoRelease opt-in (claim-ttl-escalation)
+
+## [2026-07-12 09:12:11 PM] src/lib/lockManager.js
+
+- Agent: @claude
+- Target: src/lib/lockManager.js
+- Claim HEAD: f2b84312f53219c3c37785d5cac959730cf7260f
+- Release HEAD: a844e6800f45308156b7f9dbb12113633513fd23
+- Drift: yes
+- SHA: 43a1ff754f76ecf37dced755c0639b085fab0bb1
+- Commit: feat(locks): TTL sweep eligibility for path-locally-idle overdue locks (claim-ttl-escalation)
+
+## [2026-07-12 09:12:26 PM] src/commands/status.js
+
+- Agent: @claude
+- Target: src/commands/status.js
+- Claim HEAD: 8f5e32e93800f391bbc35badf614524cf419c2f2
+- Release HEAD: 43a1ff754f76ecf37dced755c0639b085fab0bb1
+- Drift: yes
+- SHA: cd6aaea88caeae0814d5607ba74a171fa98682f3
+- Commit: feat(status): OVERDUE tag past soft claim TTL (claim-ttl-escalation)
+
+## [2026-07-12 09:12:43 PM] src/commands/doctor.js
+
+- Agent: @claude
+- Target: src/commands/doctor.js
+- Claim HEAD: f2b84312f53219c3c37785d5cac959730cf7260f
+- Release HEAD: cd6aaea88caeae0814d5607ba74a171fa98682f3
+- Drift: yes
+- SHA: aa66a780460b5283f2f54729ecb049b16c1be920
+- Commit: feat(doctor): non-ok finding for overdue locks naming the owner (claim-ttl-escalation)
+
+## [2026-07-12 09:13:07 PM] test/lockManager.test.js
+
+- Agent: @claude
+- Target: test/lockManager.test.js
+- Claim HEAD: 8f5e32e93800f391bbc35badf614524cf419c2f2
+- Release HEAD: aa66a780460b5283f2f54729ecb049b16c1be920
+- Drift: yes
+- SHA: f554cca977792150bcc85efab7cd70a3be213965
+- Commit: test(locks): TTL sweep matrix — opt-in, path-idle only, blob-moved and directory protected (claim-ttl-escalation)
+
+## [2026-07-12 09:13:20 PM] test/config.test.js
+
+- Agent: @claude
+- Target: test/config.test.js
+- Claim HEAD: a6cf38b720999f8386e6ebbd590757cabf3db052
+- Release HEAD: f554cca977792150bcc85efab7cd70a3be213965
+- Drift: yes
+- SHA: 09e56b495d9d2db72d604e796d5b88975071b9bc
+- Commit: test(config): claimTtl defaults, custom values, invalid fallback (claim-ttl-escalation)
+
+## [2026-07-12 09:13:32 PM] test/status.test.js
+
+- Agent: @claude
+- Target: test/status.test.js
+- Claim HEAD: a6cf38b720999f8386e6ebbd590757cabf3db052
+- Release HEAD: 09e56b495d9d2db72d604e796d5b88975071b9bc
+- Drift: yes
+- SHA: 48b02449e791e05c923e9214c5f63d4b181e7e52
+- Commit: test(status): OVERDUE tag above TTL, absent below (claim-ttl-escalation)
+
+## [2026-07-12 09:13:47 PM] test/doctor.test.js
+
+- Agent: @claude
+- Target: test/doctor.test.js
+- Claim HEAD: 90cefd81e65e2a8ad132b60641f47fb0e1862fc5
+- Release HEAD: 48b02449e791e05c923e9214c5f63d4b181e7e52
+- Drift: yes
+- SHA: c1b6836718ec524463ee4cc51b336ba9dac5d352
+- Commit: test(doctor): overdue lock finding past soft TTL (claim-ttl-escalation)
+
+## [2026-07-12 09:14:01 PM] README.md
+
+- Agent: @claude
+- Target: README.md
+- Claim HEAD: 8c85ef5a30f8321726f25406cb3dc6a6cca561a9
+- Release HEAD: c1b6836718ec524463ee4cc51b336ba9dac5d352
+- Drift: yes
+- SHA: 4456bc244ae51b010b4c196282769a0305b73119
+- Commit: docs(readme): soft claim TTL and opt-in auto-release (claim-ttl-escalation)
+
+## [2026-07-12 09:15:05 PM] _NEXUS_QUEUE.md
+
+- Agent: @claude
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: 4456bc244ae51b010b4c196282769a0305b73119
+- Release HEAD: 4456bc244ae51b010b4c196282769a0305b73119
+- Drift: no
+- SHA: 3d113fd5b362d932d29e6c96fa82094dcd5fffe3
+- Commit: queue: claim-ttl-escalation done with receipt; includes @codex next-explainability delegation registry update
+
+## [2026-07-12 09:16:03 PM] _NEXUS_QUEUE.md
+
+- Agent: @codex
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: 3d113fd5b362d932d29e6c96fa82094dcd5fffe3
+- Release HEAD: 3d113fd5b362d932d29e6c96fa82094dcd5fffe3
+- Drift: no
+- SHA: af1d3f01efdc6006bed271b6b8e560acd6f45488
+- Commit: queue: mark inkobytes agents dedup done
+
+## [2026-07-12 10:46:00 PM] src/commands/hooks.js
+
+- Agent: @claude
+- Target: src/commands/hooks.js
+- Claim HEAD: af1d3f01efdc6006bed271b6b8e560acd6f45488
+- Release HEAD: af1d3f01efdc6006bed271b6b8e560acd6f45488
+- Drift: no
+- SHA: c19433bf250590223b6789e7f91f60066c96f98f
+- Commit: feat(hooks): guard template V2 — block foreign-owned locks, honor directory claims, outdated-status refresh (write-path-lock-binding)
+
+## [2026-07-12 10:46:12 PM] test/hooks.test.js
+
+- Agent: @claude
+- Target: test/hooks.test.js
+- Claim HEAD: af1d3f01efdc6006bed271b6b8e560acd6f45488
+- Release HEAD: c19433bf250590223b6789e7f91f60066c96f98f
+- Drift: yes
+- SHA: f6ddb2512904dfec735c80fc55ecb5ffb2bbe1e3
+- Commit: test(hooks): ownership blocking, parent-dir walk, outdated refresh without --force (write-path-lock-binding)
+
+## [2026-07-12 10:46:23 PM] docs/hooks.md
+
+- Agent: @claude
+- Target: docs/hooks.md
+- Claim HEAD: af1d3f01efdc6006bed271b6b8e560acd6f45488
+- Release HEAD: f6ddb2512904dfec735c80fc55ecb5ffb2bbe1e3
+- Drift: yes
+- SHA: 8a58d7d0410aae8b66fc362ed7333781d3cab496
+- Commit: docs(hooks): V2 ownership enforcement, directory coverage, stale-base known gap (write-path-lock-binding)
+
+## [2026-07-12 10:46:38 PM] src/commands/init.js
+
+- Agent: @claude
+- Target: src/commands/init.js
+- Claim HEAD: af1d3f01efdc6006bed271b6b8e560acd6f45488
+- Release HEAD: 8a58d7d0410aae8b66fc362ed7333781d3cab496
+- Drift: yes
+- SHA: unknown
+- Commit: chore: release unused claim (no changes needed for write-path-lock-binding)
+
+## [2026-07-12 10:46:54 PM] src/lib/lockManager.js
+
+- Agent: @claude
+- Target: src/lib/lockManager.js
+- Claim HEAD: af1d3f01efdc6006bed271b6b8e560acd6f45488
+- Release HEAD: 8a58d7d0410aae8b66fc362ed7333781d3cab496
+- Drift: yes
+- SHA: unknown
+- Commit: chore: release unused claim (no changes needed for write-path-lock-binding)
+
+## [2026-07-12 10:48:13 PM] _NEXUS_QUEUE.md
+
+- Agent: @claude
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: 8a58d7d0410aae8b66fc362ed7333781d3cab496
+- Release HEAD: 8a58d7d0410aae8b66fc362ed7333781d3cab496
+- Drift: no
+- SHA: 88644f073a755983d80480724161c24606321d33
+- Commit: queue: write-path-lock-binding done with receipt; includes @codex delegation registry update
+
+## [2026-07-12 10:48:56 PM] src/commands/verify.js
+
+- Agent: @codex
+- Target: src/commands/verify.js
+- Claim HEAD: c19433bf250590223b6789e7f91f60066c96f98f
+- Release HEAD: 88644f073a755983d80480724161c24606321d33
+- Drift: yes
+- SHA: ddf73f930011f564a55e21f4c44f00d0982b9665
+- Commit: receipt-verify-command: add verifier
+
+## [2026-07-12 10:49:11 PM] test/verify.test.js
+
+- Agent: @codex
+- Target: test/verify.test.js
+- Claim HEAD: c19433bf250590223b6789e7f91f60066c96f98f
+- Release HEAD: ddf73f930011f564a55e21f4c44f00d0982b9665
+- Drift: yes
+- SHA: 05441bc7e3625d1ac936c79419e4990f0b2c6301
+- Commit: receipt-verify-command: cover verifier cases
+
+## [2026-07-12 10:49:27 PM] bin/nexus.js
+
+- Agent: @codex
+- Target: bin/nexus.js
+- Claim HEAD: c19433bf250590223b6789e7f91f60066c96f98f
+- Release HEAD: 05441bc7e3625d1ac936c79419e4990f0b2c6301
+- Drift: yes
+- SHA: a54f8c784d5bf4253cd2d7a9ad29c9cfcb1d0fe1
+- Commit: receipt-verify-command: wire verify cli
+
+## [2026-07-12 10:49:48 PM] src/commands/help.js
+
+- Agent: @codex
+- Target: src/commands/help.js
+- Claim HEAD: c19433bf250590223b6789e7f91f60066c96f98f
+- Release HEAD: a54f8c784d5bf4253cd2d7a9ad29c9cfcb1d0fe1
+- Drift: yes
+- SHA: cafb8d5fc33eb0a6bf325f68d8b951aa8fb5de3b
+- Commit: receipt-verify-command: mention verify help
+
+## [2026-07-12 10:49:49 PM] _NEXUS_QUEUE.md
+
+- Agent: @claude
+- Target: _NEXUS_QUEUE.md
+- Claim HEAD: 88644f073a755983d80480724161c24606321d33
+- Release HEAD: a54f8c784d5bf4253cd2d7a9ad29c9cfcb1d0fe1
+- Drift: yes
+- SHA: 66a6623764e8270a5b79780e29530cf945e100a3
+- Commit: queue: propose verify-gate-scope (issue 17); includes lane receipt reconcile for 4 codex tasks
+
+## [2026-07-12 10:50:02 PM] README.md
+
+- Agent: @codex
+- Target: README.md
+- Claim HEAD: c19433bf250590223b6789e7f91f60066c96f98f
+- Release HEAD: 66a6623764e8270a5b79780e29530cf945e100a3
+- Drift: yes
+- SHA: f0022c8a0a3a3c15f6e044a3dc491db78a519ff0
+- Commit: receipt-verify-command: document verify command
+
+## [2026-07-12 10:50:27 PM] _NEXUS_Q_CODEX.md
+
+- Agent: @codex
+- Target: _NEXUS_Q_CODEX.md
+- Claim HEAD: f0022c8a0a3a3c15f6e044a3dc491db78a519ff0
+- Release HEAD: f0022c8a0a3a3c15f6e044a3dc491db78a519ff0
+- Drift: no
+- SHA: 4f6fc3a00c452a40c67de2fbb11318c20a981f49
+- Commit: receipt-verify-command: record lane receipt
+
+## [2026-07-12 11:00:29 PM] CHANGELOG.md
+
+- Agent: @claude
+- Target: CHANGELOG.md
+- Claim HEAD: 4f6fc3a00c452a40c67de2fbb11318c20a981f49
+- Release HEAD: 4f6fc3a00c452a40c67de2fbb11318c20a981f49
+- Drift: no
+- SHA: 088d51b8759fd4960f6bfba47b26036bdf6adf76
+- Commit: docs(changelog): 1.4.0 — the dogfooding release
+
+## [2026-07-12 11:00:39 PM] package.json
+
+- Agent: @claude
+- Target: package.json
+- Claim HEAD: 4f6fc3a00c452a40c67de2fbb11318c20a981f49
+- Release HEAD: 088d51b8759fd4960f6bfba47b26036bdf6adf76
+- Drift: yes
+- SHA: b463710e9a9118d9930392935c809934ce7d3c38
+- Commit: chore(release): bump version to 1.4.0
+
+## [2026-07-12 11:21:05 PM] test/doctor.test.js
+
+- Agent: @claude
+- Target: test/doctor.test.js
+- Claim HEAD: b463710e9a9118d9930392935c809934ce7d3c38
+- Release HEAD: b463710e9a9118d9930392935c809934ce7d3c38
+- Drift: no
+- SHA: 34a66d9982fed651b408d67de6a7b8bdecfa20d8
+- Commit: test(doctor): pin NO_COLOR so color-sensitive assertions pass in TTY publish runs
+
+## [2026-07-12 11:26:36 PM] _NEXUS_STANDUP.md
+
+- Agent: @claude
+- Target: _NEXUS_STANDUP.md
+- Claim HEAD: 34a66d9982fed651b408d67de6a7b8bdecfa20d8
+- Release HEAD: 34a66d9982fed651b408d67de6a7b8bdecfa20d8
+- Drift: no
+- SHA: 133257fffe1606bb141e73d064969f99884cc6d8
+- Commit: chore(standup): session notes through 1.4.0 publish
+

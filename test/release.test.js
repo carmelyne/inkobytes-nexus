@@ -27,6 +27,23 @@ function inTempRepo(fn) {
   }
 }
 
+function capture(fn) {
+  const originalLog = console.log;
+  const originalWarn = console.warn;
+  const lines = [];
+  console.log = (...args) => lines.push(args.join(' '));
+  console.warn = (...args) => lines.push(args.join(' '));
+
+  try {
+    fn();
+  } finally {
+    console.log = originalLog;
+    console.warn = originalWarn;
+  }
+
+  return lines.join('\n');
+}
+
 test('stageAndCommit returns clear message when git index stays locked', () => {
   inTempRepo((root) => {
     writeFileSync(join(root, 'file.txt'), 'hello\n', 'utf-8');
@@ -40,13 +57,23 @@ test('stageAndCommit returns clear message when git index stays locked', () => {
   });
 });
 
+test('release --help prints release usage without requiring a target', () => {
+  inTempRepo(() => {
+    const output = capture(() => release(['--help']));
+
+    assert.match(output, /Usage: nexus release <filepath_or_dir>/);
+    assert.match(output, /--include-preexisting/);
+    assert.match(output, /--no-verify/);
+  });
+});
+
 test('release appends structured report entry', () => {
   inTempRepo((root) => {
     writeFileSync(join(root, 'file.txt'), 'hello\n', 'utf-8');
     spawnSync('git', ['add', 'file.txt'], { cwd: root, stdio: 'pipe' });
     spawnSync('git', ['commit', '-m', 'init'], { cwd: root, stdio: 'pipe' });
-    writeFileSync(join(root, 'file.txt'), 'hello again\n', 'utf-8');
     acquireLock('file.txt', '@codex', 'test release report');
+    writeFileSync(join(root, 'file.txt'), 'hello again\n', 'utf-8');
 
     release(['file.txt', 'test release report']);
 
@@ -78,8 +105,8 @@ test('release appends matching completed queue task to ledger', () => {
     ].join('\n'), 'utf-8');
     spawnSync('git', ['add', 'file.txt', '_NEXUS_QUEUE.md'], { cwd: root, stdio: 'pipe' });
     spawnSync('git', ['commit', '-m', 'init'], { cwd: root, stdio: 'pipe' });
-    writeFileSync(join(root, 'file.txt'), 'hello again\n', 'utf-8');
     acquireLock('file.txt', '@codex', 'test release ledger');
+    writeFileSync(join(root, 'file.txt'), 'hello again\n', 'utf-8');
 
     release(['file.txt', 'release-ledger-data: test release ledger']);
 
@@ -200,6 +227,35 @@ test('release warns and reports when HEAD changed since claim', () => {
   });
 });
 
+test('release does not warn for same-agent back-to-back releases', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, 'alpha.txt'), 'alpha\n', 'utf-8');
+    writeFileSync(join(root, 'beta.txt'), 'beta\n', 'utf-8');
+    spawnSync('git', ['add', 'alpha.txt', 'beta.txt'], { cwd: root, stdio: 'pipe' });
+    spawnSync('git', ['commit', '-m', 'init'], { cwd: root, stdio: 'pipe' });
+    acquireLock('alpha.txt', '@codex', 'release alpha');
+    acquireLock('beta.txt', '@codex', 'release beta');
+
+    writeFileSync(join(root, 'alpha.txt'), 'alpha released\n', 'utf-8');
+    release(['alpha.txt', 'release alpha']);
+
+    writeFileSync(join(root, 'beta.txt'), 'beta released\n', 'utf-8');
+    const warnings = [];
+    const originalWarn = console.warn;
+    console.warn = (message) => warnings.push(String(message));
+    try {
+      release(['beta.txt', 'release beta']);
+    } finally {
+      console.warn = originalWarn;
+    }
+
+    assert.equal(warnings.filter((warning) => /HEAD changed since claim/.test(warning)).length, 0);
+    const log = spawnSync('git', ['log', '--pretty=%s', '-2'], { cwd: root, encoding: 'utf-8' }).stdout.trim();
+    assert.match(log, /\[@codex\] release beta/);
+    assert.match(log, /\[@codex\] release alpha/);
+  });
+});
+
 function captureExit(fn) {
   const originalLog = console.log;
   const originalError = console.error;
@@ -232,8 +288,8 @@ function seedVerifyRepo(root, verifyCommand, autonomy = 0) {
   writeFileSync(join(root, 'file.txt'), 'hello\n', 'utf-8');
   spawnSync('git', ['add', 'file.txt'], { cwd: root, stdio: 'pipe' });
   spawnSync('git', ['commit', '-m', 'init'], { cwd: root, stdio: 'pipe' });
-  writeFileSync(join(root, 'file.txt'), 'hello again\n', 'utf-8');
   acquireLock('file.txt', '@codex', 'verify gate test');
+  writeFileSync(join(root, 'file.txt'), 'hello again\n', 'utf-8');
 }
 
 test('release runs the configured verify command before committing', () => {
@@ -293,13 +349,97 @@ test('release --no-verify is refused at autonomy 1 or higher', () => {
   });
 });
 
+// Regression for the 2026-07-06 Mooncrafting sweep: another agent's
+// uncommitted work sat in the file before the claim, and release silently
+// committed it under the releasing agent's message.
+test('release refuses to sweep changes that predate the claim and keeps the claim', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, 'file.txt'), 'hello\n', 'utf-8');
+    spawnSync('git', ['add', 'file.txt'], { cwd: root, stdio: 'pipe' });
+    spawnSync('git', ['commit', '-m', 'init'], { cwd: root, stdio: 'pipe' });
+
+    writeFileSync(join(root, 'file.txt'), 'hello\nforeign uncommitted work\n', 'utf-8');
+    const warnings = [];
+    const originalWarn = console.warn;
+    console.warn = (message) => warnings.push(message);
+    try {
+      acquireLock('file.txt', '@codex', 'sweep guard test');
+    } finally {
+      console.warn = originalWarn;
+    }
+    writeFileSync(join(root, 'file.txt'), 'hello\nforeign uncommitted work\nmy claimed work\n', 'utf-8');
+
+    const output = captureExit(() => release(['file.txt', 'should not commit']));
+
+    assert.match(output, /\[DIFF\] Changes to be committed for file\.txt/);
+    assert.match(output, /uncommitted changes before this claim/);
+    assert.match(output, /--include-preexisting/);
+    assert.match(output, /claim on file\.txt is kept/);
+    assert.ok(listLocks().find((lock) => lock.target === 'file.txt'), 'claim must survive the refusal');
+    const log = spawnSync('git', ['log', '-1', '--pretty=%s'], { cwd: root, encoding: 'utf-8' }).stdout.trim();
+    assert.equal(log, 'init', 'nothing may be committed when pre-claim changes are present');
+    const standup = readFileSync(join(root, '_NEXUS_STANDUP.md'), 'utf-8');
+    assert.match(standup, /@codex \[BLOCKED\]: release file\.txt refused — pre-claim uncommitted changes present/);
+  });
+});
+
+test('release --include-preexisting commits pre-claim changes with a loud warning', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, 'file.txt'), 'hello\n', 'utf-8');
+    spawnSync('git', ['add', 'file.txt'], { cwd: root, stdio: 'pipe' });
+    spawnSync('git', ['commit', '-m', 'init'], { cwd: root, stdio: 'pipe' });
+
+    writeFileSync(join(root, 'file.txt'), 'hello\npre-claim work\n', 'utf-8');
+    const warnings = [];
+    const originalWarn = console.warn;
+    console.warn = (message) => warnings.push(String(message));
+    try {
+      acquireLock('file.txt', '@codex', 'sweep override test');
+      writeFileSync(join(root, 'file.txt'), 'hello\npre-claim work\nclaimed work\n', 'utf-8');
+      release(['file.txt', 'explicit sweep', '--include-preexisting']);
+    } finally {
+      console.warn = originalWarn;
+    }
+
+    assert.ok(warnings.some((w) => /predate the claim/.test(w) && /--include-preexisting/.test(w)), 'release must warn when sweeping');
+    const log = spawnSync('git', ['log', '-1', '--pretty=%s'], { cwd: root, encoding: 'utf-8' }).stdout.trim();
+    assert.equal(log, '[@codex] explicit sweep');
+    const content = spawnSync('git', ['show', 'HEAD:file.txt'], { cwd: root, encoding: 'utf-8' }).stdout;
+    assert.match(content, /pre-claim work/);
+    assert.match(content, /claimed work/);
+  });
+});
+
+test('release prints a diffstat of pending changes before committing', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, 'file.txt'), 'hello\n', 'utf-8');
+    spawnSync('git', ['add', 'file.txt'], { cwd: root, stdio: 'pipe' });
+    spawnSync('git', ['commit', '-m', 'init'], { cwd: root, stdio: 'pipe' });
+    acquireLock('file.txt', '@codex', 'diffstat test');
+    writeFileSync(join(root, 'file.txt'), 'hello\nclaimed work\n', 'utf-8');
+
+    const lines = [];
+    const originalLog = console.log;
+    console.log = (...args) => lines.push(args.join(' '));
+    try {
+      release(['file.txt', 'diffstat release']);
+    } finally {
+      console.log = originalLog;
+    }
+
+    const output = lines.join('\n');
+    assert.match(output, /\[DIFF\] Changes to be committed for file\.txt/);
+    assert.match(output, /file\.txt \|/);
+  });
+});
+
 test('release skips report append when releasing _NEXUS_REPORT.md', () => {
   inTempRepo((root) => {
     writeFileSync(join(root, '_NEXUS_REPORT.md'), '# Report\n\nExisting receipt\n', 'utf-8');
     spawnSync('git', ['add', '_NEXUS_REPORT.md'], { cwd: root, stdio: 'pipe' });
     spawnSync('git', ['commit', '-m', 'init report'], { cwd: root, stdio: 'pipe' });
-    writeFileSync(join(root, '_NEXUS_REPORT.md'), '# Report\n\nExisting receipt\n\nManual cleanup\n', 'utf-8');
     acquireLock('_NEXUS_REPORT.md', '@codex', 'test report self-noise');
+    writeFileSync(join(root, '_NEXUS_REPORT.md'), '# Report\n\nExisting receipt\n\nManual cleanup\n', 'utf-8');
 
     release(['_NEXUS_REPORT.md', 'test report self-noise']);
 

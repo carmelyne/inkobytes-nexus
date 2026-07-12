@@ -406,6 +406,16 @@ nexus release src/lib/components/login/ "feat: login form"
 Nexus stages only the released path before committing, which helps avoid unrelated changes from other agents.
 If Git's index is temporarily locked by another release, Nexus waits briefly and retries before failing with a clearer message.
 
+#### Sweep guard
+
+Staging only the released path still commits *everything* uncommitted in that path — including work that was already sitting there before your claim. To keep one agent's release from sweeping another agent's (or an earlier session's) uncommitted work into its commit:
+
+- `nexus claim` records whether the path already had uncommitted changes (`dirty-at-claim` in the lock) and warns immediately when it does.
+- Every release prints a `[DIFF]` block first — a diffstat of exactly what is about to be committed, including untracked files.
+- If the path was dirty before the claim, release refuses, keeps your claim, and logs a `[BLOCKED]` line to standup. Re-run with `--include-preexisting` to commit everything deliberately (logged with a loud warning), or resolve ownership in standup first.
+
+Locks taken before this feature have no `dirty-at-claim` record; those releases behave as before.
+
 Each release appends a repo-local receipt to `_NEXUS_REPORT.md`. If the released path is listed on a completed queue task and the release message names that task id, Nexus also appends one deduplicated completed-task entry to `_NEXUS_LEDGER.md`.
 
 #### Release verification gate
@@ -458,6 +468,12 @@ Stale detection assumes dead agents go quiet, but a stuck loop agent keeps its l
 
 `progressAwareStale` (default `true`) makes staleness itself progress-aware: a lock is stale only when it is past `staleThreshold` **and** shows no progress signal within the window, so a long legitimate work session with moving content survives claim-time auto-breaks and `nexus clean --stale`. A silent old lock sweeps exactly as before. Set it to `false` to restore pure age-based staleness; `nexus doctor` always reports which mode is live. Design and review decisions live in `docs/loop-progress-signals.md`.
 
+#### Soft claim TTL
+
+Progress signals can be *agent-level* (a recent release anywhere keeps all of that agent's locks "progressing"), so a forgotten claim can ride a busy agent indefinitely while other agents wait. `claimTtl` (seconds, default `7200`) is a soft visibility threshold: past it, `nexus status` tags the lock `⏰ OVERDUE` and `nexus doctor` raises a non-ok Locks finding naming the owner — other agents see a hogged path without going looking.
+
+`claimTtlAutoRelease` (default `false`) additionally lets sweeps (claim-time auto-break, `nexus clean --stale`) break an overdue lock, but only when the claimed file's content has not moved since claim (same blob) — path-local work always protects a lock, and directory or new-path claims are never TTL-swept because they cannot prove idleness.
+
 ### `nexus standup "<dated message>"`
 
 Append a validated standup line to `_NEXUS_STANDUP.md`.
@@ -496,7 +512,17 @@ The suggestion includes any declared task primitives (`Goal`, `Outcome`, `Constr
 
 With `--take`, Nexus delegates the selected task into the agent's lane file, such as `_NEXUS_Q_CODEX.md`, and marks the master queue task as `Status: Delegated` with a lane pointer and pending receipt. The full task block travels with the copy, including task primitives, so the lane is the working contract. Delegated tasks are skipped by later `nexus next` runs until reconciliation lands.
 
-If nothing is safe, the agent should stand by.
+If nothing is safe, the agent should stand by. Standby output includes a compact `Skipped candidates` list with one reason per queue item, so agents can tell whether work was blocked by done state, ambiguous task state, lane delegation, dependencies, file claims, budget, or review/contract requirements.
+
+### `nexus verify <task-id>`
+
+Check recorded release receipts for a queue task against git commits.
+
+```bash
+nexus verify receipt-verify-command
+```
+
+Nexus finds release report entries whose commit message mentions the task id, verifies their commit hashes exist locally, and prints whether those commits changed files declared on the task. It is read-only and fails cleanly when the task id is unknown, no verifiable receipt commits exist, or matched commits only changed files outside the declared task scope.
 
 ### `nexus q <agent>` and `nexus q done <id> <agent>`
 

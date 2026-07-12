@@ -182,6 +182,71 @@ test('regression: the 2026-06-11 incident shape survives the sweep', () => {
   });
 });
 
+// claim-ttl-escalation: agent-level progress signals (a release elsewhere)
+// keep a lock "progressing" even when the claimed path itself never moves —
+// the 2026-07-07 landmarks.js shape. Past the soft TTL, path-idle locks
+// become sweepable, but only when the human opted in.
+const AGENT_LEVEL_PROGRESS = { progressing: true, signals: ['release receipt within 900s (other.txt)'] };
+
+function seedTtlRepo(root, configJson) {
+  spawnSync('mkdir', ['-p', join(root, '.nexus')], { stdio: 'pipe' });
+  writeFileSync(join(root, '.nexus', 'config.json'), configJson, 'utf-8');
+  writeFileSync(join(root, 'idle.txt'), 'v1\n', 'utf-8');
+  acquireLock('idle.txt', '@claude', 'forgotten claim');
+  backdateLock('idle.txt', 8000);
+}
+
+test('overdue path-idle lock is sweepable when claimTtlAutoRelease is on', () => {
+  inTempRepo((root) => {
+    seedTtlRepo(root, '{ "claimTtl": 7200, "claimTtlAutoRelease": true }');
+
+    const lock = listLocks()[0];
+    assert.equal(isSweepEligible(lock, AGENT_LEVEL_PROGRESS), true);
+  });
+});
+
+test('overdue path-idle lock is spared by default (claimTtlAutoRelease off)', () => {
+  inTempRepo((root) => {
+    seedTtlRepo(root, '{ "claimTtl": 7200 }');
+
+    const lock = listLocks()[0];
+    assert.equal(isSweepEligible(lock, AGENT_LEVEL_PROGRESS), false, 'auto-release must be opt-in');
+  });
+});
+
+test('overdue lock whose claimed blob moved is never TTL-swept', () => {
+  inTempRepo((root) => {
+    seedTtlRepo(root, '{ "claimTtl": 7200, "claimTtlAutoRelease": true }');
+    writeFileSync(join(root, 'idle.txt'), 'v2 — path-local work happened\n', 'utf-8');
+
+    const lock = listLocks()[0];
+    assert.equal(isSweepEligible(lock, AGENT_LEVEL_PROGRESS), false, 'active work on the path must never be auto-broken');
+  });
+});
+
+test('overdue lock below the TTL is not sweepable while progressing', () => {
+  inTempRepo((root) => {
+    seedTtlRepo(root, '{ "claimTtl": 9000, "claimTtlAutoRelease": true }');
+
+    const lock = listLocks()[0];
+    assert.equal(isSweepEligible(lock, AGENT_LEVEL_PROGRESS), false, '8000s old vs 9000s TTL is not overdue');
+  });
+});
+
+test('overdue directory lock is never TTL-swept', () => {
+  inTempRepo((root) => {
+    spawnSync('mkdir', ['-p', join(root, '.nexus')], { stdio: 'pipe' });
+    writeFileSync(join(root, '.nexus', 'config.json'), '{ "claimTtl": 7200, "claimTtlAutoRelease": true }', 'utf-8');
+    spawnSync('mkdir', ['-p', join(root, 'src')], { stdio: 'pipe' });
+    writeFileSync(join(root, 'src', 'a.txt'), 'v1\n', 'utf-8');
+    acquireLock('src', '@claude', 'directory work');
+    backdateLock('src', 8000);
+
+    const lock = listLocks()[0];
+    assert.equal(isSweepEligible(lock, AGENT_LEVEL_PROGRESS), false, 'directory locks cannot prove path idleness');
+  });
+});
+
 test('listLocks ignores non-lock entries in the lock directory', () => {
   inTempRepo((root) => {
     acquireLock('file.txt', '@codex', 'test ignore noise');

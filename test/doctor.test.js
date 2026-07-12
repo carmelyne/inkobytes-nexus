@@ -1,3 +1,9 @@
+// Doctor output assertions match plain text; pin the color env so the suite
+// passes identically in a TTY (npm publish from a terminal), piped runs, and
+// under a user's FORCE_COLOR.
+delete process.env.FORCE_COLOR;
+process.env.NO_COLOR = '1';
+
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
@@ -883,6 +889,60 @@ test('doctor lists auto-flow tasks failing the full task contract with the missi
   });
 });
 
+test('doctor ignores sample tasks in the executable auto-flow contract checks', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), [
+      '# Queue',
+      '',
+      '## Ready Queue',
+      '',
+      '- [ ] TASK/Codex: Sample hello task',
+      '  - Id: hello-main',
+      '  - Status: Sample',
+      '  - Auto-flow: yes',
+      '',
+    ].join('\n'), 'utf-8');
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /All auto-flow tasks in Ready Queue satisfy the task contract/);
+    assert.match(output, /All auto-flow tasks in Ready Queue declare the task primitives/);
+    assert.doesNotMatch(output, /task: hello-main/);
+    assert.doesNotMatch(output, /fails the auto-flow task contract/);
+  });
+});
+
+test('doctor notes sample tasks when a repo already has commits', () => {
+  inTempRepo((root) => {
+    spawnSync('git', ['init'], { cwd: root, stdio: 'pipe' });
+    spawnSync('git', ['config', 'user.email', 'test@example.com'], { cwd: root, stdio: 'pipe' });
+    spawnSync('git', ['config', 'user.name', 'Test Agent'], { cwd: root, stdio: 'pipe' });
+    writeFileSync(join(root, 'README.md'), '# Real repo\n', 'utf-8');
+    spawnSync('git', ['add', 'README.md'], { cwd: root, stdio: 'pipe' });
+    spawnSync('git', ['commit', '-m', 'initial commit'], { cwd: root, stdio: 'pipe' });
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), [
+      '# Queue',
+      '',
+      '## Ready Queue',
+      '',
+      '- [ ] TASK/Codex: Sample hello task',
+      '  - Id: hello-main',
+      '  - Status: Sample',
+      '  - Auto-flow: no',
+      '',
+    ].join('\n'), 'utf-8');
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /Sample queue tasks remain in a repo with commits \(hello-main\)/);
+    assert.match(output, /Keep them as documentation, or remove them once real queue work exists/);
+  });
+});
+
 test('doctor reports contract ok when auto-flow tasks carry all required fields', () => {
   inTempRepo((root) => {
     writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
@@ -1274,5 +1334,29 @@ test('doctor reports stuck-with-effort on repeated verify failures for the same 
     assert.equal(entries.length, 1, 'only repeated failures are stuck-with-effort');
     assert.equal(entries[0].ok, true, 'stuck-with-effort entries are informational');
     assert.match(entries[0].issue, /Release verify failed 2 times for file\.txt/);
+  });
+});
+
+test('doctor flags an overdue lock past the soft claim TTL as needing attention', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    mkdirSync(join(root, '.nexus'), { recursive: true });
+    writeFileSync(join(root, '.nexus', 'config.json'), JSON.stringify({ claimTtl: 60 }), 'utf-8');
+    resetConfig();
+    writeFileSync(join(root, 'file.txt'), 'v1\n', 'utf-8');
+
+    acquireLock('file.txt', '@codex', 'long-held claim');
+    // Progressing (blob moved) so it is not stale, but well past the TTL.
+    writeFileSync(join(root, 'file.txt'), 'v2\n', 'utf-8');
+    writeFileSync(join(root, '.nexus', 'locks', 'file.txt.lock', 'ts'), String(Math.floor(Date.now() / 1000) - 120), 'utf-8');
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /OVERDUE lock on file\.txt held by @codex/);
+    assert.match(output, /soft TTL 60s/);
+    assert.match(output, /release or announce in standup/);
+    assert.doesNotMatch(output, /Stale lock on file\.txt/);
   });
 });
