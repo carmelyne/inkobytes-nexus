@@ -604,7 +604,7 @@ export default function doctor(args) {
     const queueContent = readFileSync(queuePath, 'utf-8');
     const readySection = extractReadyQueueSection(queueContent);
     const failing = parseContractTasks(readySection)
-      .filter((t) => !t.done && t.status !== 'Done' && t.autoFlow === 'yes')
+      .filter((t) => isExecutableQueueTask(t) && t.autoFlow === 'yes')
       .map((t) => ({ task: t, violations: contractViolations(t) }))
       .filter(({ violations }) => violations.length);
 
@@ -639,7 +639,7 @@ export default function doctor(args) {
     // Missing primitives are actionable at autonomy 2, advisory below.
     const primitivesRequired = config.autonomy >= 2;
     const primitiveFailing = parseContractTasks(readySection)
-      .filter((t) => !t.done && t.status !== 'Done' && t.autoFlow === 'yes')
+      .filter((t) => isExecutableQueueTask(t) && t.autoFlow === 'yes')
       .map((t) => ({ task: t, gaps: primitiveGaps(t) }))
       .filter(({ gaps }) => gaps.length);
 
@@ -665,6 +665,16 @@ export default function doctor(args) {
       sections['Queue Authorship'].push({
         issue: 'All auto-flow tasks in Ready Queue declare the task primitives',
         fix: 'No action needed.',
+        ok: true,
+      });
+    }
+
+    const sampleTasks = parseContractTasks(readySection)
+      .filter((t) => String(t.status || '').toLowerCase() === 'sample');
+    if (sampleTasks.length && hasGitCommits(root)) {
+      sections['Queue Authorship'].push({
+        issue: `Sample queue tasks remain in a repo with commits (${sampleTasks.map((t) => t.id || t.title).join(', ')})`,
+        fix: 'Keep them as documentation, or remove them once real queue work exists.',
         ok: true,
       });
     }
@@ -1019,6 +1029,20 @@ function extractReadyQueueSection(content) {
     if (inSection) result.push(line);
   }
   return result.join('\n');
+}
+
+function isExecutableQueueTask(task) {
+  const status = String(task.status || '').toLowerCase();
+  return !task.done && status !== 'done' && status !== 'sample';
+}
+
+function hasGitCommits(root) {
+  const result = spawnSync('git', ['rev-parse', '--verify', 'HEAD'], {
+    cwd: root,
+    encoding: 'utf-8',
+    stdio: 'pipe',
+  });
+  return result.status === 0;
 }
 
 function replaceLegacyHelperCommands(content) {
