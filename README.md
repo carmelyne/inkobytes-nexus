@@ -506,7 +506,7 @@ The suggestion includes any declared task primitives (`Goal`, `Outcome`, `Constr
 
 With `--take`, Nexus delegates the selected task into the agent's lane file, such as `_NEXUS_Q_CODEX.md`, and marks the master queue task as `Status: Delegated` with a lane pointer and pending receipt. The full task block travels with the copy, including task primitives, so the lane is the working contract. Delegated tasks are skipped by later `nexus next` runs until reconciliation lands.
 
-If nothing is safe, the agent should stand by.
+If nothing is safe, the agent should stand by. Standby output includes a compact `Skipped candidates` list with one reason per queue item, so agents can tell whether work was blocked by done state, ambiguous task state, lane delegation, dependencies, file claims, budget, or review/contract requirements.
 
 ### `nexus q <agent>` and `nexus q done <id> <agent>`
 
