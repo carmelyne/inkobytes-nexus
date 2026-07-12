@@ -27,6 +27,23 @@ function inTempRepo(fn) {
   }
 }
 
+function capture(fn) {
+  const originalLog = console.log;
+  const originalWarn = console.warn;
+  const lines = [];
+  console.log = (...args) => lines.push(args.join(' '));
+  console.warn = (...args) => lines.push(args.join(' '));
+
+  try {
+    fn();
+  } finally {
+    console.log = originalLog;
+    console.warn = originalWarn;
+  }
+
+  return lines.join('\n');
+}
+
 test('stageAndCommit returns clear message when git index stays locked', () => {
   inTempRepo((root) => {
     writeFileSync(join(root, 'file.txt'), 'hello\n', 'utf-8');
@@ -37,6 +54,16 @@ test('stageAndCommit returns clear message when git index stays locked', () => {
 
     assert.equal(result.success, false);
     assert.match(result.message, /Git index stayed locked/);
+  });
+});
+
+test('release --help prints release usage without requiring a target', () => {
+  inTempRepo(() => {
+    const output = capture(() => release(['--help']));
+
+    assert.match(output, /Usage: nexus release <filepath_or_dir>/);
+    assert.match(output, /--include-preexisting/);
+    assert.match(output, /--no-verify/);
   });
 });
 
@@ -197,6 +224,35 @@ test('release warns and reports when HEAD changed since claim', () => {
     assert.match(report, new RegExp(`- Release HEAD: ${releaseHead}`));
     assert.match(report, /- Drift: yes/);
     assert.match(report, /- SHA: [0-9a-f]{40}/);
+  });
+});
+
+test('release does not warn for same-agent back-to-back releases', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, 'alpha.txt'), 'alpha\n', 'utf-8');
+    writeFileSync(join(root, 'beta.txt'), 'beta\n', 'utf-8');
+    spawnSync('git', ['add', 'alpha.txt', 'beta.txt'], { cwd: root, stdio: 'pipe' });
+    spawnSync('git', ['commit', '-m', 'init'], { cwd: root, stdio: 'pipe' });
+    acquireLock('alpha.txt', '@codex', 'release alpha');
+    acquireLock('beta.txt', '@codex', 'release beta');
+
+    writeFileSync(join(root, 'alpha.txt'), 'alpha released\n', 'utf-8');
+    release(['alpha.txt', 'release alpha']);
+
+    writeFileSync(join(root, 'beta.txt'), 'beta released\n', 'utf-8');
+    const warnings = [];
+    const originalWarn = console.warn;
+    console.warn = (message) => warnings.push(String(message));
+    try {
+      release(['beta.txt', 'release beta']);
+    } finally {
+      console.warn = originalWarn;
+    }
+
+    assert.equal(warnings.filter((warning) => /HEAD changed since claim/.test(warning)).length, 0);
+    const log = spawnSync('git', ['log', '--pretty=%s', '-2'], { cwd: root, encoding: 'utf-8' }).stdout.trim();
+    assert.match(log, /\[@codex\] release beta/);
+    assert.match(log, /\[@codex\] release alpha/);
   });
 });
 
