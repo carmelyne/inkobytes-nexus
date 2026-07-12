@@ -514,6 +514,16 @@ With `--take`, Nexus delegates the selected task into the agent's lane file, suc
 
 If nothing is safe, the agent should stand by. Standby output includes a compact `Skipped candidates` list with one reason per queue item, so agents can tell whether work was blocked by done state, ambiguous task state, lane delegation, dependencies, file claims, budget, or review/contract requirements.
 
+### `nexus verify <task-id>`
+
+Check recorded release receipts for a queue task against git commits.
+
+```bash
+nexus verify receipt-verify-command
+```
+
+Nexus finds release report entries whose commit message mentions the task id, verifies their commit hashes exist locally, and prints whether those commits changed files declared on the task. It is read-only and fails cleanly when the task id is unknown, no verifiable receipt commits exist, or matched commits only changed files outside the declared task scope.
+
 ### `nexus q <agent>` and `nexus q done <id> <agent>`
 
 Inspect an agent queue lane or write a lane-local completion receipt.
