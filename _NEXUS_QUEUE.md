@@ -453,10 +453,10 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Completed by: @claude
   - Completed at: 2026-06-12T16:59:08.544Z
 
-- [ ] TASK/@claude: Progress-aware staleness — gate auto-break on no-progress
+- [x] TASK/@claude: Progress-aware staleness — gate auto-break on no-progress
   - Id: loop-progress-stale-break
   - Epic: Loop readiness
-  - Status: Delegated
+  - Status: Done
   - Created: 2026-06-12
   - Depends on: loop-progress-impl
   - Files: src/lib/lockManager.js, src/lib/config.js, src/commands/doctor.js, test/lockManager.test.js, test/doctor.test.js, README.md
@@ -474,7 +474,10 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Delegated to: @claude
   - Delegated at: 2026-06-12T16:59:49.424Z
   - Lane: _NEXUS_Q_CLAUDE.md
-  - Receipt: pending
+  - Receipt: reconciled at 2026-06-12T18:44:09.053Z
+  - Done: 2026-06-12
+  - Completed by: @claude
+  - Completed at: 2026-06-12T18:42:59.727Z
 
 - [ ] TASK/Codex: Verify and document agent budget behavior for loop mode
   - Id: budget-loop-verify
@@ -488,6 +491,65 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Auto-flow: yes
   - Review: pending
   - Notes: nexus next already supports an optional agent budget file. Add tests pinning the current behavior, document the file format and semantics in README, and add a doctor warning at autonomy level 2 when no budget file exists for active agents. Loop principle: unattended work has explicit volume bounds.
+
+### Dogfooding issues batch 2026-07-12 (source: docs/nexus-issues.md)
+
+- [ ] TASK/Codex: Fix CLI papercuts from dogfooding (issues 1, 5, 7, 9)
+  - Id: dogfood-papercut-batch
+  - Epic: Dogfooding fixes
+  - Status: Ready
+  - Created: 2026-07-12
+  - Depends on: none
+  - Files: src/commands/claim.js, src/commands/release.js, src/commands/help.js, src/commands/standup.js, src/lib/lockManager.js
+  - Affinity: cli, dx, warnings
+  - Cost: medium
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Four independent papercuts from docs/nexus-issues.md, one batch. (1) `--model` warning prints on every claim — warn once per session, or read a per-agent default from config. (5) `nexus release --help` falls through to git as a pathspec — intercept `-h`/`--help` before path parsing on every subcommand that takes paths. (7) same-agent sequential releases trigger false "HEAD changed" warnings — track the agent's own release commits and exclude them from the HEAD-movement check. (9) standup timestamp validation rejects one-digit hours — accept on parse, normalize on write, and show a corrected version of a rejected line in the error.
+  - Goal: Stop training agents to skim past warnings; every remaining warning should be actionable.
+  - Outcome: Three claims in a row print at most one model warning; `release --help` prints usage; back-to-back releases produce no false HEAD warnings; `7:05 PM` standup entries parse.
+  - Constraints: No behavior change to real warnings (foreign HEAD movement must still warn). Tests for each of the four fixes.
+  - Stop If: The help interception requires restructuring shared arg parsing beyond the listed files.
+  - Evidence: Test output plus a terminal transcript of the four fixed interactions in the release note.
+
+- [ ] TASK/@claude: Guard release against sweeping unrelated uncommitted changes (issue 6)
+  - Id: release-sweep-guard
+  - Epic: Dogfooding fixes
+  - Status: Ready
+  - Created: 2026-07-12
+  - Depends on: none
+  - Files: src/commands/release.js, src/commands/claim.js, src/lib/lockManager.js, test/release.test.js, README.md
+  - Affinity: release, data-integrity, receipts
+  - Cost: medium
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Highest-severity dogfooding issue. `nexus release <path>` currently commits any uncommitted working-tree changes in the file, including other agents' work (swept foreign changes twice on 2026-07-06 in Mooncrafting). The claim-time freshness receipt already snapshots the blob hash: persist it in the lock record, and at release time compare the pre-claim blob against HEAD. If the file was already dirty before the claim, refuse to commit unless `--include-preexisting` is passed, and always print a diffstat of exactly what is about to be committed.
+  - Goal: A release commit contains only work done under the releasing agent's claim, or is loudly explicit about including more.
+  - Outcome: Releasing a file that was dirty pre-claim aborts with a clear message naming the pre-existing changes; `--include-preexisting` overrides; every release prints a diffstat before committing.
+  - Constraints: Do not break the clean-file fast path or the verify-gate flow. Regression test reproducing the 2026-07-06 sweep scenario.
+  - Stop If: Persisting the pre-claim blob requires a lock-file format migration affecting other live repos — propose the migration first.
+  - Evidence: Regression test output and a demo transcript of the abort + override in the release note.
+
+- [ ] TASK/@claude: Add `nexus trash` and init security options (rm -rf replacement)
+  - Id: trash-security-init
+  - Epic: Dogfooding fixes
+  - Status: Ready
+  - Created: 2026-07-12
+  - Depends on: none
+  - Files: src/commands/trash.js, src/commands/init.js, src/commands/doctor.js, src/commands/help.js, test/trash.test.js
+  - Affinity: cli, security, init, rollback
+  - Cost: medium
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Human-requested 2026-07-12. Agents should never hard-delete; deletes should be reversible. (a) `nexus trash <path>` moves the target into `.nexus/trash/<timestamp>/` preserving relative path, writes a manifest line (who, when, original path), cross-platform with zero new dependencies; `nexus trash --list` and `nexus trash --restore <path>` round-trip it. (b) `nexus init` scaffolds a "Destructive Delete Safety" section into `_NEXUS_CONSTITUTION.md`: never `rm -rf`, use `nexus trash`. (c) Opt-in `nexus init --hooks` scaffolds a PreToolUse hook that blocks `rm -rf` (and similar recursive deletes) and points at `nexus trash`. (d) `nexus doctor` flags an oversized `.nexus/trash/` for human emptying, and gitignore gains `.nexus/trash/`.
+  - Goal: Replace irreversible agent deletes with a rollback-friendly primitive plus optional enforcement.
+  - Outcome: `nexus trash`/`--list`/`--restore` work round-trip; fresh init scaffolds the constitution section and gitignore entry; `--hooks` writes the blocking hook; doctor reports trash-dir size.
+  - Constraints: Hook scaffold is opt-in, never overwrites existing user hooks or settings. Nexus's own two rmSync call sites stay as-is (halt file, skill reinstall) unless trivially convertible.
+  - Stop If: Hook wiring requires editing a user's existing .claude/settings.json with prior content — ask before merging into it.
+  - Evidence: Round-trip test output and a fresh-init transcript showing the scaffolded section and hook in the release note.
 
 ## Proposed Queue
 
