@@ -32,22 +32,32 @@ Lane-local task notes and completion receipts for @codex. Reconcile back to
   - Id: sample-task-safety
   - Agent: @codex
   - Completed at: 2026-07-12T12:02:42.289Z
-  - Receipt: pending reconciliation
+  - Receipt: reconciled at 2026-07-12T14:48:45.726Z
+  - Reconciled at: 2026-07-12T14:48:45.726Z
 
 - [x] trash-security-init
   - Id: trash-security-init
   - Agent: @codex
   - Completed at: 2026-07-12T12:13:28.729Z
-  - Receipt: pending reconciliation
+  - Receipt: reconciled at 2026-07-12T14:48:45.726Z
+  - Reconciled at: 2026-07-12T14:48:45.726Z
 
 - [x] dogfood-papercut-batch
   - Id: dogfood-papercut-batch
   - Agent: @codex
   - Completed at: 2026-07-12T12:28:13.376Z
-  - Receipt: pending reconciliation
+  - Receipt: reconciled at 2026-07-12T14:48:45.726Z
+  - Reconciled at: 2026-07-12T14:48:45.726Z
 
 - [x] next-explainability
   - Id: next-explainability
   - Agent: @codex
   - Completed at: 2026-07-12T12:36:13.902Z
+  - Receipt: reconciled at 2026-07-12T14:48:45.726Z
+  - Reconciled at: 2026-07-12T14:48:45.726Z
+
+- [x] receipt-verify-command
+  - Id: receipt-verify-command
+  - Agent: @codex
+  - Completed at: 2026-07-12T14:50:11.757Z
   - Receipt: pending reconciliation
