@@ -1330,3 +1330,27 @@ test('doctor reports stuck-with-effort on repeated verify failures for the same 
     assert.match(entries[0].issue, /Release verify failed 2 times for file\.txt/);
   });
 });
+
+test('doctor flags an overdue lock past the soft claim TTL as needing attention', () => {
+  inTempRepo((root) => {
+    writeFileSync(join(root, '_NEXUS_CONSTITUTION.md'), '# Constitution\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_QUEUE.md'), '# Queue\n', 'utf-8');
+    writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n', 'utf-8');
+    mkdirSync(join(root, '.nexus'), { recursive: true });
+    writeFileSync(join(root, '.nexus', 'config.json'), JSON.stringify({ claimTtl: 60 }), 'utf-8');
+    resetConfig();
+    writeFileSync(join(root, 'file.txt'), 'v1\n', 'utf-8');
+
+    acquireLock('file.txt', '@codex', 'long-held claim');
+    // Progressing (blob moved) so it is not stale, but well past the TTL.
+    writeFileSync(join(root, 'file.txt'), 'v2\n', 'utf-8');
+    writeFileSync(join(root, '.nexus', 'locks', 'file.txt.lock', 'ts'), String(Math.floor(Date.now() / 1000) - 120), 'utf-8');
+
+    const output = captureLogs(() => doctor([]));
+
+    assert.match(output, /OVERDUE lock on file\.txt held by @codex/);
+    assert.match(output, /soft TTL 60s/);
+    assert.match(output, /release or announce in standup/);
+    assert.doesNotMatch(output, /Stale lock on file\.txt/);
+  });
+});
