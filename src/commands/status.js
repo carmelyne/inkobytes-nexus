@@ -40,7 +40,8 @@ export default function status(args) {
     const agentMatch = boardLine?.match(/Locked by \*\*(.+?)\*\*/);
     const agent = agentMatch ? agentMatch[1] : 'unknown';
 
-    const staleTag = stale ? ' ⚠️  STALE' : '';
+    const overdue = lock.age !== null && lock.age > config.claimTtl;
+    const staleTag = stale ? ' ⚠️  STALE' : overdue ? ' ⏰ OVERDUE' : '';
     console.log(`  🔒 ${lock.target}`);
     console.log(`     Agent: ${agent} | Age: ${ageStr}${staleTag}`);
     if (stale) {
@@ -54,6 +55,9 @@ export default function status(args) {
         ? `active — progressing (${progress.signals[0]})`
         : `active — no progress signal (${lock.age !== null ? `${lock.age}s` : 'unknown age'})`;
       console.log(`     ${label}`);
+    }
+    if (overdue) {
+      console.log(`     Overdue: held ${ageStr}, soft TTL is ${formatAge(config.claimTtl)}. ${agent} should release or announce in standup; do not edit through it.`);
     }
   }
 
