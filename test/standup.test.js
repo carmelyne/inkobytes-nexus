@@ -55,21 +55,21 @@ function captureExit(fn) {
 }
 
 test('validateStandupLine accepts dated AM/PM agent status messages', () => {
-  const result = validateStandupLine('2026-06-01 08:38 AM @codex [DONE]: Updated tests');
+  const result = validateStandupLine('2026-06-01 7:05 PM @codex [DONE]: Updated tests');
 
   assert.equal(result.ok, true);
-  assert.equal(result.line, '2026-06-01 08:38 AM @codex [DONE]: Updated tests');
+  assert.equal(result.line, '2026-06-01 7:05 PM @codex [DONE]: Updated tests');
 });
 
 test('standup appends valid messages', () => {
   inTempRepo((root) => {
     writeFileSync(join(root, '_NEXUS_STANDUP.md'), '# Standup\n\n', 'utf-8');
 
-    const output = capture(() => standup(['2026-06-01 08:38 AM @codex [DONE]: Updated tests']));
+    const output = capture(() => standup(['2026-06-01 7:05 PM @codex [DONE]: Updated tests']));
     const standupText = readFileSync(join(root, '_NEXUS_STANDUP.md'), 'utf-8');
 
     assert.match(output, /Message recorded/);
-    assert.match(standupText, /2026-06-01 08:38 AM @codex \[DONE\]: Updated tests/);
+    assert.match(standupText, /2026-06-01 7:05 PM @codex \[DONE\]: Updated tests/);
   });
 });
 
