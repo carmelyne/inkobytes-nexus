@@ -497,7 +497,7 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
 - [ ] TASK/Codex: Fix CLI papercuts from dogfooding (issues 1, 5, 7, 9)
   - Id: dogfood-papercut-batch
   - Epic: Dogfooding fixes
-  - Status: Ready
+  - Status: Delegated
   - Created: 2026-07-12
   - Depends on: none
   - Files: src/commands/claim.js, src/commands/release.js, src/commands/help.js, src/commands/standup.js, src/lib/lockManager.js
@@ -512,12 +512,19 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Constraints: No behavior change to real warnings (foreign HEAD movement must still warn). Tests for each of the four fixes.
   - Stop If: The help interception requires restructuring shared arg parsing beyond the listed files.
   - Evidence: Test output plus a terminal transcript of the four fixed interactions in the release note.
+  - Delegated to: @codex
+  - Delegated at: 2026-07-12T12:19:57.360Z
+  - Lane: _NEXUS_Q_CODEX.md
+  - Receipt: pending
 
-- [ ] TASK/@claude: Guard release against sweeping unrelated uncommitted changes (issue 6)
+- [x] TASK/@claude: Guard release against sweeping unrelated uncommitted changes (issue 6)
   - Id: release-sweep-guard
   - Epic: Dogfooding fixes
-  - Status: Ready
+  - Status: Done
   - Created: 2026-07-12
+  - Done: 2026-07-12
+  - Completed by: @claude
+  - Completed at: 2026-07-12T20:25:00Z
   - Depends on: none
   - Files: src/commands/release.js, src/commands/claim.js, src/lib/lockManager.js, test/release.test.js, README.md
   - Affinity: release, data-integrity, receipts
@@ -531,11 +538,12 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Constraints: Do not break the clean-file fast path or the verify-gate flow. Regression test reproducing the 2026-07-06 sweep scenario.
   - Stop If: Persisting the pre-claim blob requires a lock-file format migration affecting other live repos — propose the migration first.
   - Evidence: Regression test output and a demo transcript of the abort + override in the release note.
+  - Receipt: Shipped 2026-07-12. Lock records `dirty-at-claim` (porcelain snapshot, additive metadata — no migration); claim warns immediately on pre-claim dirt; release prints [DIFF] diffstat (incl. untracked) on every release, refuses pre-claim-dirty releases keeping the claim + standup [BLOCKED] line, `--include-preexisting` overrides with loud warning. 3 new tests incl. 2026-07-06 regression; 4 existing tests reordered to claim-before-edit; suite 265/265. E2E smoke in temp repo verified refuse + override. Guard fired on real work same session (queue file dirty from @codex delegation) — working as designed. Pre-feature locks (no dirty-at-claim) behave as before.
 
 - [ ] TASK/@claude: Add `nexus trash` and init security options (rm -rf replacement)
   - Id: trash-security-init
   - Epic: Dogfooding fixes
-  - Status: Ready
+  - Status: Delegated
   - Created: 2026-07-12
   - Depends on: none
   - Files: src/commands/trash.js, src/commands/init.js, src/commands/doctor.js, src/commands/help.js, test/trash.test.js
@@ -550,6 +558,10 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Constraints: Hook scaffold is opt-in, never overwrites existing user hooks or settings. Nexus's own two rmSync call sites stay as-is (halt file, skill reinstall) unless trivially convertible.
   - Stop If: Hook wiring requires editing a user's existing .claude/settings.json with prior content — ask before merging into it.
   - Evidence: Round-trip test output and a fresh-init transcript showing the scaffolded section and hook in the release note.
+  - Delegated to: @codex
+  - Delegated at: 2026-07-12T12:06:41.769Z
+  - Lane: _NEXUS_Q_CODEX.md
+  - Receipt: pending
 
 - [ ] TASK/@claude: Design doc — claim semantics rework: free reads, read leases, batch claim (issues 2, 3, 16)
   - Id: claim-semantics-design
