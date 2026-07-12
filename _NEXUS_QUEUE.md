@@ -588,11 +588,14 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Stop If: The design concludes locks must stay on reads — say so plainly with reasons rather than forcing the rework.
   - Evidence: The doc itself, announced in standup for review.
 
-- [ ] TASK/@claude: Bind claims to the write path via pre-write hook (issue 10)
+- [x] TASK/@claude: Bind claims to the write path via pre-write hook (issue 10)
   - Id: write-path-lock-binding
   - Epic: Dogfooding fixes
-  - Status: Ready
+  - Status: Done
   - Created: 2026-07-12
+  - Done: 2026-07-12
+  - Completed by: @claude
+  - Completed at: 2026-07-12T23:20:00Z
   - Depends on: trash-security-init
   - Files: src/commands/hooks.js, src/commands/init.js, src/lib/lockManager.js, test/hooks.test.js, docs/hooks.md
   - Affinity: hooks, locks, enforcement
@@ -606,6 +609,7 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Constraints: Never block agent-local files (.claude/CONTINUITY.md, memories). No false blocks on orientation-set reads. Opt-in via the same init --hooks flag.
   - Stop If: Blob-base checking cannot be done reliably from hook input — ship owner-check enforcement alone and log the gap.
   - Evidence: Hook test matrix (foreign lock, no lock, stale base, own valid claim) in the release note.
+  - Receipt: Shipped 2026-07-12. Guard template V2: blocks writes through foreign-owned locks naming the owner (unreadable owner = foreign, safe default), walks parent dirs so directory claims cover children (matches CLI hierarchy), keeps CLAIM FIRST for unclaimed paths. hookStatus gains 'outdated' (V1 detected) and install refreshes it without --force. Stop-If invoked as predicted: hook input carries no base-content identity, so stale-base checking within a validly held claim is documented as a known gap in docs/hooks.md — the freshness receipt remains the answer there. E2E matrix verified live (foreign block naming @codex, unclaimed block, own dir claim allows child edit); 13 hook tests; suite 289/289. Scope notes: init.js and lockManager.js claimed but unchanged (integration point was the template itself); agent-local continuity/memory exemptions untouched.
 
 - [x] TASK/@claude: Stale claim TTL with surfacing and progress-aware auto-release (issue 12)
   - Id: claim-ttl-escalation
@@ -679,7 +683,7 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
 - [ ] TASK/Codex: Add `nexus verify <task-id>` receipt checker (issue 13)
   - Id: receipt-verify-command
   - Epic: Dogfooding fixes
-  - Status: Ready
+  - Status: Delegated
   - Created: 2026-07-12
   - Depends on: none
   - Files: src/commands/verify.js, src/commands/help.js, bin/nexus.js, test/verify.test.js, README.md
@@ -694,6 +698,10 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Constraints: Read-only. Works from receipt data already recorded; do not add new receipt fields in this task.
   - Stop If: Existing receipts don't record commit hashes reliably — report what fraction are verifiable and propose the receipt-field fix first.
   - Evidence: Test output for legit/missing/out-of-scope receipt cases in the release note.
+  - Delegated to: @codex
+  - Delegated at: 2026-07-12T14:45:56.207Z
+  - Lane: _NEXUS_Q_CODEX.md
+  - Receipt: pending
 
 - [ ] TASK/Codex: Rotate/archive coordination files and flag oversized ones (issue 14)
   - Id: coordination-file-rotation
