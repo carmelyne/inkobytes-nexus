@@ -60,23 +60,21 @@ export default function next(args) {
   // At autonomy 1+ the queue is the program: the full task contract applies,
   // and skipped tasks are reported so the human can repair them.
   const contractSkipped = [];
-  const candidates = tasks
-    .filter(t => t.status === 'Ready')
-    .filter(t => t.autoFlow === 'yes')
-    .filter(t => {
-      if (config.autonomy < 1) return t.review === 'approved';
-      const violations = contractViolations(t);
-      if (violations.length) {
-        contractSkipped.push({ id: t.id || t.title, violations });
-        return false;
-      }
-      return true;
-    })
-    .filter(t => !delegatedIds.has(t.id))
-    .filter(t => !hasFileConflict(t.files, claimedFiles))
-    .filter(t => dependenciesMet(t.dependsOn, tasks, config.root))
-    .filter(t => t.cost !== 'spiky')
-    .filter(t => fitsbudget(t.cost, budget));
+  const skipped = [];
+  const candidates = [];
+  for (const task of tasks) {
+    const reason = skipReasonForTask(task, {
+      config,
+      tasks,
+      root: config.root,
+      claimedFiles,
+      delegatedIds,
+      budget,
+      contractSkipped,
+    });
+    if (reason) skipped.push({ id: task.id || task.title, reason });
+    else candidates.push(task);
+  }
 
   if (contractSkipped.length) {
     console.log(`⚠️  Task contract (autonomy ${config.autonomy}): skipped ${contractSkipped.length} auto-flow task(s) with missing fields:`);
@@ -88,6 +86,7 @@ export default function next(args) {
 
   if (candidates.length === 0) {
     console.log(`📋 No safe auto-flow tasks available for ${agent}. Standby.`);
+    printSkippedCandidates(skipped);
     printSampleTaskPointer(tasks);
     return;
   }
@@ -131,6 +130,55 @@ function printSampleTaskPointer(tasks) {
 
   console.log(`   Sample tasks found: ${sampleTasks.map(t => t.id || t.title).join(', ')}`);
   console.log('   They are documentation only. Copy one into real queue work with Status: Ready and Auto-flow: yes after human approval.');
+}
+
+function printSkippedCandidates(skipped) {
+  if (skipped.length === 0) return;
+
+  console.log('   Skipped candidates:');
+  for (const { id, reason } of skipped) {
+    console.log(`   - ${id}: ${reason}`);
+  }
+}
+
+function skipReasonForTask(task, {
+  config,
+  tasks,
+  root,
+  claimedFiles,
+  delegatedIds,
+  budget,
+  contractSkipped,
+}) {
+  if (hasAmbiguousTaskState(task)) return 'ambiguous task state';
+  if (isDoneTask(task)) return 'done';
+  if (task.status !== 'Ready') return `status ${task.status || 'missing'}`;
+  if (task.autoFlow !== 'yes') return `auto-flow ${task.autoFlow || 'missing'}`;
+
+  if (config.autonomy < 1) {
+    if (task.review !== 'approved') return `review ${task.review || 'missing'}`;
+  } else {
+    const violations = contractViolations(task);
+    if (violations.length) {
+      contractSkipped.push({ id: task.id || task.title, violations });
+      return `task contract missing ${violations.map(v => v.needs).join(', ')}`;
+    }
+  }
+
+  if (delegatedIds.has(task.id)) return 'delegated lane state';
+  if (hasFileConflict(task.files, claimedFiles)) return 'claimed file conflict';
+  if (!dependenciesMet(task.dependsOn, tasks, root)) return `dependency ${task.dependsOn} not met`;
+  if (task.cost === 'spiky') return 'cost spiky';
+  if (!fitsbudget(task.cost, budget)) return 'budget exceeded';
+  return '';
+}
+
+function hasAmbiguousTaskState(task) {
+  return task.status === 'Ready' && (task.checkbox === 'x' || Boolean(task.done));
+}
+
+function isDoneTask(task) {
+  return task.checkbox === 'x' || task.status === 'Done' || Boolean(task.done);
 }
 
 // Task primitives travel with the suggestion so the agent starts with the
