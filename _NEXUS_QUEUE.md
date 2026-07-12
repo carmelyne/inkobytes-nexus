@@ -22,10 +22,12 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Auto-flow: no
   - Notes: 90s pure kinetic typography short-form video for Nexus. No agent panels, no terminals — motion graphics only. 11 scenes covering: the problem (chaos, merge conflicts), the fix (@inkobytes/nexus), 18 commands, no conflicts, memory/continuity, security, drills, dashboard, scale, solo use, close. Screenshots and short clips allowed as inserts. All scenes built: 1–10 plus 5b, 6b, bridge, and credits (completed 2026-06-01, confirmed against remotion-labs/src/scenes/ on 2026-06-10 — the earlier "scenes remain" reopen note was wrong). Render/export for release still pending; track separately if it becomes a task.
 
-- [ ] TASK/Codex: Clean duplicated Inkobytes AGENTS instructions
+- [x] TASK/Codex: Clean duplicated Inkobytes AGENTS instructions
   - Id: inkobytes-agents-dedup
   - Epic: Agent guardrails
-  - Status: Ready
+  - Status: Done
+  - Done: 2026-07-12
+  - Completed by: @codex
   - Depends on: hooks-install-command
   - Files: /Users/carmelyne/dev/inkobytes/.codex/AGENTS.md, /Users/carmelyne/dev/inkobytes/.claude/CLAUDE.md, /Users/carmelyne/dev/inkobytes/.gemini/GEMINI.md, /Users/carmelyne/dev/inkobytes/_NEXUS_QUEUE.md
   - Affinity: protocol, docs, cleanup
@@ -33,7 +35,7 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Auto-flow: no
   - Review: approved
   - Approved by: human
-  - Notes: Human hold 2026-06-13: skip implementation for now because Pong wants more time to think about the dedup direction. When this resumes, preserve project-specific rules, keep agent-local continuity/memory guidance correct, and avoid broad doctor rewrites unless explicitly approved. Also review the human-facing language preference before editing: explain design decisions in Taglish-friendly plain English; no academic phrasing or compressed architecture jargon; define project terms before using them; after abstract claims, give concrete examples; prefer "what this does" and "why it matters"; use short sentences; if the wording might trigger "huh ano pinagsasabi mo," rewrite it first.
+  - Notes: Completed in /Users/carmelyne/dev/inkobytes; marked done here per human confirmation on 2026-07-12.
 
 - [ ] TASK/Codex: Create Nexus dynamic/governed loops graphic
   - Id: nexus-dynamic-governed-loops-graphic
