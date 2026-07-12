@@ -88,6 +88,7 @@ export default function next(args) {
 
   if (candidates.length === 0) {
     console.log(`📋 No safe auto-flow tasks available for ${agent}. Standby.`);
+    printSampleTaskPointer(tasks);
     return;
   }
 
@@ -122,6 +123,14 @@ export default function next(args) {
   }
 
   console.log('');
+}
+
+function printSampleTaskPointer(tasks) {
+  const sampleTasks = tasks.filter(t => String(t.status || '').toLowerCase() === 'sample');
+  if (sampleTasks.length === 0) return;
+
+  console.log(`   Sample tasks found: ${sampleTasks.map(t => t.id || t.title).join(', ')}`);
+  console.log('   They are documentation only. Copy one into real queue work with Status: Ready and Auto-flow: yes after human approval.');
 }
 
 // Task primitives travel with the suggestion so the agent starts with the
