@@ -102,11 +102,30 @@ export function isSweepEligible(lock, progress) {
   if (!config.progressAwareStale) return true;
   try {
     const result = progress ?? evaluateLockProgress(lock);
-    return !result.progressing;
+    if (!result.progressing) return true;
+    // TTL escalation (claim-ttl-escalation): agent-level signals (a recent
+    // release elsewhere) keep every lock that agent holds "progressing", so a
+    // forgotten claim can ride a busy agent forever. Past the soft TTL, only
+    // movement on the claimed path itself protects the lock — and breaking
+    // even those is opt-in.
+    return config.claimTtlAutoRelease && isOverdueAndPathIdle(lock, config);
   } catch {
     // Progress evaluation is advisory; on failure keep the age-only behavior.
     return true;
   }
+}
+
+/**
+ * Overdue = held past the soft claim TTL. Path-idle = the claimed file's
+ * content has not moved since claim (same blob). Only file locks with a
+ * recorded claim blob can prove idleness; directory and new-path locks stay
+ * protected.
+ */
+export function isOverdueAndPathIdle(lock, config = getConfig()) {
+  if (lock.age === null || lock.age === undefined || lock.age <= config.claimTtl) return false;
+  if (lock.pathType !== 'file' || !lock.blob) return false;
+  const current = readGitBlob(lock.target, config.root);
+  return Boolean(current) && current === lock.blob;
 }
 
 /**
