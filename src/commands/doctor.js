@@ -438,20 +438,39 @@ export default function doctor(args) {
   }
 
   if (freshLocks.length) {
+    const config = getConfig();
     for (const lock of freshLocks) {
       const age = lock.age === null ? 'unknown age' : `${lock.age}s old`;
-      sections.Locks.push({
-        issue: `Active lock on ${lock.target} (${age})`,
-        fix: 'No action if the agent is still working. Use `nexus status` to inspect.',
-        ok: true,
-        displayGroup: lock.target,
-        lockInfo: {
-          target: lock.target,
-          agent: lock.agent || '',
-          kind: 'active',
-          age,
-        },
-      });
+      // Overdue = past the soft claim TTL but not stale (still progressing).
+      // Loud on purpose: other agents should see a hogged path without going
+      // looking — the 2026-07-07 landmarks.js gap (claim-ttl-escalation).
+      const overdue = lock.age !== null && lock.age > config.claimTtl;
+      if (overdue) {
+        sections.Locks.push({
+          issue: `OVERDUE lock on ${lock.target} held by ${lock.agent || 'unknown'} (${age}, soft TTL ${config.claimTtl}s)`,
+          fix: 'Owner should release or announce in standup. If path-idle abandonment is confirmed, `claimTtlAutoRelease: true` lets sweeps break it.',
+          displayGroup: lock.target,
+          lockInfo: {
+            target: lock.target,
+            agent: lock.agent || '',
+            kind: 'overdue',
+            age,
+          },
+        });
+      } else {
+        sections.Locks.push({
+          issue: `Active lock on ${lock.target} (${age})`,
+          fix: 'No action if the agent is still working. Use `nexus status` to inspect.',
+          ok: true,
+          displayGroup: lock.target,
+          lockInfo: {
+            target: lock.target,
+            agent: lock.agent || '',
+            kind: 'active',
+            age,
+          },
+        });
+      }
       if (!lock.model) {
         sections.Locks.push({
           issue: `Active lock on ${lock.target} has no --model metadata`,
