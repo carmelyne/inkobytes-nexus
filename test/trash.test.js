@@ -83,7 +83,7 @@ test('trash --hooks scaffolds opt-in Claude delete guard without overwriting set
     assert.match(readFileSync(join(root, '.claude', 'settings.json'), 'utf-8'), /nexus_trash_guard\.py/);
     const hook = readFileSync(join(root, '.claude', 'hooks', 'nexus_trash_guard.py'), 'utf-8');
     assert.match(hook, /NEXUS_TRASH_GUARD_V1/);
-    assert.match(hook, /Use `nexus trash <path>` instead of irreversible delete/);
+    assert.match(hook, /Use nexus trash\./);
 
     assert.throws(() => trash(['--hooks']), /Refusing to overwrite existing \.claude\/settings\.json/);
   });
