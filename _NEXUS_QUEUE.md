@@ -605,11 +605,14 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Stop If: Blob-base checking cannot be done reliably from hook input — ship owner-check enforcement alone and log the gap.
   - Evidence: Hook test matrix (foreign lock, no lock, stale base, own valid claim) in the release note.
 
-- [ ] TASK/@claude: Stale claim TTL with surfacing and progress-aware auto-release (issue 12)
+- [x] TASK/@claude: Stale claim TTL with surfacing and progress-aware auto-release (issue 12)
   - Id: claim-ttl-escalation
   - Epic: Dogfooding fixes
-  - Status: Ready
+  - Status: Done
   - Created: 2026-07-12
+  - Done: 2026-07-12
+  - Completed by: @claude
+  - Completed at: 2026-07-12T22:20:00Z
   - Depends on: none
   - Files: src/lib/lockManager.js, src/lib/config.js, src/commands/status.js, src/commands/doctor.js, test/lockManager.test.js
   - Affinity: locks, staleness, throughput
@@ -623,6 +626,7 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Constraints: Default TTL conservative; auto-release off by default. The 2026-06-11 sweep-incident regression test must stay green.
   - Stop If: TTL metadata requires a lock-file format migration affecting live repos — propose it first (coordinate with release-sweep-guard's blob persistence).
   - Evidence: Test output covering overdue-flagging and the no-progress auto-release gate in the release note.
+  - Receipt: Shipped 2026-07-12. `claimTtl` (default 7200s) + `claimTtlAutoRelease` (default off) in config; status tags ⏰ OVERDUE past TTL; doctor raises non-ok Locks finding naming the owner. Key insight: agent-level progress signals (release elsewhere) keep all an agent's locks alive forever — TTL auto-release therefore keys on *path-local* idleness (claim blob unchanged); blob-moved, directory, and new-path locks are never TTL-swept. No lock-format migration (reuses existing blob metadata). 11 new tests across lockManager/config/status/doctor (scope note: test/config.test.js, test/status.test.js, test/doctor.test.js, README.md touched beyond declared Files); 2026-06-11 regression stays green; suite 286/286. Per-claim TTL override deferred until the global default proves wrong.
 
 - [ ] TASK/Codex: Make scaffolded sample tasks inert (issue 4)
   - Id: sample-task-safety
@@ -650,7 +654,7 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
 - [ ] TASK/Codex: Make next/next --take explain queue decisions (issues 8, 11)
   - Id: next-explainability
   - Epic: Dogfooding fixes
-  - Status: Ready
+  - Status: Delegated
   - Created: 2026-07-12
   - Depends on: none
   - Files: src/commands/next.js, test/next.test.js, README.md
@@ -665,6 +669,10 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Constraints: Output stays compact — one line per skipped candidate.
   - Stop If: Done-receipt cross-checking needs lane-file semantics that queue reconcile doesn't guarantee — flag the gap instead of guessing.
   - Evidence: Test cases reproducing both 2026-07 failure modes in the release note.
+  - Delegated to: @codex
+  - Delegated at: 2026-07-12T12:32:11.206Z
+  - Lane: _NEXUS_Q_CODEX.md
+  - Receipt: pending
 
 - [ ] TASK/Codex: Add `nexus verify <task-id>` receipt checker (issue 13)
   - Id: receipt-verify-command
