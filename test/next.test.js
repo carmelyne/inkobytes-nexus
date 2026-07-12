@@ -6,6 +6,7 @@ import { join } from 'path';
 import { chdir, cwd } from 'process';
 import { spawnSync } from 'child_process';
 import next from '../src/commands/next.js';
+import init from '../src/commands/init.js';
 import { resetConfig } from '../src/lib/config.js';
 
 function inTempRepo(fn) {
@@ -72,6 +73,20 @@ test('next prints manually pinned related drills from queue', () => {
     assert.match(output, /- data-mutation-delete-rows/);
     assert.match(output, /- task-contract/);
     assert.match(output, /nexus drill show <id>/);
+  });
+});
+
+test('next in a freshly initialized repo stands by and points to sample tasks', () => {
+  inTempRepo(() => {
+    captureLogs(() => init([]));
+
+    const output = captureLogs(() => next(['@Agent-1']));
+
+    assert.match(output, /No safe auto-flow tasks available for @Agent-1\. Standby\./);
+    assert.match(output, /Sample tasks found: hello-main, hello-utils/);
+    assert.match(output, /documentation only/);
+    assert.match(output, /Status: Ready and Auto-flow: yes after human approval/);
+    assert.doesNotMatch(output, /Task: hello-main/);
   });
 });
 
