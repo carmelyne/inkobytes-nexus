@@ -124,6 +124,10 @@ export default function claim(args) {
     console.warn('[WARN] Claim has no model metadata. Add `--model <name>` when available.');
   }
 
+  if (result.dirtyAtClaim) {
+    console.warn(`[WARN] ${target} already has uncommitted changes that predate this claim. Release will refuse to sweep them unless run with --include-preexisting; consider resolving ownership in standup first.`);
+  }
+
   // Update blackboard
   appendEntry(`- 🔒 **${target}** - Locked by **${agent}**: ${intent}`);
 
