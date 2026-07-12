@@ -21,7 +21,10 @@ export const HOOK_AGENT_CONFIGS = {
   },
 };
 
-export const HOOK_FINGERPRINT = 'NEXUS_HOOK_TEMPLATE_V1';
+// V2 (write-path-lock-binding): the guard checks lock *ownership*, not just
+// lock existence — a path locked by another agent blocks instead of passing.
+export const HOOK_FINGERPRINT = 'NEXUS_HOOK_TEMPLATE_V2';
+const HOOK_FINGERPRINT_FAMILY = 'NEXUS_HOOK_TEMPLATE_';
 
 const COMMAND_USAGE = 'Usage: nexus hooks install --agent @codex|@claude|@gemini|all [--target <path>] [--force]';
 
@@ -80,7 +83,8 @@ export function hookStatus(agent, target = HOOK_AGENT_CONFIGS[agent]?.defaultTar
   if (!existsSync(path)) return { agent, path, status: 'missing' };
 
   const content = readFileSync(path, 'utf-8');
-  if (!content.includes(HOOK_FINGERPRINT)) return { agent, path, status: 'foreign' };
+  if (!content.includes(HOOK_FINGERPRINT_FAMILY)) return { agent, path, status: 'foreign' };
+  if (!content.includes(HOOK_FINGERPRINT)) return { agent, path, status: 'outdated' };
   if (!content.includes(`NEXUS_AGENT = '${agent}'`)) return { agent, path, status: 'wrong-agent' };
   return { agent, path, status: 'current' };
 }
@@ -176,8 +180,31 @@ def needs_claim(rel: str) -> bool:
     return not rel.startswith(ALLOW_PREFIXES)
 
 
-def lock_path(root: Path, rel: str) -> Path:
-    return root / '.nexus' / 'locks' / f"{rel.replace('/', '~2F')}.lock" / 'ts'
+def lock_dir(root: Path, rel: str) -> Path:
+    return root / '.nexus' / 'locks' / f"{rel.replace('/', '~2F')}.lock"
+
+
+def lock_owner(root: Path, rel: str) -> str | None:
+    """None = no lock; '' = lock with unreadable owner (treated as foreign)."""
+    lock = lock_dir(root, rel)
+    if not (lock / 'ts').exists():
+        return None
+    try:
+        return (lock / 'agent').read_text(encoding='utf-8').strip()
+    except Exception:
+        return ''
+
+
+def find_lock(root: Path, rel: str) -> tuple[str, str] | None:
+    """Nearest lock covering rel: the exact path, else a parent directory claim."""
+    current = rel
+    while True:
+        owner = lock_owner(root, current)
+        if owner is not None:
+            return current, owner
+        if '/' not in current:
+            return None
+        current = current.rsplit('/', 1)[0]
 
 
 def add_path(paths: set[tuple[Path, str]], path_text: str) -> None:
@@ -225,12 +252,21 @@ def bash_write_paths(command: str) -> set[tuple[Path, str]]:
     return paths
 
 
-def missing_locks(paths: set[tuple[Path, str]]) -> list[tuple[Path, str]]:
+def classify_paths(paths: set[tuple[Path, str]]) -> tuple[list[tuple[Path, str]], list[tuple[Path, str, str]]]:
+    """Split write targets into unclaimed and foreign-owned (someone else's lock)."""
     missing = []
+    foreign = []
     for root, rel in sorted(paths, key=lambda item: (str(item[0]), item[1])):
-        if needs_claim(rel) and not lock_path(root, rel).exists():
+        if not needs_claim(rel):
+            continue
+        found = find_lock(root, rel)
+        if found is None:
             missing.append((root, rel))
-    return missing
+            continue
+        locked_path, owner = found
+        if owner != NEXUS_AGENT:
+            foreign.append((root, locked_path, owner or 'unknown'))
+    return missing, foreign
 
 
 def claim_required_message(missing: list[tuple[Path, str]]) -> str:
@@ -247,6 +283,17 @@ def claim_required_message(missing: list[tuple[Path, str]]) -> str:
     )
 
 
+def foreign_lock_message(foreign: list[tuple[Path, str, str]]) -> str:
+    shown = ', '.join(f'{rel} (held by {owner})' for _, rel, owner in foreign[:8]) + (' ...' if len(foreign) > 8 else '')
+    return (
+        '⛔ LOCKED BY ANOTHER AGENT: '
+        + shown
+        + '\\n'
+        + 'Do not edit through another agent\\'s claim. Wait for release, or coordinate in _NEXUS_STANDUP.md.\\n'
+        + 'No workaround.'
+    )
+
+
 def main() -> None:
     payload = load_payload()
     command = command_text(payload)
@@ -258,7 +305,9 @@ def main() -> None:
     else:
         paths.update(bash_write_paths(command))
 
-    missing = missing_locks(paths)
+    missing, foreign = classify_paths(paths)
+    if foreign:
+        block(foreign_lock_message(foreign))
     if missing:
         block(claim_required_message(missing))
 
