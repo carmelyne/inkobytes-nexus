@@ -310,6 +310,13 @@ Older repos may mention shell helpers:
 \`\`\`
 
 Prefer the \`nexus\` CLI commands. \`nexus doctor\` reports legacy references.
+
+## 15. Rollback-Friendly Deletes
+
+For project files, prefer \`nexus trash <path>\` over direct \`rm\`. Nexus trash
+moves the target into \`.nexus/trash/\` with metadata so the same repo can list
+and restore it later. Use \`nexus trash --hooks\` only when a human wants the
+optional local delete guard scaffolded for this repo.
 `,
 };
 
@@ -320,6 +327,7 @@ DECISIONS.md
 docs-priv/
 .nexus/locks/
 .nexus/presence/
+.nexus/trash/
 *.lockdir
 *.flock
 `;
