@@ -551,6 +551,158 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Stop If: Hook wiring requires editing a user's existing .claude/settings.json with prior content — ask before merging into it.
   - Evidence: Round-trip test output and a fresh-init transcript showing the scaffolded section and hook in the release note.
 
+- [ ] TASK/@claude: Design doc — claim semantics rework: free reads, read leases, batch claim (issues 2, 3, 16)
+  - Id: claim-semantics-design
+  - Epic: Dogfooding fixes
+  - Status: Ready
+  - Created: 2026-07-12
+  - Depends on: none
+  - Files: docs/claim-semantics-rework.md
+  - Affinity: protocol, design, locks
+  - Cost: medium
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Protocol-level change, so design doc first — implementation is a separate future task gated on human approval of this doc. Core question from docs/nexus-issues.md: should reads take locks at all, given freshness is already solved by blob receipts? Cover: (a) making reads free and reserving claims for writes (dissolves issue 16's fuzzy orientation boundary); (b) whether a shared read lease (`claim --read`) is still needed for long collaborative reads, and its interaction with writer claims; (c) batch claim `nexus claim <p1> <p2> ... @agent "intent"` — one intent, N receipts, atomic all-or-nothing; (d) migration story for existing repos and the generated constitution/protocol text.
+  - Goal: One coherent proposal for claim semantics instead of three point fixes that could contradict each other.
+  - Outcome: A design doc with a recommendation, tradeoffs, migration plan, and the exact protocol-text diffs, ready for human review.
+  - Constraints: Design only — no code or protocol-text changes in this task.
+  - Stop If: The design concludes locks must stay on reads — say so plainly with reasons rather than forcing the rework.
+  - Evidence: The doc itself, announced in standup for review.
+
+- [ ] TASK/@claude: Bind claims to the write path via pre-write hook (issue 10)
+  - Id: write-path-lock-binding
+  - Epic: Dogfooding fixes
+  - Status: Ready
+  - Created: 2026-07-12
+  - Depends on: trash-security-init
+  - Files: src/commands/hooks.js, src/commands/init.js, src/lib/lockManager.js, test/hooks.test.js, docs/hooks.md
+  - Affinity: hooks, locks, enforcement
+  - Cost: large
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Root of issues 6, 12, 13 per docs/nexus-issues.md: claims are advisory, so a lock-then-write-from-cache race stomped finished work (2026-07-04 terrain.js). Reuses the hook scaffold infrastructure from trash-security-init. A PreToolUse-style pre-write hook rejects edits to a shared path whose lock belongs to another agent or to no one, and rejects writes whose base blob predates the current claim's receipt blob. Must degrade gracefully in harnesses without hooks (advisory mode stays, doctor says which mode is active).
+  - Goal: Holding the claim and being allowed to write become the same fact, where the harness supports enforcement.
+  - Outcome: With hooks installed, an edit to a path claimed by another agent (or unclaimed shared path) is blocked with a message naming the owner; stale-base writes are blocked; repos without hooks behave as today.
+  - Constraints: Never block agent-local files (.claude/CONTINUITY.md, memories). No false blocks on orientation-set reads. Opt-in via the same init --hooks flag.
+  - Stop If: Blob-base checking cannot be done reliably from hook input — ship owner-check enforcement alone and log the gap.
+  - Evidence: Hook test matrix (foreign lock, no lock, stale base, own valid claim) in the release note.
+
+- [ ] TASK/@claude: Stale claim TTL with surfacing and progress-aware auto-release (issue 12)
+  - Id: claim-ttl-escalation
+  - Epic: Dogfooding fixes
+  - Status: Ready
+  - Created: 2026-07-12
+  - Depends on: none
+  - Files: src/lib/lockManager.js, src/lib/config.js, src/commands/status.js, src/commands/doctor.js, test/lockManager.test.js
+  - Affinity: locks, staleness, throughput
+  - Cost: medium
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Builds on progressAwareStale (shipped 2026-06-13). Claims gain a soft TTL (config default, per-claim override). `nexus status` and `nexus doctor` flag overdue locks prominently to *other* agents, not just the owner. Optional auto-release after TTL only when the progress signals show no movement on the path — reuse isSweepEligible / agentTrace rather than adding a second staleness notion. The 2026-07-07 landmarks.js case (2h+ stale, remedied by standup ping) is the scenario to fix.
+  - Goal: A stale claim becomes visible and self-healing instead of requiring another agent to go looking and ping.
+  - Outcome: Overdue claims show loudly in status/doctor with age and owner; with auto-release enabled, a no-progress claim past TTL releases with a standup log line; active work is never auto-broken.
+  - Constraints: Default TTL conservative; auto-release off by default. The 2026-06-11 sweep-incident regression test must stay green.
+  - Stop If: TTL metadata requires a lock-file format migration affecting live repos — propose it first (coordinate with release-sweep-guard's blob persistence).
+  - Evidence: Test output covering overdue-flagging and the no-progress auto-release gate in the release note.
+
+- [ ] TASK/Codex: Make scaffolded sample tasks inert (issue 4)
+  - Id: sample-task-safety
+  - Epic: Dogfooding fixes
+  - Status: Ready
+  - Created: 2026-07-12
+  - Depends on: none
+  - Files: src/commands/init.js, src/commands/next.js, src/commands/doctor.js, test/next.test.js, test/doctor.test.js
+  - Affinity: init, queue, safety
+  - Cost: small
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Scaffolded Hello World tasks ship as Status: Ready / Review: approved / Auto-flow: yes, so a good-faith `nexus next` in a fresh repo could start building src/hello.js inside a real project. Change the scaffold to `Status: Sample`, teach `nexus next` to skip Sample tasks (mention them once with how to activate), and add a doctor advisory when Sample tasks coexist with real commits.
+  - Goal: A fresh init can never send an agent off building sample code in a real repo.
+  - Outcome: `nexus next` in a freshly initialized repo returns standby with a pointer to the sample tasks instead of suggesting hello-main.
+  - Constraints: Keep the samples as documentation of the task format — do not delete them.
+  - Stop If: Status parsing treats unknown statuses as errors elsewhere — reconcile that first.
+  - Evidence: next/doctor test output in the release note.
+
+- [ ] TASK/Codex: Make next/next --take explain queue decisions (issues 8, 11)
+  - Id: next-explainability
+  - Epic: Dogfooding fixes
+  - Status: Ready
+  - Created: 2026-07-12
+  - Depends on: none
+  - Files: src/commands/next.js, test/next.test.js, README.md
+  - Affinity: cli, queue, trust
+  - Cost: medium
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: `nexus next` misjudges state in both directions per docs/nexus-issues.md: suggests already-done tasks (agents re-verify everything manually, 2026-07-04) and returns false standby on genuinely Ready tasks (2026-07-06). Fixes: cross-check candidates against done receipts and lane files before suggesting; when returning standby, print per-candidate skip reasons (blocked-by, claimed, auto-flow, review state, delegated, done-elsewhere); when state is ambiguous, say so instead of suggesting confidently.
+  - Goal: Agents can trust next's answer, or at least see exactly why it answered that way.
+  - Outcome: Done tasks are never suggested; standby output lists each skipped candidate with its reason; ambiguous state is labeled ambiguous.
+  - Constraints: Output stays compact — one line per skipped candidate.
+  - Stop If: Done-receipt cross-checking needs lane-file semantics that queue reconcile doesn't guarantee — flag the gap instead of guessing.
+  - Evidence: Test cases reproducing both 2026-07 failure modes in the release note.
+
+- [ ] TASK/Codex: Add `nexus verify <task-id>` receipt checker (issue 13)
+  - Id: receipt-verify-command
+  - Epic: Dogfooding fixes
+  - Status: Ready
+  - Created: 2026-07-12
+  - Depends on: none
+  - Files: src/commands/verify.js, src/commands/help.js, bin/nexus.js, test/verify.test.js, README.md
+  - Affinity: cli, receipts, trust
+  - Cost: medium
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Trust disputes are currently settled by reading diffs manually (fleet-tint false suspicion, 2026-07-04). `nexus verify <task-id>` resolves the task's receipt commit(s), prints diffstat and touched paths against the task's stated Files scope, and flags receipts whose commits don't exist or don't touch the claimed files. Read-only; never mutates queue or lanes.
+  - Goal: Checking another agent's done-receipt costs one command instead of a manual diff archaeology session.
+  - Outcome: verify on a legit receipt shows commits + in-scope diffstat; on a bad receipt it flags missing commits or out-of-scope-only changes; unknown task ids error cleanly.
+  - Constraints: Read-only. Works from receipt data already recorded; do not add new receipt fields in this task.
+  - Stop If: Existing receipts don't record commit hashes reliably — report what fraction are verifiable and propose the receipt-field fix first.
+  - Evidence: Test output for legit/missing/out-of-scope receipt cases in the release note.
+
+- [ ] TASK/Codex: Rotate/archive coordination files and flag oversized ones (issue 14)
+  - Id: coordination-file-rotation
+  - Epic: Dogfooding fixes
+  - Status: Ready
+  - Created: 2026-07-12
+  - Depends on: none
+  - Files: src/commands/report.js, src/commands/queue.js, src/commands/doctor.js, bin/nexus.js, test/report.test.js
+  - Affinity: cli, token-cost, maintenance
+  - Cost: medium
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Mooncrafting's _NEXUS_REPORT.md hit 10,231 lines; every orientation read pays for it forever, and it sat dirty for days unnoticed. Add `nexus report rotate` (move entries to _NEXUS_REPORT-YYYY-MM.md archives, keep current month live), done-task archival out of the live queue (this repo already has the monthly-archive task queued — coordinate, don't duplicate), and doctor warnings for oversized (line-count threshold in config) or long-dirty coordination files.
+  - Goal: Orientation reads stop growing without bound; dirty coordination files get noticed by tooling, not luck.
+  - Outcome: rotate moves prior-month report entries to archive files; doctor warns on oversized or uncommitted-for-days coordination files with the exact command to fix.
+  - Constraints: Rotation must be a claim/release-honest operation (archives committed atomically with the trim). Never rewrite entry content while moving it.
+  - Stop If: Overlap with the queued archive-completed-tasks-by-month task is nontrivial — reconcile the two scopes in standup first.
+  - Evidence: Rotation round-trip test and doctor-warning test output in the release note.
+
+- [ ] TASK/Codex: Add `nexus brief @agent` diff-aware orientation (issue 15)
+  - Id: session-brief-command
+  - Epic: Dogfooding fixes
+  - Status: Ready
+  - Created: 2026-07-12
+  - Depends on: coordination-file-rotation
+  - Files: src/commands/brief.js, src/commands/checkout.js, src/commands/help.js, bin/nexus.js, test/brief.test.js, README.md
+  - Affinity: cli, token-cost, orientation
+  - Cost: large
+  - Auto-flow: yes
+  - Review: approved
+  - Approved by: human
+  - Notes: Session start currently rereads constitution + queue + standup + USER.md + continuity + memories even when nearly nothing changed — a fixed token tax per agent per session. `nexus brief @agent` prints only what changed since the agent's last checkout: new standup entries, queue diffs (added/claimed/done tasks), new DECISIONS entries, protocol-file changes — with pointers into the full files for anything unfamiliar. Anchor on the checkout timestamp/commit recorded by `nexus checkout`; if no checkout marker exists, say so and recommend the full read.
+  - Goal: Returning agents pay for the delta, not the whole coordination corpus.
+  - Outcome: brief after a quiet gap prints a short "nothing new since <time>" note; after activity it lists new entries/diffs grouped by file; first-ever run falls back to recommending full orientation.
+  - Constraints: brief supplements, never replaces, the constitution as the authority; it must say when full reads are still required (e.g. protocol files changed).
+  - Stop If: checkout doesn't record a usable anchor — add that to checkout first as part of this task, or split it out.
+  - Evidence: Test output for quiet-gap, active-gap, and no-anchor cases in the release note.
+
 ## Proposed Queue
 
 *(Agent-suggested tasks awaiting human review. nexus next ignores this section.)*
