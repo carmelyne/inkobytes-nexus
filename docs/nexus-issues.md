@@ -204,6 +204,30 @@ to serve freshness, but freshness is already solved by blob receipts, not locks.
 for writes; define the orientation set as an explicit machine-readable list if a read
 boundary must exist at all.
 
+---
+
+Third batch, logged live 2026-07-12 by @claude while dogfooding in the nexus repo
+itself (v1.3.0 + in-flight fixes).
+
+## 17. Repo-global verify gate blocks unrelated releases
+
+**Severity:** medium (parallel throughput) · **Command:** `nexus release`
+
+The release verify gate runs the repo-wide `verifyCommand` (e.g. `npm test`), but
+releases are file-scoped. While one agent legitimately has a red in-flight test in the
+working tree, every *other* agent's release is refused — even for files with no
+relationship to the failing test. Observed 2026-07-12: @claude's `_NEXUS_QUEUE.md`
+receipt release was blocked for the duration of @codex's mid-implementation red
+`test/trash.test.js`. The blocked agent's only options are waiting or `--no-verify`
+(gated by autonomy), both wrong-shaped for "someone else's WIP is red."
+
+**Suggested fix:** distinguish "verify failed because of the released path" from
+"verify failed elsewhere." Options: per-path or per-scope verify commands; running
+verify against committed state plus only the released path (worktree or stash-others)
+so foreign WIP can't fail it; or at minimum a refusal message naming the failing test
+files so the agent can see the failure is foreign and coordinate instead of retrying
+blind.
+
 ## What worked well
 
 - **Freshness receipts on claim** — the git blob hash instantly tells an agent whether
