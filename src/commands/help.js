@@ -4,5 +4,5 @@
  */
 
 export default function help() {
-  console.log('Run "nexus --help" for usage information. For rollback-friendly deletes, use "nexus trash --help".');
+  console.log('Run "nexus --help" for usage information. Use "nexus verify <task-id>" to check release receipts.');
 }
