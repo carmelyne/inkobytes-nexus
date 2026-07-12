@@ -125,6 +125,7 @@ const LOCK_METADATA_FILES = [
   'blob',
   'path-type',
   'progress-check',
+  'dirty-at-claim',
 ];
 
 export function readGitHead(root) {
@@ -135,6 +136,18 @@ export function readGitHead(root) {
   });
   const head = result.stdout?.trim();
   return result.status === 0 && head ? head : 'unknown';
+}
+
+// Porcelain status scoped to one path: non-empty means the path (or files
+// under it, for directory claims) has uncommitted changes vs HEAD, including
+// untracked files.
+export function readGitPathStatus(target, root) {
+  const result = spawnSync('git', ['status', '--porcelain', '--', target], {
+    cwd: root,
+    encoding: 'utf-8',
+    stdio: ['ignore', 'pipe', 'ignore'],
+  });
+  return result.status === 0 ? (result.stdout || '').trimEnd() : '';
 }
 
 // hash-object is pure content identity — it works even for untracked files
@@ -226,6 +239,7 @@ export function acquireLock(target, agentName, intent, subagents = 0, metadata =
       // Progress-signal metadata (loop-progress-signals): record what the
       // claimed content looked like so progress checks can detect movement.
       // Advisory only — a failure here must not invalidate the lock.
+      let dirtyAtClaim = false;
       try {
         if (!existsSync(normalizedTarget)) {
           writeFileSync(join(lockPath, 'path-type'), 'new', 'utf-8');
@@ -237,11 +251,16 @@ export function acquireLock(target, agentName, intent, subagents = 0, metadata =
           const blob = readGitBlob(normalizedTarget, config.root);
           if (blob) writeFileSync(join(lockPath, 'blob'), blob, 'utf-8');
         }
+        // Pre-claim dirty snapshot (release-sweep-guard): release refuses to
+        // sweep changes that predate the claim unless told to include them.
+        dirtyAtClaim = Boolean(readGitPathStatus(normalizedTarget, config.root));
+        writeFileSync(join(lockPath, 'dirty-at-claim'), dirtyAtClaim ? 'true' : 'false', 'utf-8');
       } catch { /* progress metadata is best-effort */ }
 
       return {
         success: true,
         message: `[LOCK ACQUIRED] - ${agentName} is clear to modify ${normalizedTarget}`,
+        dirtyAtClaim,
       };
     } catch {
       attempts++;
@@ -328,6 +347,8 @@ export function listLocks() {
       blob: readMeta('blob'),
       pathType: readMeta('path-type'),
       progressCheck: readMeta('progress-check'),
+      // '' (pre-feature lock), 'true', or 'false' — release only refuses on 'true'.
+      dirtyAtClaim: readMeta('dirty-at-claim'),
     });
   }
 
