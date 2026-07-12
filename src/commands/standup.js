@@ -7,7 +7,7 @@ import { appendFileSync, existsSync, writeFileSync } from 'fs';
 import { getConfig } from '../lib/config.js';
 
 const STANDUP_FORMAT = 'YYYY-MM-DD HH:MM AM/PM @agent [STATUS]: message';
-const STANDUP_LINE_RE = /^(\d{4})-(\d{2})-(\d{2}) (0[1-9]|1[0-2]):([0-5]\d) (AM|PM) (@[a-z0-9][a-z0-9_-]*) \[([A-Z][A-Z0-9_-]*)\]: (.+)$/;
+const STANDUP_LINE_RE = /^(\d{4})-(\d{2})-(\d{2}) (0?[1-9]|1[0-2]):([0-5]\d) (AM|PM) (@[a-z0-9][a-z0-9_-]*) \[([A-Z][A-Z0-9_-]*)\]: (.+)$/;
 
 export function validateStandupLine(line) {
   const text = typeof line === 'string' ? line.trim() : '';
