@@ -46,12 +46,12 @@ Local agent work decisions live here. This file is gitignored by Nexus.
 - [ ] TASK/Agent-1: Create the main hello.js entry point
   - Id: hello-main
   - Epic: Hello World
-  - Status: Ready
+  - Status: Sample
   - Depends on: none
   - Files: src/hello.js
   - Affinity: entry-point
   - Cost: small
-  - Auto-flow: yes
+  - Auto-flow: no
   - Review: approved
   - Approved by: human
   - Notes: Sample starter task — print a hello message from src/hello.js.
@@ -64,12 +64,12 @@ Local agent work decisions live here. This file is gitignored by Nexus.
 - [ ] TASK/Agent-2: Create the utils.js helper
   - Id: hello-utils
   - Epic: Hello World
-  - Status: Ready
+  - Status: Sample
   - Depends on: none
   - Files: src/utils.js
   - Affinity: helpers
   - Cost: small
-  - Auto-flow: yes
+  - Auto-flow: no
   - Review: approved
   - Approved by: human
   - Notes: Sample starter task — add a small helper used by hello.js.
@@ -112,12 +112,12 @@ Adversarial result:
 - [ ] TASK/Agent-1: Create the main hello.js entry point
   - Id: hello-main
   - Epic: Hello World
-  - Status: Ready
+  - Status: Sample
   - Depends on: none
   - Files: src/hello.js
   - Affinity: entry-point
   - Cost: small
-  - Auto-flow: yes
+  - Auto-flow: no
   - Review: approved
   - Approved by: human
   - Notes: Sample starter task — print a hello message from src/hello.js.
@@ -130,12 +130,12 @@ Adversarial result:
 - [ ] TASK/Agent-2: Create the utils.js helper
   - Id: hello-utils
   - Epic: Hello World
-  - Status: Ready
+  - Status: Sample
   - Depends on: none
   - Files: src/utils.js
   - Affinity: helpers
   - Cost: small
-  - Auto-flow: yes
+  - Auto-flow: no
   - Review: approved
   - Approved by: human
   - Notes: Sample starter task — add a small helper used by hello.js.
