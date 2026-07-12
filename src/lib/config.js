@@ -49,6 +49,17 @@ export function getConfig(fromDir) {
     // Decision 1 (2026-06-12): stale = age AND no progress signal, so working
     // locks survive sweeps regardless of age. Set false for age-only staleness.
     progressAwareStale: localConfig.progressAwareStale !== false,
+    // Soft TTL for claims in seconds (claim-ttl-escalation). Past this age a
+    // lock is flagged OVERDUE to *other* agents in status/doctor — it is a
+    // visibility threshold, not a kill switch. Conservative default: 2 hours,
+    // the point at which the 2026-07-07 landmarks.js claim was clearly abandoned.
+    claimTtl: Number.isInteger(localConfig.claimTtl) && localConfig.claimTtl > 0
+      ? localConfig.claimTtl
+      : 7200,
+    // Off by default: auto-release an overdue lock only when progress signals
+    // show no movement on the path. Opt-in because breaking a live claim is
+    // the one mistake this feature exists to prevent elsewhere.
+    claimTtlAutoRelease: localConfig.claimTtlAutoRelease === true,
   };
 
   return _config;
