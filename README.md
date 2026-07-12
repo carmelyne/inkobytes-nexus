@@ -406,6 +406,16 @@ nexus release src/lib/components/login/ "feat: login form"
 Nexus stages only the released path before committing, which helps avoid unrelated changes from other agents.
 If Git's index is temporarily locked by another release, Nexus waits briefly and retries before failing with a clearer message.
 
+#### Sweep guard
+
+Staging only the released path still commits *everything* uncommitted in that path — including work that was already sitting there before your claim. To keep one agent's release from sweeping another agent's (or an earlier session's) uncommitted work into its commit:
+
+- `nexus claim` records whether the path already had uncommitted changes (`dirty-at-claim` in the lock) and warns immediately when it does.
+- Every release prints a `[DIFF]` block first — a diffstat of exactly what is about to be committed, including untracked files.
+- If the path was dirty before the claim, release refuses, keeps your claim, and logs a `[BLOCKED]` line to standup. Re-run with `--include-preexisting` to commit everything deliberately (logged with a loud warning), or resolve ownership in standup first.
+
+Locks taken before this feature have no `dirty-at-claim` record; those releases behave as before.
+
 Each release appends a repo-local receipt to `_NEXUS_REPORT.md`. If the released path is listed on a completed queue task and the release message names that task id, Nexus also appends one deduplicated completed-task entry to `_NEXUS_LEDGER.md`.
 
 #### Release verification gate
