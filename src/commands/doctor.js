@@ -25,6 +25,7 @@ import {
   protocolBlock,
 } from '../lib/protocolText.js';
 import { HOOK_AGENT_CONFIGS, hookStatus } from './hooks.js';
+import { trashSize } from './trash.js';
 import { contractViolations, parseContractTasks, primitiveGaps } from '../lib/taskContract.js';
 import { scanQueueLanes } from '../lib/queue.js';
 
@@ -205,6 +206,7 @@ export default function doctor(args) {
     Locks: [],
     'Generated Artifacts': [],
     Hooks: [],
+    Trash: [],
     promptCHMOD: [],
     'Queue Authorship': [],
     'Queue Lanes': [],
@@ -704,6 +706,15 @@ export default function doctor(args) {
     }
   }
 
+  // Trash visibility — rollback payloads should be visible before they pile up.
+  const bytes = trashSize(root);
+  sections.Trash.push({
+    issue: bytes
+      ? `.nexus/trash uses ${formatBytes(bytes)}`
+      : '.nexus/trash is empty',
+    ok: true,
+  });
+
   // Staleness mode — humans should know which sweep rule is live.
   sections['Loop Readiness'].push({
     issue: config.progressAwareStale
@@ -1043,6 +1054,12 @@ function hasGitCommits(root) {
     stdio: 'pipe',
   });
   return result.status === 0;
+}
+
+function formatBytes(bytes) {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 function replaceLegacyHelperCommands(content) {
