@@ -14,6 +14,11 @@ import { appendCompletedLedgerEntries } from './ledger.js';
 import { refuseIfHalted } from './halt.js';
 
 export default function release(args) {
+  if (args.includes('--help') || args.includes('-h')) {
+    printReleaseHelp();
+    return;
+  }
+
   refuseIfHalted('release');
 
   const noVerify = args.includes('--no-verify');
@@ -43,8 +48,9 @@ export default function release(args) {
   const releaseHead = readGitHead(config.root);
   const claimHead = lock?.claimHead || 'unknown';
   const hasHeadDrift = claimHead !== 'unknown' && releaseHead !== 'unknown' && claimHead !== releaseHead;
+  const hasForeignHeadDrift = hasHeadDrift && hasForeignInterleavedCommits(config.root, claimHead, releaseHead, releaseAgent);
 
-  if (hasHeadDrift) {
+  if (hasForeignHeadDrift) {
     console.warn(`[WARN] HEAD changed since claim for ${target}: claimed ${shortSha(claimHead)}, releasing from ${shortSha(releaseHead)}. Review interleaved commits if needed.`);
   }
 
@@ -124,6 +130,18 @@ export default function release(args) {
   console.log('[LOCK RELEASED & COMMITTED]');
 }
 
+function printReleaseHelp() {
+  console.log([
+    'Usage: nexus release <filepath_or_dir> "<commit message>" [--no-verify] [--include-preexisting]',
+    '',
+    'Unlocks a claimed path, commits the scoped changes, and records a release receipt.',
+    '',
+    'Options:',
+    '  --no-verify            Skip configured verify command at autonomy 0 only',
+    '  --include-preexisting  Commit changes that existed before the claim',
+  ].join('\n'));
+}
+
 // Gate A: agents must not compound on unverified commits. The verify command
 // is human-configured in .nexus/config.json (release.verifyCommand), so
 // running it through a shell is config-as-code, not untrusted input.
@@ -199,6 +217,21 @@ function standupTimestamp() {
 
 function shortSha(sha) {
   return sha === 'unknown' ? sha : sha.slice(0, 7);
+}
+
+function hasForeignInterleavedCommits(root, claimHead, releaseHead, releaseAgent) {
+  const result = spawnSync('git', ['log', '--pretty=%s', `${claimHead}..${releaseHead}`], {
+    cwd: root,
+    encoding: 'utf-8',
+    stdio: ['ignore', 'pipe', 'ignore'],
+  });
+  if (result.status !== 0) return true;
+
+  const subjects = result.stdout.split('\n').map((line) => line.trim()).filter(Boolean);
+  if (!subjects.length) return false;
+  const prefix = releaseAgent ? `[${releaseAgent}] ` : '';
+  if (!prefix) return true;
+  return subjects.some((subject) => !subject.startsWith(prefix));
 }
 
 function formatReportTimestamp(date) {
