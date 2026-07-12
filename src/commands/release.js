@@ -6,7 +6,7 @@
 import { appendFileSync } from 'fs';
 import { spawnSync } from 'child_process';
 import { removeEntry } from '../lib/blackboard.js';
-import { listLocks, readGitHead, releaseLock } from '../lib/lockManager.js';
+import { listLocks, readGitHead, readGitPathStatus, releaseLock } from '../lib/lockManager.js';
 import { stageAndCommit } from '../lib/git.js';
 import { getConfig } from '../lib/config.js';
 import { normalizeTarget } from '../lib/pathSafety.js';
@@ -17,11 +17,12 @@ export default function release(args) {
   refuseIfHalted('release');
 
   const noVerify = args.includes('--no-verify');
-  const positional = args.filter((arg) => arg !== '--no-verify');
+  const includePreexisting = args.includes('--include-preexisting');
+  const positional = args.filter((arg) => arg !== '--no-verify' && arg !== '--include-preexisting');
   let target = positional[0];
 
   if (!target) {
-    console.error('Usage: nexus release <filepath_or_dir> "<commit message>" [--no-verify]');
+    console.error('Usage: nexus release <filepath_or_dir> "<commit message>" [--no-verify] [--include-preexisting]');
     process.exit(1);
   }
 
@@ -45,6 +46,27 @@ export default function release(args) {
 
   if (hasHeadDrift) {
     console.warn(`[WARN] HEAD changed since claim for ${target}: claimed ${shortSha(claimHead)}, releasing from ${shortSha(releaseHead)}. Review interleaved commits if needed.`);
+  }
+
+  // Sweep guard (release-sweep-guard): a release commits everything
+  // uncommitted under the target, so show exactly what that is, and refuse
+  // when part of it predates the claim — that is another agent's (or an
+  // earlier session's) work, not this claim's.
+  const pendingStatus = readGitPathStatus(target, config.root);
+  if (pendingStatus) {
+    console.log(`[DIFF] Changes to be committed for ${target}:`);
+    printPendingChanges(config.root, target, pendingStatus);
+  }
+
+  if (lock?.dirtyAtClaim === 'true') {
+    if (!includePreexisting) {
+      console.error(`[ERROR] ${target} already had uncommitted changes before this claim was taken. Releasing would sweep pre-claim work into this commit.`);
+      console.error('Review the diff above. Re-run with --include-preexisting to commit everything, or coordinate ownership in standup first.');
+      console.error(`Release refused; your claim on ${target} is kept.`);
+      appendStandupLine(config, `${standupTimestamp()} ${releaseAgent || 'unknown'} [BLOCKED]: release ${target} refused — pre-claim uncommitted changes present (re-run with --include-preexisting)`);
+      process.exit(1);
+    }
+    console.warn(`[WARN] Committing changes that predate the claim on ${target} (--include-preexisting).`);
   }
 
   runVerifyGate({ config, target, agent: releaseAgent || 'unknown', noVerify });
@@ -136,6 +158,20 @@ function runVerifyGate({ config, target, agent, noVerify }) {
   console.error(tailLines(`${result.stdout || ''}\n${result.stderr || ''}`, 12));
   appendStandupLine(config, `${standupTimestamp()} ${agent} [BLOCKED]: release ${target} refused — verify failed (${verifyCommand})`);
   process.exit(1);
+}
+
+function printPendingChanges(root, target, pendingStatus) {
+  const diffstat = spawnSync('git', ['diff', '--stat', 'HEAD', '--', target], {
+    cwd: root, encoding: 'utf-8', stdio: ['ignore', 'pipe', 'ignore'],
+  });
+  const stat = diffstat.status === 0 ? (diffstat.stdout || '').trimEnd() : '';
+  if (stat) console.log(stat.split('\n').map((line) => `  ${line.trim()}`).join('\n'));
+
+  // diff --stat misses untracked files; porcelain '??' lines cover them.
+  const untracked = pendingStatus.split('\n').filter((line) => line.startsWith('??'));
+  for (const line of untracked) {
+    console.log(`  ${line.slice(3).trim()} (untracked)`);
+  }
 }
 
 function appendStandupLine(config, line) {
