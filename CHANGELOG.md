@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.4.0 - 2026-07-13
+
+The dogfooding release: 15 of the 17 friction points logged while using Nexus on a real multi-agent project (`docs/nexus-issues.md`) are fixed or designed in this version.
+
+- **Release sweep guard**: `nexus claim` records whether the path already had uncommitted changes (`dirty-at-claim`) and warns immediately; every `nexus release` prints a `[DIFF]` diffstat (including untracked files) of exactly what is about to be committed, and refuses to sweep changes that predate the claim unless run with `--include-preexisting`. One agent's release can no longer silently commit another agent's work.
+- **Hook guard V2 (write-path lock binding)**: the PreToolUse guard now enforces lock *ownership*, not just lock existence — writes through another agent's claim are denied naming the owner, and parent-directory claims cover child files, matching the CLI hierarchy. Older V1 hooks report as `outdated` in `nexus doctor --hooks` and refresh with `nexus hooks install` (no `--force` needed). Known gap documented: stale-base writes within a validly held claim cannot be hook-detected.
+- **Soft claim TTL**: `claimTtl` (default 7200s) flags long-held locks as `⏰ OVERDUE` in `nexus status` and as a doctor finding naming the owner. Opt-in `claimTtlAutoRelease` lets sweeps break an overdue lock only when the claimed file's content has not moved since claim — path-local work always protects a lock; directory and new-path claims are never TTL-swept.
+- **`nexus trash`**: reversible deletes for agents — moves targets into `.nexus/trash/` with restore metadata (`--list`, `--restore`), plus an optional `nexus trash --hooks` guard that intercepts destructive `rm` in favor of trash. `nexus doctor` reports trash directory usage.
+- **`nexus verify <task-id>`**: read-only receipt checker — resolves a done-task's commits and shows diffstat and touched paths against the task's declared file scope, so checking another agent's receipt costs one command instead of manual diff archaeology.
+- **`nexus next` explainability**: done tasks are cross-checked against receipts and lane files before being suggested; standby responses list each skipped candidate with the reason (blocked-by, claimed, review state, delegated), so a false standby is diagnosable.
+- **Sample-task safety**: freshly scaffolded Hello World tasks ship as `Status: Sample`; `nexus next` skips them with a pointer instead of sending an agent off to build `src/hello.js` in a real project, and doctor flags samples that coexist with real commits.
+- **CLI papercuts**: the `--model` metadata warning prints once per session instead of on every claim; `--help`/`-h` is intercepted on path-taking subcommands instead of falling through to git as a pathspec; same-agent sequential releases no longer trigger false "HEAD changed" warnings (own release commits are excluded from the drift check); standup timestamps accept one-digit hours.
+- **Design doc**: `docs/claim-semantics-rework.md` proposes free reads (claims reserved for writes), a lock-less `nexus fresh` receipt command, and atomic batch claim — awaiting human review before implementation.
+- **Dogfooding log**: `docs/nexus-issues.md` imported and extended live; issue 17 (repo-global verify gate blocks unrelated releases while another agent's in-flight test is red) is logged with a proposed fix task.
+
 ## 1.3.0 - 2026-06-21
 
 - Added observable loop progress signals built from repo-state changes rather than agent self-reports. Nexus now detects claimed-file blob movement, recent release receipts, and delegated-lane receipts through a shared agent trace reader.
