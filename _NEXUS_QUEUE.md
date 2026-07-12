@@ -563,11 +563,15 @@ carry `Created:`; flip `Done:` and archive when the checkbox closes.
   - Lane: _NEXUS_Q_CODEX.md
   - Receipt: pending
 
-- [ ] TASK/@claude: Design doc — claim semantics rework: free reads, read leases, batch claim (issues 2, 3, 16)
+- [x] TASK/@claude: Design doc — claim semantics rework: free reads, read leases, batch claim (issues 2, 3, 16)
   - Id: claim-semantics-design
   - Epic: Dogfooding fixes
-  - Status: Ready
+  - Status: Done
   - Created: 2026-07-12
+  - Done: 2026-07-12
+  - Completed by: @claude
+  - Completed at: 2026-07-12T21:05:00Z
+  - Receipt: docs/claim-semantics-rework.md shipped 2026-07-12. Recommends: reads free + `nexus fresh <path>` receipt command; NO read leases now (detection-and-retry via blob receipts suffices; revisit with contention data); batch claim atomic all-or-nothing with sorted acquisition. Includes exact constitution/agent-guide text diffs, doctor-flow migration, tradeoffs. DESIGN AWAITS HUMAN REVIEW before any implementation task is created.
   - Depends on: none
   - Files: docs/claim-semantics-rework.md
   - Affinity: protocol, design, locks
