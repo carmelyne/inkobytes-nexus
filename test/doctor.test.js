@@ -1,3 +1,9 @@
+// Doctor output assertions match plain text; pin the color env so the suite
+// passes identically in a TTY (npm publish from a terminal), piped runs, and
+// under a user's FORCE_COLOR.
+delete process.env.FORCE_COLOR;
+process.env.NO_COLOR = '1';
+
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
