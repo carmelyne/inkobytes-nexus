@@ -1,5 +1,1 @@
-- 🔒 **.claude/CLAUDE.md** - Locked by **@claude**: doctor --fix protocol block sync (human approved)
-- 🔒 **.codex/AGENTS.md** - Locked by **@claude**: doctor --fix protocol block sync
-- 🔒 **.gemini/GEMINI.md** - Locked by **@claude**: doctor --fix protocol block sync
-- 🔒 **.agy/AGENTS.md** - Locked by **@claude**: doctor --fix protocol block sync
-- 🔒 **_NEXUS.md** - Locked by **@claude**: commit idle blackboard state
+- 🔒 **_NEXUS.md** - Locked by **@claude**: commit idle blackboard before 1.4.0 merge
