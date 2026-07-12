@@ -468,6 +468,12 @@ Stale detection assumes dead agents go quiet, but a stuck loop agent keeps its l
 
 `progressAwareStale` (default `true`) makes staleness itself progress-aware: a lock is stale only when it is past `staleThreshold` **and** shows no progress signal within the window, so a long legitimate work session with moving content survives claim-time auto-breaks and `nexus clean --stale`. A silent old lock sweeps exactly as before. Set it to `false` to restore pure age-based staleness; `nexus doctor` always reports which mode is live. Design and review decisions live in `docs/loop-progress-signals.md`.
 
+#### Soft claim TTL
+
+Progress signals can be *agent-level* (a recent release anywhere keeps all of that agent's locks "progressing"), so a forgotten claim can ride a busy agent indefinitely while other agents wait. `claimTtl` (seconds, default `7200`) is a soft visibility threshold: past it, `nexus status` tags the lock `⏰ OVERDUE` and `nexus doctor` raises a non-ok Locks finding naming the owner — other agents see a hogged path without going looking.
+
+`claimTtlAutoRelease` (default `false`) additionally lets sweeps (claim-time auto-break, `nexus clean --stale`) break an overdue lock, but only when the claimed file's content has not moved since claim (same blob) — path-local work always protects a lock, and directory or new-path claims are never TTL-swept because they cannot prove idleness.
+
 ### `nexus standup "<dated message>"`
 
 Append a validated standup line to `_NEXUS_STANDUP.md`.
